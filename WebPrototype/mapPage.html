@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script
+src="http://maps.googleapis.com/maps/api/js">
+</script>
+
+<script>
+function initialize() {
+  var mapProp = {
+    center:new google.maps.LatLng(49.882114,-119.477829),
+    zoom:12,
+    mapTypeId:google.maps.MapTypeId.ROADMAP
+  };
+  var map=new google.maps.Map(document.getElementById("googleMap"), mapProp);
+}
+google.maps.event.addDomListener(window, 'load', initialize);
+</script>
+</head>
+
+<body>
+<h2  class="text-center">Majik Bus- Kelowna, BC</h2>
+<div id="googleMap" style="width:1000px;height:500px;"></div>
+ 	&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
+    <div class="form-group">
+      <label for="route">Bus Route: </label>
+      <input type="route" class="form-control" id="route" placeholder="Enter Bus Route: ">
+    </div>
+
+</body>
+</html>
