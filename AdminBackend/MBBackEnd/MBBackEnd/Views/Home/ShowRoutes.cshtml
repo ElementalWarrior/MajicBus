@@ -1,0 +1,40 @@
+﻿@* we need to define the data this view takes, this comes from the "return View(data)" line in the controller *@
+@model List<MBBackEnd.Models.RouteView>
+
+@* we can then access the data through the "Model" object, notice the capitol M vs m in the line above *@
+@* one defines which type to use, and one accesses it *@
+
+<table>
+    <thead>
+        <tr>
+            <td>RouteID</td>
+            <td>Name</td>
+            <td>Name Short</td>
+            <td>Description</td>
+            <td>Date Created</td>
+        </tr>
+    </thead>
+
+    @* this is a razor file, its mixed html with server logic. *@
+    @* it is an interpreted file, IE compiled when needed, you can insert server logic with @ or @{} *@
+    @foreach (MBBackEnd.Models.RouteView route in Model)
+    {
+        <tr>
+            <td>
+                @route.RouteID
+            </td>
+            <td>
+                @route.NameLong
+            </td>
+            <td>
+                @route.NameShort
+            </td>
+            <td>
+                @route.Description
+            </td>
+            <td>
+                @route.dtCreated
+            </td>
+        </tr>
+    }
+</table>
