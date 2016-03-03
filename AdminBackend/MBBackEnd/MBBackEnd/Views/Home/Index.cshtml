@@ -1,33 +1,77 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-    <title>Simple Map</title>
-    <meta name="viewport" content="initial-scale=1.0">
-    <meta charset="utf-8">
-    <style>
-        html, body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-        }
+    <script src="http://maps.googleapis.com/maps/api/js">
+    </script>
+    <script>
+function initialize() {
+  var mapProp = {
+    center:new google.maps.LatLng(49.882114,-119.477829),
+    zoom:12,
+    mapTypeId:google.maps.MapTypeId.ROADMAP
+  };
+  var map = new google.maps.Map(document.getElementById("googleMap"), mapProp);
+  setMarkers(map);
+}
+google.maps.event.addDomListener(window, 'load', initialize);
 
-        #map {
-            height: 100%;
-        }
-    </style>
+// Data for the markers consisting of a name, a LatLng and a zIndex for the
+// order in which these markers should display on top of each other.
+var busStops = [
+  ['UBCO Exchange Bay C', 49.9392503, -119.3968606, 4],
+  ['Stop ID: 103438', 49.923892, -119.3859375, 5],
+  ['Stop ID: 103409', 49.9159614, -119.3885974, 3],
+  ['Stop ID: 103392', 49.9065665, -119.3872178, 2],
+  ['Stop ID: 103382', 49.9007155, -119.3867892, 1]
+];
+
+function setMarkers(map) {
+    // Adds markers to the map.
+
+    // Marker sizes are expressed as a Size of X,Y where the origin of the image
+    // (0,0) is located in the top left of the image.
+
+    // Origins, anchor positions and coordinates of the marker increase in the X
+    // direction to the right and in the Y direction down.
+    var image = {
+        url: 'http://i.imgur.com/qyMqRlM.png',
+        // This marker is 20 pixels wide by 32 pixels high.
+        size: new google.maps.Size(20, 32),
+        // The origin for this image is (0, 0).
+        origin: new google.maps.Point(0, 0),
+        // The anchor for this image is the base of the flagpole at (0, 32).
+        anchor: new google.maps.Point(0, 32)
+    };
+    // Shapes define the clickable region of the icon. The type defines an HTML
+    // <area> element 'poly' which traces out a polygon as a series of X,Y points.
+    // The final coordinate closes the poly by connecting to the first coordinate.
+    var shape = {
+        coords: [1, 1, 1, 20, 18, 20, 18, 1],
+        type: 'poly'
+    };
+    for (var i = 0; i < busStops.length; i++) {
+        var busStop = busStops[i];
+        var marker = new google.maps.Marker({
+            position: { lat: busStop[1], lng: busStop[2] },
+            map: map,
+            icon: image,
+            shape: shape,
+            title: busStop[0],
+            zIndex: busStop[3]
+        });
+    }
+}
+
+
+    </script>
 </head>
 <body>
-    <div id="map"></div>
-    <script>
-      var map;
-      function initMap() {
-        map = new google.maps.Map(document.getElementById('map'), {
-          center: {lat: -34.397, lng: 150.644},
-          zoom: 8
-        });
-      }
-    </script>
-    <script src="https://maps.googleapis.com/maps/api/js?&callback=initMap"
-            async defer></script>
+    <h2 class="text-center">Majic Bus- Kelowna, BC</h2>
+    <div id="googleMap" style="width:1000px;height:500px;"></div>
+    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+    <div class="form-group">
+        <label for="route">Bus Route: </label>
+        <input type="route" class="form-control" id="route" placeholder="Enter Bus Route: ">
+    </div>
 </body>
 </html>
