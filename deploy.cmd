@@ -1,3 +1,5 @@
 @echo off
 echo Deploying files...
-xcopy %DEPLOYMENT_SOURCE% %DEPLOYMENT_TARGET% /Y /E
+echo %DEPLOYMENT_SOURCE%
+echo %DEPLOYMENT_TARGET%
+xcopy %DEPLOYMENT_SOURCE% %DEPLOYMENT_TARGET% /Y /E /D
