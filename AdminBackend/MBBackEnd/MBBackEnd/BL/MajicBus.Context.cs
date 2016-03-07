@@ -25,11 +25,11 @@ namespace MBBackEnd.BL
             throw new UnintentionalCodeFirstException();
         }
     
+        public virtual DbSet<Calendar> Calendars { get; set; }
+        public virtual DbSet<RouteShape> RouteShapes { get; set; }
         public virtual DbSet<Route> Routes { get; set; }
         public virtual DbSet<Stop> Stops { get; set; }
         public virtual DbSet<StopTime> StopTimes { get; set; }
         public virtual DbSet<Trip> Trips { get; set; }
-        public virtual DbSet<Calendar> Calendars { get; set; }
-        public virtual DbSet<RouteShape> RouteShapes { get; set; }
     }
 }
