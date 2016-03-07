@@ -21,7 +21,6 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
             Button btn = (Button)findViewById(R.id.MapBtn);
-
             btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -1,3 +1,5 @@
+<!-- Table headings: Date Sent (use Datetime) | Date received (use Datetime) | From (number) | To (number) | message body ...OVERVIEW: Total received texts, Total sent texts, Most common bus stop -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,25 +15,72 @@
 </head>
 <body>
  
-
+<!--TITLE-->
 <div class="container">
-  <h2  class="text-center" >Admin page</h2>
-  <h3 class= "text-center" >Hello Admin, these are today's results :) </h3>
+  <h2  class="text-center" ><strong><u>Admin page</strong></u></h2>
 
-  <h3> Date: 2016/02/23 </h3> 
-  	&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
+<!--DATE-->
+<footer class="footer navbar-fixed-top">
+     <div class="container">
+	 	<p> Date: 2016/02/23 </p>
+     </div>
+</footer>
 
-  <ul class="list-inline">
+<!--different options of how to look at the collected data-->
+<ul class="nav nav-tabs">
+  <li role="presentation" class="active"><a href="#">Daily</a></li>
+  <li role="presentation"><a href="#">Weekly</a></li>
+  <li role="presentation"><a href="#">Monthly</a></li>
+</ul>
+  
+<!--Table-->
+ <div class="container">          
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Date Sent</th>
+		<th>Date Received</th>
+		<th>Received From</th>
+		<th>Sent to</th>
+		<th>Message</th>
+      </tr>
+    </thead>
 
-    <li><a href="#">Daily Results</a></li>
-    <li><a href="#">Weekly</a></li>
-    <li><a href="#">Monthly</a></li>
-    
-  </ul>
+    <tbody>
+     <tr>
+        <td>016/02/23</td>
+        <td>016/02/23</td>
+        <td>250-889-4526</td>
+		<td>250-778-2877</td>
+		<td>GIMME THE BUS TIMES!!!!</td>
+     </tr>
+	   <tr>
+        <td>016/02/24</td>
+        <td>016/02/24</td>
+        <td>250-655-7584</td>
+		<td>250-778-2877</td>
+		<td>BLEH</td>
+     </tr>
+	 <tr>
+        <td>016/01/16</td>
+        <td>016/01/16</td>
+        <td>250-165-0026</td>
+		<td>250-778-2877</td>
+		<td>This is a nice table :)</td>
+     </tr>
+	  </body>
+  </table>
+</div>
 
-  <h3> Number of Texts Received: 234 </h3>
-  <h3> Number of Texts Received: 234 </h3> 
-  <h3> Most stops texted from (Bus Id): 2342423 </h3> 
+<!--summary on each page -->
+<div class="navbar-fixed-bottom row-fluid">
+    <div class="container">
+      	<p> Number of Texts Received: 234 </p>
+		<p> Number of Texts Sent: 234 </p> 
+		<p> Most popular bus stop (Bus Id): 2342423 </p> 
+  </div>
+</div>
+
 
   </form>
 </div>
