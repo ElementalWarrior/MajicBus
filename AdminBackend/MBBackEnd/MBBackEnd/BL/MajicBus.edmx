@@ -1,0 +1,320 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="BL.Model.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012.Azure" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'mbdev01.dbo.Calendar' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="Calendar">
+          <Key>
+            <PropertyRef Name="dtStartDate" />
+            <PropertyRef Name="dtEndDate" />
+            <PropertyRef Name="Monday" />
+            <PropertyRef Name="Tuesday" />
+            <PropertyRef Name="Wednesday" />
+            <PropertyRef Name="Thursday" />
+            <PropertyRef Name="Friday" />
+            <PropertyRef Name="Saturday" />
+            <PropertyRef Name="Sunday" />
+          </Key>
+          <Property Name="CalendarID" Type="varchar" MaxLength="50" />
+          <Property Name="dtStartDate" Type="datetime" Nullable="false" />
+          <Property Name="dtEndDate" Type="datetime" Nullable="false" />
+          <Property Name="Monday" Type="bit" Nullable="false" />
+          <Property Name="Tuesday" Type="bit" Nullable="false" />
+          <Property Name="Wednesday" Type="bit" Nullable="false" />
+          <Property Name="Thursday" Type="bit" Nullable="false" />
+          <Property Name="Friday" Type="bit" Nullable="false" />
+          <Property Name="Saturday" Type="bit" Nullable="false" />
+          <Property Name="Sunday" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Routes">
+          <Key>
+            <PropertyRef Name="RouteID" />
+          </Key>
+          <Property Name="RouteID" Type="int" Nullable="false" />
+          <Property Name="NameShort" Type="varchar" MaxLength="30" />
+          <Property Name="NameLong" Type="varchar" MaxLength="100" />
+          <Property Name="Description" Type="varchar" MaxLength="200" />
+          <Property Name="dtCreated" Type="datetime" Nullable="false" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'mbdev01.dbo.RouteShapes' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="RouteShapes">
+          <Key>
+            <PropertyRef Name="RouteShapeID" />
+          </Key>
+          <Property Name="RouteShapeID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="RouteID" Type="int" />
+          <Property Name="Lon" Type="decimal" Precision="19" Scale="16" />
+          <Property Name="Lat" Type="decimal" Precision="19" Scale="16" />
+          <Property Name="SortID" Type="int" />
+          <Property Name="dtCreated" Type="datetime" />
+        </EntityType>
+        <EntityType Name="Stops">
+          <Key>
+            <PropertyRef Name="StopID" />
+          </Key>
+          <Property Name="StopID" Type="int" Nullable="false" />
+          <Property Name="StopName" Type="varchar" MaxLength="100" />
+          <Property Name="StopNameShort" Type="varchar" MaxLength="100" />
+          <Property Name="Lat" Type="decimal" Precision="19" Scale="16" />
+          <Property Name="Lon" Type="decimal" Precision="19" Scale="16" />
+          <Property Name="dtCreated" Type="datetime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="StopTimes">
+          <Key>
+            <PropertyRef Name="TripID" />
+            <PropertyRef Name="StopID" />
+            <PropertyRef Name="dtDeparture" />
+          </Key>
+          <Property Name="TripID" Type="int" Nullable="false" />
+          <Property Name="StopID" Type="int" Nullable="false" />
+          <Property Name="dtArrival" Type="varchar" MaxLength="8" />
+          <Property Name="dtDeparture" Type="varchar" MaxLength="8" Nullable="false" />
+          <Property Name="SortID" Type="int" />
+          <Property Name="dtCreated" Type="datetime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Trips">
+          <Key>
+            <PropertyRef Name="TripID" />
+          </Key>
+          <Property Name="TripID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ShapeID" Type="int" />
+          <Property Name="RouteID" Type="int" />
+          <Property Name="SortID" Type="int" />
+          <Property Name="Direction" Type="int" />
+          <Property Name="dtCreated" Type="datetime" Nullable="false" />
+          <Property Name="CalendarID" Type="varchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <EntityContainer Name="BLModelStoreContainer">
+          <EntitySet Name="Routes" EntityType="Self.Routes" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Stops" EntityType="Self.Stops" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="StopTimes" EntityType="Self.StopTimes" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Trips" EntityType="Self.Trips" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Calendar" EntityType="Self.Calendar" store:Type="Tables" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [Calendar].[CalendarID] AS [CalendarID], 
+    [Calendar].[dtStartDate] AS [dtStartDate], 
+    [Calendar].[dtEndDate] AS [dtEndDate], 
+    [Calendar].[Monday] AS [Monday], 
+    [Calendar].[Tuesday] AS [Tuesday], 
+    [Calendar].[Wednesday] AS [Wednesday], 
+    [Calendar].[Thursday] AS [Thursday], 
+    [Calendar].[Friday] AS [Friday], 
+    [Calendar].[Saturday] AS [Saturday], 
+    [Calendar].[Sunday] AS [Sunday]
+    FROM [dbo].[Calendar] AS [Calendar]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="RouteShapes" EntityType="Self.RouteShapes" store:Type="Tables" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [RouteShapes].[RouteShapeID] AS [RouteShapeID], 
+    [RouteShapes].[RouteID] AS [RouteID], 
+    [RouteShapes].[Lon] AS [Lon], 
+    [RouteShapes].[Lat] AS [Lat], 
+    [RouteShapes].[SortID] AS [SortID], 
+    [RouteShapes].[dtCreated] AS [dtCreated]
+    FROM [dbo].[RouteShapes] AS [RouteShapes]</DefiningQuery>
+          </EntitySet>
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="BL.Model" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="Route">
+          <Key>
+            <PropertyRef Name="RouteID" />
+          </Key>
+          <Property Name="RouteID" Type="Int32" Nullable="false" />
+          <Property Name="NameShort" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="NameLong" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="Description" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="dtCreated" Type="DateTime" Nullable="false" Precision="3" />
+        </EntityType>
+        <EntityType Name="Stop">
+          <Key>
+            <PropertyRef Name="StopID" />
+          </Key>
+          <Property Name="StopID" Type="Int32" Nullable="false" />
+          <Property Name="StopName" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="StopNameShort" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="Lat" Type="Decimal" Precision="19" Scale="16" />
+          <Property Name="Lon" Type="Decimal" Precision="19" Scale="16" />
+          <Property Name="dtCreated" Type="DateTime" Nullable="false" Precision="3" />
+        </EntityType>
+        <EntityType Name="StopTime">
+          <Key>
+            <PropertyRef Name="TripID" />
+            <PropertyRef Name="StopID" />
+            <PropertyRef Name="dtDeparture" />
+          </Key>
+          <Property Name="TripID" Type="Int32" Nullable="false" />
+          <Property Name="StopID" Type="Int32" Nullable="false" />
+          <Property Name="dtArrival" Type="String" MaxLength="8" FixedLength="false" Unicode="false" />
+          <Property Name="dtDeparture" Type="String" MaxLength="8" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="SortID" Type="Int32" />
+          <Property Name="dtCreated" Type="DateTime" Nullable="false" Precision="3" />
+        </EntityType>
+        <EntityType Name="Trip">
+          <Key>
+            <PropertyRef Name="TripID" />
+          </Key>
+          <Property Name="TripID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ShapeID" Type="Int32" />
+          <Property Name="RouteID" Type="Int32" />
+          <Property Name="SortID" Type="Int32" />
+          <Property Name="Direction" Type="Int32" />
+          <Property Name="dtCreated" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="CalendarID" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Calendar">
+          <Key>
+            <PropertyRef Name="dtStartDate" />
+            <PropertyRef Name="dtEndDate" />
+            <PropertyRef Name="Monday" />
+            <PropertyRef Name="Tuesday" />
+            <PropertyRef Name="Wednesday" />
+            <PropertyRef Name="Thursday" />
+            <PropertyRef Name="Friday" />
+            <PropertyRef Name="Saturday" />
+            <PropertyRef Name="Sunday" />
+          </Key>
+          <Property Name="CalendarID" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="dtStartDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="dtEndDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="Monday" Type="Boolean" Nullable="false" />
+          <Property Name="Tuesday" Type="Boolean" Nullable="false" />
+          <Property Name="Wednesday" Type="Boolean" Nullable="false" />
+          <Property Name="Thursday" Type="Boolean" Nullable="false" />
+          <Property Name="Friday" Type="Boolean" Nullable="false" />
+          <Property Name="Saturday" Type="Boolean" Nullable="false" />
+          <Property Name="Sunday" Type="Boolean" Nullable="false" />
+        </EntityType>
+        <EntityType Name="RouteShape">
+          <Key>
+            <PropertyRef Name="RouteShapeID" />
+          </Key>
+          <Property Name="RouteShapeID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="RouteID" Type="Int32" />
+          <Property Name="Lon" Type="Decimal" Precision="19" Scale="16" />
+          <Property Name="Lat" Type="Decimal" Precision="19" Scale="16" />
+          <Property Name="SortID" Type="Int32" />
+          <Property Name="dtCreated" Type="DateTime" Precision="3" />
+        </EntityType>
+        <EntityContainer Name="MajicBusEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Routes" EntityType="Self.Route" />
+          <EntitySet Name="Stops" EntityType="Self.Stop" />
+          <EntitySet Name="StopTimes" EntityType="Self.StopTime" />
+          <EntitySet Name="Trips" EntityType="Self.Trip" />
+          <EntitySet Name="Calendars" EntityType="Self.Calendar" />
+          <EntitySet Name="RouteShapes" EntityType="Self.RouteShape" />
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="BLModelStoreContainer" CdmEntityContainer="MajicBusEntities">
+          <EntitySetMapping Name="Routes">
+            <EntityTypeMapping TypeName="BL.Model.Route">
+              <MappingFragment StoreEntitySet="Routes">
+                <ScalarProperty Name="RouteID" ColumnName="RouteID" />
+                <ScalarProperty Name="NameShort" ColumnName="NameShort" />
+                <ScalarProperty Name="NameLong" ColumnName="NameLong" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="dtCreated" ColumnName="dtCreated" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Stops">
+            <EntityTypeMapping TypeName="BL.Model.Stop">
+              <MappingFragment StoreEntitySet="Stops">
+                <ScalarProperty Name="StopID" ColumnName="StopID" />
+                <ScalarProperty Name="StopName" ColumnName="StopName" />
+                <ScalarProperty Name="StopNameShort" ColumnName="StopNameShort" />
+                <ScalarProperty Name="Lat" ColumnName="Lat" />
+                <ScalarProperty Name="Lon" ColumnName="Lon" />
+                <ScalarProperty Name="dtCreated" ColumnName="dtCreated" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="StopTimes">
+            <EntityTypeMapping TypeName="BL.Model.StopTime">
+              <MappingFragment StoreEntitySet="StopTimes">
+                <ScalarProperty Name="TripID" ColumnName="TripID" />
+                <ScalarProperty Name="StopID" ColumnName="StopID" />
+                <ScalarProperty Name="dtArrival" ColumnName="dtArrival" />
+                <ScalarProperty Name="dtDeparture" ColumnName="dtDeparture" />
+                <ScalarProperty Name="SortID" ColumnName="SortID" />
+                <ScalarProperty Name="dtCreated" ColumnName="dtCreated" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Trips">
+            <EntityTypeMapping TypeName="BL.Model.Trip">
+              <MappingFragment StoreEntitySet="Trips">
+                <ScalarProperty Name="TripID" ColumnName="TripID" />
+                <ScalarProperty Name="ShapeID" ColumnName="ShapeID" />
+                <ScalarProperty Name="RouteID" ColumnName="RouteID" />
+                <ScalarProperty Name="SortID" ColumnName="SortID" />
+                <ScalarProperty Name="Direction" ColumnName="Direction" />
+                <ScalarProperty Name="dtCreated" ColumnName="dtCreated" />
+                <ScalarProperty Name="CalendarID" ColumnName="CalendarID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Calendars">
+            <EntityTypeMapping TypeName="BL.Model.Calendar">
+              <MappingFragment StoreEntitySet="Calendar">
+                <ScalarProperty Name="CalendarID" ColumnName="CalendarID" />
+                <ScalarProperty Name="dtStartDate" ColumnName="dtStartDate" />
+                <ScalarProperty Name="dtEndDate" ColumnName="dtEndDate" />
+                <ScalarProperty Name="Monday" ColumnName="Monday" />
+                <ScalarProperty Name="Tuesday" ColumnName="Tuesday" />
+                <ScalarProperty Name="Wednesday" ColumnName="Wednesday" />
+                <ScalarProperty Name="Thursday" ColumnName="Thursday" />
+                <ScalarProperty Name="Friday" ColumnName="Friday" />
+                <ScalarProperty Name="Saturday" ColumnName="Saturday" />
+                <ScalarProperty Name="Sunday" ColumnName="Sunday" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="RouteShapes">
+            <EntityTypeMapping TypeName="BL.Model.RouteShape">
+              <MappingFragment StoreEntitySet="RouteShapes">
+                <ScalarProperty Name="RouteShapeID" ColumnName="RouteShapeID" />
+                <ScalarProperty Name="RouteID" ColumnName="RouteID" />
+                <ScalarProperty Name="Lon" ColumnName="Lon" />
+                <ScalarProperty Name="Lat" ColumnName="Lat" />
+                <ScalarProperty Name="SortID" ColumnName="SortID" />
+                <ScalarProperty Name="dtCreated" ColumnName="dtCreated" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
