@@ -12,17 +12,17 @@ function initialize() {
   };
   var map = new google.maps.Map(document.getElementById("googleMap"), mapProp);
   setMarkers(map);
+
+
 }
 google.maps.event.addDomListener(window, 'load', initialize);
 
 // Data for the markers consisting of a name, a LatLng and a zIndex for the
 // order in which these markers should display on top of each other.
 var busStops = [
-  ['UBCO Exchange Bay C', 49.9392503, -119.3968606, 4],
-  ['Stop ID: 103438', 49.923892, -119.3859375, 5],
-  ['Stop ID: 103409', 49.9159614, -119.3885974, 3],
-  ['Stop ID: 103392', 49.9065665, -119.3872178, 2],
-  ['Stop ID: 103382', 49.9007155, -119.3867892, 1]
+ 
+
+
 ];
 
 function setMarkers(map) {
@@ -62,6 +62,9 @@ function setMarkers(map) {
     }
 }
 
+        
+    
+      
 
     </script>
 </head>
