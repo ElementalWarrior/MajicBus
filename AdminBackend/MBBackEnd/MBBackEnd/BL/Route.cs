@@ -14,10 +14,17 @@ namespace MBBackEnd.BL
     
     public partial class Route
     {
+        public Route()
+        {
+            this.Trips = new HashSet<Trip>();
+        }
+    
         public int RouteID { get; set; }
         public string NameShort { get; set; }
         public string NameLong { get; set; }
         public string Description { get; set; }
         public System.DateTime dtCreated { get; set; }
+    
+        public virtual ICollection<Trip> Trips { get; set; }
     }
 }

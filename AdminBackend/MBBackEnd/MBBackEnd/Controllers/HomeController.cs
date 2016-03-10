@@ -32,7 +32,8 @@ namespace MBBackEnd.Controllers
                     dtCreated = r.dtCreated,
                     NameLong = r.NameLong,
                     NameShort = r.NameShort,
-                    RouteID = r.RouteID
+                    RouteID = r.RouteID,
+                    TripCount = r.Trips.Count()
                 }).ToList();
 
             //pass this information to the view (Views/Home/ShowRoutes.cshtml)
@@ -41,6 +42,31 @@ namespace MBBackEnd.Controllers
             //or for the api return plain JSON data for the app to render.
             //return Json(viewRoutes, JsonRequestBehavior.AllowGet);
         }
+
+        public ActionResult ShowStops()
+        {
+
+            List<BL.Stop> stops = BL.Route.GetStopsByRouteID(97);
+
+            //we want to abstract the information away from the database schema into the view
+            //schema therefore we create "View Models" inside the Models folder and convert the 
+            //data into those classes
+            List<Models.StopView> viewStops = stops.Select(r => new Models.StopView
+            {
+                StopID = r.StopID,
+                lat = r.Lat,
+                lon = r.Lon,
+          
+            }).ToList();
+
+            //pass this information to the view (Views/Home/ShowRoutes.cshtml)
+            return View(viewStops);
+
+            //or for the api return plain JSON data for the app to render.
+            //return Json(viewRoutes, JsonRequestBehavior.AllowGet);
+        }
+
+
 
         public ActionResult About()
         {

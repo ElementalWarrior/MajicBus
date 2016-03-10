@@ -2,4 +2,5 @@
     <string name="app_name">GPSAPP</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_maps">Map</string>
+    <string name="GO_TO_MAPS">Go to Maps</string>
 </resources>
