@@ -14,11 +14,18 @@ namespace MBBackEnd.BL
     
     public partial class Stop
     {
+        public Stop()
+        {
+            this.StopTimes = new HashSet<StopTime>();
+        }
+    
         public int StopID { get; set; }
         public string StopName { get; set; }
         public string StopNameShort { get; set; }
         public Nullable<decimal> Lat { get; set; }
         public Nullable<decimal> Lon { get; set; }
         public System.DateTime dtCreated { get; set; }
+    
+        public virtual ICollection<StopTime> StopTimes { get; set; }
     }
 }

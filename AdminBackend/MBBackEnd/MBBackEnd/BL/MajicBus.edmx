@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="BL.Model.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012.Azure" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="BL.Model.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012.Azure" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <!--Errors Found During Generation:
 warning 6002: The table/view 'mbdev01.dbo.Calendar' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="Calendar">
@@ -89,6 +89,42 @@ warning 6002: The table/view 'mbdev01.dbo.RouteShapes' does not have a primary k
           <Property Name="dtCreated" Type="datetime" Nullable="false" />
           <Property Name="CalendarID" Type="varchar" MaxLength="50" Nullable="false" />
         </EntityType>
+        <Association Name="fkStopTimesStopID">
+          <End Role="Stops" Type="Self.Stops" Multiplicity="1" />
+          <End Role="StopTimes" Type="Self.StopTimes" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Stops">
+              <PropertyRef Name="StopID" />
+            </Principal>
+            <Dependent Role="StopTimes">
+              <PropertyRef Name="StopID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="fkStopTimesTripID">
+          <End Role="Trips" Type="Self.Trips" Multiplicity="1" />
+          <End Role="StopTimes" Type="Self.StopTimes" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Trips">
+              <PropertyRef Name="TripID" />
+            </Principal>
+            <Dependent Role="StopTimes">
+              <PropertyRef Name="TripID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="fkTripsRouteID">
+          <End Role="Routes" Type="Self.Routes" Multiplicity="0..1" />
+          <End Role="Trips" Type="Self.Trips" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Routes">
+              <PropertyRef Name="RouteID" />
+            </Principal>
+            <Dependent Role="Trips">
+              <PropertyRef Name="RouteID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <EntityContainer Name="BLModelStoreContainer">
           <EntitySet Name="Routes" EntityType="Self.Routes" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Stops" EntityType="Self.Stops" Schema="dbo" store:Type="Tables" />
@@ -118,58 +154,23 @@ warning 6002: The table/view 'mbdev01.dbo.RouteShapes' does not have a primary k
     [RouteShapes].[dtCreated] AS [dtCreated]
     FROM [dbo].[RouteShapes] AS [RouteShapes]</DefiningQuery>
           </EntitySet>
+          <AssociationSet Name="fkStopTimesStopID" Association="Self.fkStopTimesStopID">
+            <End Role="Stops" EntitySet="Stops" />
+            <End Role="StopTimes" EntitySet="StopTimes" />
+          </AssociationSet>
+          <AssociationSet Name="fkStopTimesTripID" Association="Self.fkStopTimesTripID">
+            <End Role="Trips" EntitySet="Trips" />
+            <End Role="StopTimes" EntitySet="StopTimes" />
+          </AssociationSet>
+          <AssociationSet Name="fkTripsRouteID" Association="Self.fkTripsRouteID">
+            <End Role="Routes" EntitySet="Routes" />
+            <End Role="Trips" EntitySet="Trips" />
+          </AssociationSet>
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="BL.Model" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
-        <EntityType Name="Route">
-          <Key>
-            <PropertyRef Name="RouteID" />
-          </Key>
-          <Property Name="RouteID" Type="Int32" Nullable="false" />
-          <Property Name="NameShort" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
-          <Property Name="NameLong" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
-          <Property Name="Description" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
-          <Property Name="dtCreated" Type="DateTime" Nullable="false" Precision="3" />
-        </EntityType>
-        <EntityType Name="Stop">
-          <Key>
-            <PropertyRef Name="StopID" />
-          </Key>
-          <Property Name="StopID" Type="Int32" Nullable="false" />
-          <Property Name="StopName" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
-          <Property Name="StopNameShort" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
-          <Property Name="Lat" Type="Decimal" Precision="19" Scale="16" />
-          <Property Name="Lon" Type="Decimal" Precision="19" Scale="16" />
-          <Property Name="dtCreated" Type="DateTime" Nullable="false" Precision="3" />
-        </EntityType>
-        <EntityType Name="StopTime">
-          <Key>
-            <PropertyRef Name="TripID" />
-            <PropertyRef Name="StopID" />
-            <PropertyRef Name="dtDeparture" />
-          </Key>
-          <Property Name="TripID" Type="Int32" Nullable="false" />
-          <Property Name="StopID" Type="Int32" Nullable="false" />
-          <Property Name="dtArrival" Type="String" MaxLength="8" FixedLength="false" Unicode="false" />
-          <Property Name="dtDeparture" Type="String" MaxLength="8" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="SortID" Type="Int32" />
-          <Property Name="dtCreated" Type="DateTime" Nullable="false" Precision="3" />
-        </EntityType>
-        <EntityType Name="Trip">
-          <Key>
-            <PropertyRef Name="TripID" />
-          </Key>
-          <Property Name="TripID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="ShapeID" Type="Int32" />
-          <Property Name="RouteID" Type="Int32" />
-          <Property Name="SortID" Type="Int32" />
-          <Property Name="Direction" Type="Int32" />
-          <Property Name="dtCreated" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="CalendarID" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
-        </EntityType>
         <EntityType Name="Calendar">
           <Key>
             <PropertyRef Name="dtStartDate" />
@@ -205,67 +206,119 @@ warning 6002: The table/view 'mbdev01.dbo.RouteShapes' does not have a primary k
           <Property Name="dtCreated" Type="DateTime" Precision="3" />
         </EntityType>
         <EntityContainer Name="MajicBusEntities" annotation:LazyLoadingEnabled="true">
-          <EntitySet Name="Routes" EntityType="Self.Route" />
-          <EntitySet Name="Stops" EntityType="Self.Stop" />
-          <EntitySet Name="StopTimes" EntityType="Self.StopTime" />
-          <EntitySet Name="Trips" EntityType="Self.Trip" />
           <EntitySet Name="Calendars" EntityType="Self.Calendar" />
           <EntitySet Name="RouteShapes" EntityType="Self.RouteShape" />
+          <EntitySet Name="Routes" EntityType="BL.Model.Route" />
+          <EntitySet Name="Stops" EntityType="BL.Model.Stop" />
+          <EntitySet Name="StopTimes" EntityType="BL.Model.StopTime" />
+          <EntitySet Name="Trips" EntityType="BL.Model.Trip" />
+          <AssociationSet Name="fkTripsRouteID" Association="BL.Model.fkTripsRouteID">
+            <End Role="Route" EntitySet="Routes" />
+            <End Role="Trip" EntitySet="Trips" />
+          </AssociationSet>
+          <AssociationSet Name="fkStopTimesStopID" Association="BL.Model.fkStopTimesStopID">
+            <End Role="Stop" EntitySet="Stops" />
+            <End Role="StopTime" EntitySet="StopTimes" />
+          </AssociationSet>
+          <AssociationSet Name="fkStopTimesTripID" Association="BL.Model.fkStopTimesTripID">
+            <End Role="Trip" EntitySet="Trips" />
+            <End Role="StopTime" EntitySet="StopTimes" />
+          </AssociationSet>
         </EntityContainer>
+        <EntityType Name="Route">
+          <Key>
+            <PropertyRef Name="RouteID" />
+          </Key>
+          <Property Name="RouteID" Type="Int32" Nullable="false" />
+          <Property Name="NameShort" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="NameLong" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="Description" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="dtCreated" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="Trips" Relationship="BL.Model.fkTripsRouteID" FromRole="Route" ToRole="Trip" />
+        </EntityType>
+        <EntityType Name="Stop">
+          <Key>
+            <PropertyRef Name="StopID" />
+          </Key>
+          <Property Name="StopID" Type="Int32" Nullable="false" />
+          <Property Name="StopName" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="StopNameShort" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="Lat" Type="Decimal" Precision="19" Scale="16" />
+          <Property Name="Lon" Type="Decimal" Precision="19" Scale="16" />
+          <Property Name="dtCreated" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="StopTimes" Relationship="BL.Model.fkStopTimesStopID" FromRole="Stop" ToRole="StopTime" />
+        </EntityType>
+        <EntityType Name="StopTime">
+          <Key>
+            <PropertyRef Name="TripID" />
+            <PropertyRef Name="StopID" />
+            <PropertyRef Name="dtDeparture" />
+          </Key>
+          <Property Name="TripID" Type="Int32" Nullable="false" />
+          <Property Name="StopID" Type="Int32" Nullable="false" />
+          <Property Name="dtArrival" Type="String" MaxLength="8" FixedLength="false" Unicode="false" />
+          <Property Name="dtDeparture" Type="String" Nullable="false" MaxLength="8" FixedLength="false" Unicode="false" />
+          <Property Name="SortID" Type="Int32" />
+          <Property Name="dtCreated" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="Stop" Relationship="BL.Model.fkStopTimesStopID" FromRole="StopTime" ToRole="Stop" />
+          <NavigationProperty Name="Trip" Relationship="BL.Model.fkStopTimesTripID" FromRole="StopTime" ToRole="Trip" />
+        </EntityType>
+        <EntityType Name="Trip">
+          <Key>
+            <PropertyRef Name="TripID" />
+          </Key>
+          <Property Name="TripID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ShapeID" Type="Int32" />
+          <Property Name="RouteID" Type="Int32" />
+          <Property Name="SortID" Type="Int32" />
+          <Property Name="Direction" Type="Int32" />
+          <Property Name="dtCreated" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="CalendarID" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Route" Relationship="BL.Model.fkTripsRouteID" FromRole="Trip" ToRole="Route" />
+          <NavigationProperty Name="StopTimes" Relationship="BL.Model.fkStopTimesTripID" FromRole="Trip" ToRole="StopTime" />
+        </EntityType>
+        <Association Name="fkTripsRouteID">
+          <End Type="BL.Model.Route" Role="Route" Multiplicity="0..1" />
+          <End Type="BL.Model.Trip" Role="Trip" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Route">
+              <PropertyRef Name="RouteID" />
+            </Principal>
+            <Dependent Role="Trip">
+              <PropertyRef Name="RouteID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="fkStopTimesStopID">
+          <End Type="BL.Model.Stop" Role="Stop" Multiplicity="1" />
+          <End Type="BL.Model.StopTime" Role="StopTime" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Stop">
+              <PropertyRef Name="StopID" />
+            </Principal>
+            <Dependent Role="StopTime">
+              <PropertyRef Name="StopID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="fkStopTimesTripID">
+          <End Type="BL.Model.Trip" Role="Trip" Multiplicity="1" />
+          <End Type="BL.Model.StopTime" Role="StopTime" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Trip">
+              <PropertyRef Name="TripID" />
+            </Principal>
+            <Dependent Role="StopTime">
+              <PropertyRef Name="TripID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
         <EntityContainerMapping StorageEntityContainer="BLModelStoreContainer" CdmEntityContainer="MajicBusEntities">
-          <EntitySetMapping Name="Routes">
-            <EntityTypeMapping TypeName="BL.Model.Route">
-              <MappingFragment StoreEntitySet="Routes">
-                <ScalarProperty Name="RouteID" ColumnName="RouteID" />
-                <ScalarProperty Name="NameShort" ColumnName="NameShort" />
-                <ScalarProperty Name="NameLong" ColumnName="NameLong" />
-                <ScalarProperty Name="Description" ColumnName="Description" />
-                <ScalarProperty Name="dtCreated" ColumnName="dtCreated" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Stops">
-            <EntityTypeMapping TypeName="BL.Model.Stop">
-              <MappingFragment StoreEntitySet="Stops">
-                <ScalarProperty Name="StopID" ColumnName="StopID" />
-                <ScalarProperty Name="StopName" ColumnName="StopName" />
-                <ScalarProperty Name="StopNameShort" ColumnName="StopNameShort" />
-                <ScalarProperty Name="Lat" ColumnName="Lat" />
-                <ScalarProperty Name="Lon" ColumnName="Lon" />
-                <ScalarProperty Name="dtCreated" ColumnName="dtCreated" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="StopTimes">
-            <EntityTypeMapping TypeName="BL.Model.StopTime">
-              <MappingFragment StoreEntitySet="StopTimes">
-                <ScalarProperty Name="TripID" ColumnName="TripID" />
-                <ScalarProperty Name="StopID" ColumnName="StopID" />
-                <ScalarProperty Name="dtArrival" ColumnName="dtArrival" />
-                <ScalarProperty Name="dtDeparture" ColumnName="dtDeparture" />
-                <ScalarProperty Name="SortID" ColumnName="SortID" />
-                <ScalarProperty Name="dtCreated" ColumnName="dtCreated" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Trips">
-            <EntityTypeMapping TypeName="BL.Model.Trip">
-              <MappingFragment StoreEntitySet="Trips">
-                <ScalarProperty Name="TripID" ColumnName="TripID" />
-                <ScalarProperty Name="ShapeID" ColumnName="ShapeID" />
-                <ScalarProperty Name="RouteID" ColumnName="RouteID" />
-                <ScalarProperty Name="SortID" ColumnName="SortID" />
-                <ScalarProperty Name="Direction" ColumnName="Direction" />
-                <ScalarProperty Name="dtCreated" ColumnName="dtCreated" />
-                <ScalarProperty Name="CalendarID" ColumnName="CalendarID" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="Calendars">
             <EntityTypeMapping TypeName="BL.Model.Calendar">
               <MappingFragment StoreEntitySet="Calendar">
@@ -291,6 +344,54 @@ warning 6002: The table/view 'mbdev01.dbo.RouteShapes' does not have a primary k
                 <ScalarProperty Name="Lat" ColumnName="Lat" />
                 <ScalarProperty Name="SortID" ColumnName="SortID" />
                 <ScalarProperty Name="dtCreated" ColumnName="dtCreated" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Routes">
+            <EntityTypeMapping TypeName="BL.Model.Route">
+              <MappingFragment StoreEntitySet="Routes">
+                <ScalarProperty Name="dtCreated" ColumnName="dtCreated" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="NameLong" ColumnName="NameLong" />
+                <ScalarProperty Name="NameShort" ColumnName="NameShort" />
+                <ScalarProperty Name="RouteID" ColumnName="RouteID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Stops">
+            <EntityTypeMapping TypeName="BL.Model.Stop">
+              <MappingFragment StoreEntitySet="Stops">
+                <ScalarProperty Name="dtCreated" ColumnName="dtCreated" />
+                <ScalarProperty Name="Lon" ColumnName="Lon" />
+                <ScalarProperty Name="Lat" ColumnName="Lat" />
+                <ScalarProperty Name="StopNameShort" ColumnName="StopNameShort" />
+                <ScalarProperty Name="StopName" ColumnName="StopName" />
+                <ScalarProperty Name="StopID" ColumnName="StopID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="StopTimes">
+            <EntityTypeMapping TypeName="BL.Model.StopTime">
+              <MappingFragment StoreEntitySet="StopTimes">
+                <ScalarProperty Name="dtCreated" ColumnName="dtCreated" />
+                <ScalarProperty Name="SortID" ColumnName="SortID" />
+                <ScalarProperty Name="dtDeparture" ColumnName="dtDeparture" />
+                <ScalarProperty Name="dtArrival" ColumnName="dtArrival" />
+                <ScalarProperty Name="StopID" ColumnName="StopID" />
+                <ScalarProperty Name="TripID" ColumnName="TripID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Trips">
+            <EntityTypeMapping TypeName="BL.Model.Trip">
+              <MappingFragment StoreEntitySet="Trips">
+                <ScalarProperty Name="CalendarID" ColumnName="CalendarID" />
+                <ScalarProperty Name="dtCreated" ColumnName="dtCreated" />
+                <ScalarProperty Name="Direction" ColumnName="Direction" />
+                <ScalarProperty Name="SortID" ColumnName="SortID" />
+                <ScalarProperty Name="RouteID" ColumnName="RouteID" />
+                <ScalarProperty Name="ShapeID" ColumnName="ShapeID" />
+                <ScalarProperty Name="TripID" ColumnName="TripID" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

@@ -32,7 +32,8 @@ namespace MBBackEnd.Controllers
                     dtCreated = r.dtCreated,
                     NameLong = r.NameLong,
                     NameShort = r.NameShort,
-                    RouteID = r.RouteID
+                    RouteID = r.RouteID,
+                    TripCount = r.Trips.Count()
                 }).ToList();
 
             //pass this information to the view (Views/Home/ShowRoutes.cshtml)
