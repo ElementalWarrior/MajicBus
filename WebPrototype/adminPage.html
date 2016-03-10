@@ -9,22 +9,51 @@
   <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
   <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+  <script>
+  
+	function startTime() 
+	{
+		var date = new Date();
+		var time = "";
+		var ampm = "AM";
+		var hour = date.getHours();
+		var min = checkTime(date.getMinutes());
+		var sec = checkTime(date.getSeconds());
+		var day = date.toDateString();
+	
+		if(hour > 12)
+		{
+			hour = hour - 12;
+			ampm = "PM";
+		}
+	
+		time =  day + " - "+ hour + ":" + min + ":" + sec + " " + ampm;
+		document.getElementById('dateId').innerHTML = "" + time;
+		var t = setTimeout(startTime, 500);
+	}
 
+	function checkTime(i) 
+	{
+		if (i < 10) {i = "0" + i};  // add zero in front of numbers < 10
+		return i;
+	}
+  </script>
 
 
 </head>
-<body>
+<body onload = "startTime()">
  
 <!--TITLE-->
 <div class="container">
-  <h2  class="text-center" ><strong><u>Admin page</strong></u></h2>
+  <h2  class="text-center" ><strong><u>Majic Bus Admin page</strong></u></h2>
 
 <!--DATE-->
-<footer class="footer navbar-fixed-top">
+<header class="footer navbar-fixed-top">
      <div class="container">
-	 	<p> Date: 2016/02/23 </p>
+	 	<p id = "dateId">  </p>
      </div>
-</footer>
+</header>
+<!-- $('#tblWeekly').hide() -->
 
 <!--different options of how to look at the collected data-->
 <ul class="nav nav-tabs">
@@ -34,8 +63,78 @@
 </ul>
   
 <!--Table-->
- <div class="container">          
-  <table class="table table-bordered">
+ <div class = "container">          
+  <table id = "tblDaily" class = "table table-bordered">
+    <thead>
+      <tr>
+        <th>Date Sent</th>
+		<th>Date Received</th>
+		<th>Received From</th>
+		<th>Sent to</th>
+		<th>Message</th>
+      </tr>
+    </thead>
+
+    <tbody>
+     <tr>
+        <td>016/02/23</td>
+        <td>016/02/23</td>
+        <td>250-889-4526</td>
+		<td>250-778-2877</td>
+		<td>GIMME THE BUS TIMES!!!!</td>
+     </tr>
+	   <tr>
+        <td>016/02/24</td>
+        <td>016/02/24</td>
+        <td>250-655-7584</td>
+		<td>250-778-2877</td>
+		<td>BLEH</td>
+     </tr>
+	 <tr>
+        <td>016/01/16</td>
+        <td>016/01/16</td>
+        <td>250-165-0026</td>
+		<td>250-778-2877</td>
+		<td>This is a nice table :)</td>
+     </tr>
+	  </body>
+  </table>
+  <table id = "tblWeekly" style="display:none" class = "table table-bordered">
+    <thead>
+      <tr>
+        <th>Date Sent</th>
+		<th>Date Received</th>
+		<th>Received From</th>
+		<th>Sent to</th>
+		<th>Message</th>
+      </tr>
+    </thead>
+
+    <tbody>
+     <tr>
+        <td>016/02/23</td>
+        <td>016/02/23</td>
+        <td>250-889-4526</td>
+		<td>250-778-2877</td>
+		<td>GIMME THE BUS TIMES!!!!</td>
+     </tr>
+	   <tr>
+        <td>016/02/24</td>
+        <td>016/02/24</td>
+        <td>250-655-7584</td>
+		<td>250-778-2877</td>
+		<td>BLEH</td>
+     </tr>
+	 <tr>
+        <td>016/01/16</td>
+        <td>016/01/16</td>
+        <td>250-165-0026</td>
+		<td>250-778-2877</td>
+		<td>This is a nice table :)</td>
+     </tr>
+	  </body>
+  </table>
+  <table id = "tblMonthly" style="display:none" class = "table table-bordered">
     <thead>
       <tr>
         <th>Date Sent</th>
