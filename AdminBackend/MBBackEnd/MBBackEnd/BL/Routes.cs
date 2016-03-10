@@ -18,7 +18,18 @@ namespace MBBackEnd.BL
             return context.Routes.Include("Trips").ToList();
 
         }
-    }
+        //TODO: create stops to return lat / long  and stop ids 
+        public static List<Stop> GetStopsByRouteID(int routeID)
+        { 
+            var context = new MajicBusEntities();
+            return (from r in context.Routes
+                    where r.RouteID == routeID
+                    select r).First().Trips.First().StopTimes.Select(st => st.Stop).ToList();
 
+            
+            
+        }
+    }
+     
 
 }

@@ -23,4 +23,11 @@ namespace MBBackEnd.Models
         public int? Direction { get; set; }
         public DateTime dtCreated { get; set; }
     }
+
+    public class StopView
+    {
+        public int StopID { get; set; }
+        public decimal? lat { get; set; }
+        public decimal? lon { get; set; }
+    }
 }

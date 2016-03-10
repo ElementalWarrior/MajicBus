@@ -6,8 +6,8 @@
     <script src="http://maps.googleapis.com/maps/api/js">
     </script>
     <script>
-        window.busStops = @Newtonsoft.Json.JsonConvert.SerializeObject(Model);
-
+        window.busStops = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model));
+        window.markers = [];
 
         function initialize() {
             var mapProp = {
@@ -16,18 +16,29 @@
                 mapTypeId:google.maps.MapTypeId.ROADMAP
             };
             var map = new google.maps.Map(document.getElementById("googleMap"), mapProp);
-           // setMarkers(map);
+            // setMarkers(map);
 
-            for(var  i=0; i < window.busStops.length; i++)
-                var stop = window.busStops[i];
-            var marker = new google.maps.Marker({
-                position: {lat: stop[1], lng: stop[2]},
-                map: map,
-                icon: image,
-                shape: shape,
-                title: stop[0],
+            var image = {
+                url: 'http://i.imgur.com/qyMqRlM.png',
+                // This marker is 20 pixels wide by 32 pixels high.
+                size: new google.maps.Size(20, 32),
+                // The origin for this image is (0, 0).
+                origin: new google.maps.Point(0, 0),
+                // The anchor for this image is the base of the flagpole at (0, 32).
+                anchor: new google.maps.Point(0, 32)
+            };
             
-            });
+            for(var  i=0; i < window.busStops.length; i++){
+                var stop = window.busStops[i];
+                window.markers.push(new google.maps.Marker({
+                    position: {lat: stop.lat, lng: stop.lon},
+                    map: map,
+                    icon: image,
+                    //shape: shape,
+                    title: stop.RouteID,
+            
+                }));
+            }
         }
         google.maps.event.addDomListener(window, 'load', initialize);
 
