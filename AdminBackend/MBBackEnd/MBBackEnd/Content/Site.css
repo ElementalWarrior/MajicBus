@@ -1,5 +1,4 @@
 ﻿body {
-    padding-top: 50px;
     padding-bottom: 20px;
 }
 
@@ -21,4 +20,45 @@ input,
 select,
 textarea {
     max-width: 280px;
+}
+
+html, body
+{
+    background: #808080;
+}
+header,
+header .container
+{
+    height: 250px;
+}
+header .container
+{
+    position: relative;
+}
+header::before
+{
+    background: #222f2f;
+    box-shadow: inset 0 0 50px 30px rgba(0,0,0,.15);
+    content: "";
+    display: block;
+    height: 300px;
+    position: absolute;
+    width: 100%;
+}
+.navbar
+{
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    left: 0;
+}
+#main
+{
+    position: relative;
+}
+#main .container
+{
+    background: #ffffff;
 }
