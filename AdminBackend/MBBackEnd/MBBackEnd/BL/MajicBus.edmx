@@ -53,6 +53,17 @@ warning 6002: The table/view 'mbdev01.dbo.RouteShapes' does not have a primary k
           <Property Name="SortID" Type="int" />
           <Property Name="dtCreated" Type="datetime" />
         </EntityType>
+        <EntityType Name="SMSLogs">
+          <Key>
+            <PropertyRef Name="SMSLogID" />
+          </Key>
+          <Property Name="SMSLogID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ReceivedFrom" Type="varchar" MaxLength="15" />
+          <Property Name="SentTo" Type="varchar" MaxLength="15" />
+          <Property Name="MessageBody" Type="varchar" MaxLength="160" />
+          <Property Name="dtReceived" Type="datetime" />
+          <Property Name="dtSent" Type="datetime" />
+        </EntityType>
         <EntityType Name="Stops">
           <Key>
             <PropertyRef Name="StopID" />
@@ -127,6 +138,7 @@ warning 6002: The table/view 'mbdev01.dbo.RouteShapes' does not have a primary k
         </Association>
         <EntityContainer Name="BLModelStoreContainer">
           <EntitySet Name="Routes" EntityType="Self.Routes" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="SMSLogs" EntityType="Self.SMSLogs" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Stops" EntityType="Self.Stops" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="StopTimes" EntityType="Self.StopTimes" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Trips" EntityType="Self.Trips" Schema="dbo" store:Type="Tables" />
@@ -224,6 +236,7 @@ warning 6002: The table/view 'mbdev01.dbo.RouteShapes' does not have a primary k
             <End Role="Trip" EntitySet="Trips" />
             <End Role="StopTime" EntitySet="StopTimes" />
           </AssociationSet>
+          <EntitySet Name="SMSLogs" EntityType="BL.Model.SMSLog" />
         </EntityContainer>
         <EntityType Name="Route">
           <Key>
@@ -313,6 +326,17 @@ warning 6002: The table/view 'mbdev01.dbo.RouteShapes' does not have a primary k
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <EntityType Name="SMSLog">
+          <Key>
+            <PropertyRef Name="SMSLogID" />
+          </Key>
+          <Property Name="SMSLogID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ReceivedFrom" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="SentTo" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="MessageBody" Type="String" MaxLength="160" FixedLength="false" Unicode="false" />
+          <Property Name="dtReceived" Type="DateTime" Precision="3" />
+          <Property Name="dtSent" Type="DateTime" Precision="3" />
+        </EntityType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -392,6 +416,18 @@ warning 6002: The table/view 'mbdev01.dbo.RouteShapes' does not have a primary k
                 <ScalarProperty Name="RouteID" ColumnName="RouteID" />
                 <ScalarProperty Name="ShapeID" ColumnName="ShapeID" />
                 <ScalarProperty Name="TripID" ColumnName="TripID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="SMSLogs">
+            <EntityTypeMapping TypeName="BL.Model.SMSLog">
+              <MappingFragment StoreEntitySet="SMSLogs">
+                <ScalarProperty Name="dtSent" ColumnName="dtSent" />
+                <ScalarProperty Name="dtReceived" ColumnName="dtReceived" />
+                <ScalarProperty Name="MessageBody" ColumnName="MessageBody" />
+                <ScalarProperty Name="SentTo" ColumnName="SentTo" />
+                <ScalarProperty Name="ReceivedFrom" ColumnName="ReceivedFrom" />
+                <ScalarProperty Name="SMSLogID" ColumnName="SMSLogID" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
