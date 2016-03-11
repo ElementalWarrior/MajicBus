@@ -31,5 +31,6 @@ namespace MBBackEnd.BL
         public virtual DbSet<Stop> Stops { get; set; }
         public virtual DbSet<StopTime> StopTimes { get; set; }
         public virtual DbSet<Trip> Trips { get; set; }
+        public virtual DbSet<SMSLog> SMSLogs { get; set; }
     }
 }
