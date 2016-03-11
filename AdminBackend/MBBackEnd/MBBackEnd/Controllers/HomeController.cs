@@ -12,7 +12,7 @@ namespace MBBackEnd.Controllers
         {
             return View();
         }
-
+        
         public ActionResult ShowRoutes()
         {
             //get data from the database in the BL folder (BL = Business Logic of the site)
@@ -26,6 +26,8 @@ namespace MBBackEnd.Controllers
             //we want to abstract the information away from the database schema into the view
             //schema therefore we create "View Models" inside the Models folder and convert the 
             //data into those classes
+            
+            //TO DO: Selects all stops 
             List<Models.RouteView> viewRoutes = routes.Select(r => new Models.RouteView
                 {
                     Description = r.Description,
@@ -33,8 +35,15 @@ namespace MBBackEnd.Controllers
                     NameLong = r.NameLong,
                     NameShort = r.NameShort,
                     RouteID = r.RouteID,
-                    TripCount = r.Trips.Count()
-                }).ToList();
+                    TripCount = r.Trips.Count(),
+                    Stops = r.Trips.First().StopTimes.Select(st => st.Stop).Select(s => new Models.StopView
+                    {
+                        StopID = s.StopID,
+                        lat = s.Lat,
+                        lon = s.Lon,
+
+                    }).ToList()
+            }).ToList();
 
             //pass this information to the view (Views/Home/ShowRoutes.cshtml)
             return View(viewRoutes);
@@ -42,6 +51,7 @@ namespace MBBackEnd.Controllers
             //or for the api return plain JSON data for the app to render.
             //return Json(viewRoutes, JsonRequestBehavior.AllowGet);
         }
+      
 
         public ActionResult ShowStops()
         {

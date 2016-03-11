@@ -13,6 +13,7 @@ namespace MBBackEnd.Models
         public string Description { get; set; }
         public DateTime dtCreated { get; set; }
         public int TripCount { get; set; }
+        public List<StopView> Stops { get; set; }
     }
     public class TripView
     {

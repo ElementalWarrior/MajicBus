@@ -15,9 +15,11 @@ namespace MBBackEnd.BL
             //return (from r in context.Routes
             //        join t in context.Trips on r.RouteID equals t.RouteID
             //        select r).Distinct().ToList();
-            return context.Routes.Include("Trips").ToList();
+
+            //
+            return context.Routes.Include("Trips.StopTimes.Stop").ToList();
         }
-        //TODO: create stops to return lat / long  and stop ids 
+     //create stops to return lat / long  and stop ids 
         public static List<Stop> GetStopsByRouteID(int routeID)
         {
             var context = new MajicBusEntities();
