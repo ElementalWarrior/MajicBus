@@ -61,12 +61,37 @@ namespace MBBackEnd.Controllers
 
             //pass this information to the view (Views/Home/ShowRoutes.cshtml)
             return View(viewStops);
-
-            //or for the api return plain JSON data for the app to render.
-            //return Json(viewRoutes, JsonRequestBehavior.AllowGet);
         }
 
+        public ActionResult ShowRoutesJSON()
+        {
+            List<BL.Route> routes = BL.Route.GetRoutes();
+            List<Models.RouteView> viewRoutes = routes.Select(r => new Models.RouteView
+            {
+                Description = r.Description,
+                dtCreated = r.dtCreated,
+                NameLong = r.NameLong,
+                NameShort = r.NameShort,
+                RouteID = r.RouteID,
+                TripCount = r.Trips.Count()
+            }).ToList();
+            //Return plain JSON data for the app to render.
+            return Json(viewRoutes, JsonRequestBehavior.AllowGet);
+        }
 
+        public ActionResult ShowStopsJSON()
+        {
+            List<BL.Stop> stops = BL.Route.GetStopsByRouteID(97);
+            List<Models.StopView> viewStops = stops.Select(r => new Models.StopView
+            {
+                StopID = r.StopID,
+                lat = r.Lat,
+                lon = r.Lon,
+
+            }).ToList();
+            //Return plain JSON data for the app to render.
+            return Json(viewStops, JsonRequestBehavior.AllowGet);
+        }
 
         public ActionResult About()
         {
