@@ -38,14 +38,34 @@
 		return i;
 	}
   </script>
+<script>
+$(document).ready(function(){
+    $('#Daily').click(function(){
+        $('#tblDaily').show();
+		$('#tblWeekly').hide();
+		$('#tblMonthly').hide();
+    });
+    $('#Weekly').click(function(){
+		$('#tblDaily').hide();
+		$('#tblMonthly').hide();
+        $('#tblWeekly').show();
+    });
+	$('#Monthly').click(function(){
+        $('#tblMonthly').show();
+		$('#tblDail').hide();
+		$('#tblWeekly').hide();
+    });
+});
+</script>
 
 
 </head>
 <body onload = "startTime()">
- 
+
 <!--TITLE-->
 <div class="container">
   <h2  class="text-center" ><strong><u>Majic Bus Admin page</strong></u></h2>
+  
 
 <!--DATE-->
 <header class="footer navbar-fixed-top">
@@ -53,18 +73,17 @@
 	 	<p id = "dateId">  </p>
      </div>
 </header>
-<!-- $('#tblWeekly').hide() -->
 
 <!--different options of how to look at the collected data-->
-<ul class="nav nav-tabs">
-  <li role="presentation" class="active"><a href="#">Daily</a></li>
-  <li role="presentation"><a href="#">Weekly</a></li>
-  <li role="presentation"><a href="#">Monthly</a></li>
-</ul>
+<div class = "col-sm-8" style = "padding-bottom:7px;">
+<button id = "Daily" class = "btn btn-default">Daily</button>
+<button id = "Weekly" class="btn btn-default">Weekly</button>
+<button id = "Monthly" class="btn btn-default">Monthly</button>
+</div>
   
 <!--Table-->
- <div class = "container">          
-  <table id = "tblDaily" class = "table table-bordered">
+<div class = "container">     
+  <table id = "tblDaily" class = "table table-bordered" style = "display:none">
     <thead>
       <tr>
         <th>Date Sent</th>
@@ -83,23 +102,10 @@
 		<td>250-778-2877</td>
 		<td>GIMME THE BUS TIMES!!!!</td>
      </tr>
-	   <tr>
-        <td>016/02/24</td>
-        <td>016/02/24</td>
-        <td>250-655-7584</td>
-		<td>250-778-2877</td>
-		<td>BLEH</td>
-     </tr>
-	 <tr>
-        <td>016/01/16</td>
-        <td>016/01/16</td>
-        <td>250-165-0026</td>
-		<td>250-778-2877</td>
-		<td>This is a nice table :)</td>
-     </tr>
-	  </body>
+	 </tbody>
   </table>
-  <table id = "tblWeekly" style="display:none" class = "table table-bordered">
+	
+  <table id = "tblWeekly" class = "table table-bordered" style = "display:none">
     <thead>
       <tr>
         <th>Date Sent</th>
@@ -111,30 +117,17 @@
     </thead>
 
     <tbody>
-     <tr>
-        <td>016/02/23</td>
-        <td>016/02/23</td>
-        <td>250-889-4526</td>
-		<td>250-778-2877</td>
-		<td>GIMME THE BUS TIMES!!!!</td>
-     </tr>
 	   <tr>
         <td>016/02/24</td>
         <td>016/02/24</td>
         <td>250-655-7584</td>
 		<td>250-778-2877</td>
 		<td>BLEH</td>
-     </tr>
-	 <tr>
-        <td>016/01/16</td>
-        <td>016/01/16</td>
-        <td>250-165-0026</td>
-		<td>250-778-2877</td>
-		<td>This is a nice table :)</td>
-     </tr>
-	  </body>
+	   </tr>
+	</tbody>
   </table>
-  <table id = "tblMonthly" style="display:none" class = "table table-bordered">
+
+  <table id = "tblMonthly" class = "table table-bordered" style = "display:none">
     <thead>
       <tr>
         <th>Date Sent</th>
@@ -146,20 +139,6 @@
     </thead>
 
     <tbody>
-     <tr>
-        <td>016/02/23</td>
-        <td>016/02/23</td>
-        <td>250-889-4526</td>
-		<td>250-778-2877</td>
-		<td>GIMME THE BUS TIMES!!!!</td>
-     </tr>
-	   <tr>
-        <td>016/02/24</td>
-        <td>016/02/24</td>
-        <td>250-655-7584</td>
-		<td>250-778-2877</td>
-		<td>BLEH</td>
-     </tr>
 	 <tr>
         <td>016/01/16</td>
         <td>016/01/16</td>
@@ -167,7 +146,7 @@
 		<td>250-778-2877</td>
 		<td>This is a nice table :)</td>
      </tr>
-	  </body>
+	</tbody>
   </table>
 </div>
 
@@ -180,8 +159,6 @@
   </div>
 </div>
 
-
-  </form>
 </div>
 
 </body>
