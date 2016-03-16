@@ -20,5 +20,8 @@ namespace MBBackEnd.BL
         public string dtDeparture { get; set; }
         public Nullable<int> SortID { get; set; }
         public System.DateTime dtCreated { get; set; }
+    
+        public virtual Stop Stop { get; set; }
+        public virtual Trip Trip { get; set; }
     }
 }

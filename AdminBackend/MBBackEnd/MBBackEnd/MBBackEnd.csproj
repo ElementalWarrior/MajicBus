@@ -222,6 +222,10 @@
     <Compile Include="BL\RouteShape.cs">
       <DependentUpon>MajicBus.tt</DependentUpon>
     </Compile>
+    <Compile Include="BL\SMSLog.cs">
+      <DependentUpon>MajicBus.tt</DependentUpon>
+    </Compile>
+    <Compile Include="BL\SMSLogs.cs" />
     <Compile Include="BL\Stop.cs">
       <DependentUpon>MajicBus.tt</DependentUpon>
     </Compile>
@@ -323,6 +327,8 @@
     <Content Include="Views\Shared\Lockout.cshtml" />
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
     <Content Include="Views\Home\ShowRoutes.cshtml" />
+    <Content Include="Views\Home\ShowStops.cshtml" />
+    <Content Include="Views\Home\AdminPage.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

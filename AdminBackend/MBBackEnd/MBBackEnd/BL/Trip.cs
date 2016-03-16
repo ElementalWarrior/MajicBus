@@ -14,6 +14,11 @@ namespace MBBackEnd.BL
     
     public partial class Trip
     {
+        public Trip()
+        {
+            this.StopTimes = new HashSet<StopTime>();
+        }
+    
         public int TripID { get; set; }
         public Nullable<int> ShapeID { get; set; }
         public Nullable<int> RouteID { get; set; }
@@ -21,5 +26,8 @@ namespace MBBackEnd.BL
         public Nullable<int> Direction { get; set; }
         public System.DateTime dtCreated { get; set; }
         public string CalendarID { get; set; }
+    
+        public virtual Route Route { get; set; }
+        public virtual ICollection<StopTime> StopTimes { get; set; }
     }
 }
