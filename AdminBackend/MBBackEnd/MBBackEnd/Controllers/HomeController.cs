@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -10,7 +11,14 @@ namespace MBBackEnd.Controllers
     {
         public ActionResult Index()
         {
-            return View();
+            BL.MajicBusEntities context = new BL.MajicBusEntities();
+            var iter = ConfigurationManager.ConnectionStrings.GetEnumerator();
+            string configs = "";
+            while(iter.MoveNext())
+            {
+                configs += ((System.Configuration.PropertyInformation)((ConfigurationElement)iter.Current).ElementInformation.Properties["connectionString"]).Value + "<br />";
+            }
+            return View((object)configs);
         }
 
         public ActionResult ShowRoutes()

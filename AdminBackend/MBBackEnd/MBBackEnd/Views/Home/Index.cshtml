@@ -1,12 +1,10 @@
-﻿@model List<MBBackEnd.Models.StopView>
+﻿@model String
 
-<!DOCTYPE html>
-<html>
-<head>
+@Html.Raw(Model)
     <script src="http://maps.googleapis.com/maps/api/js">
     </script>
     <script>
-        window.busStops = @Newtonsoft.Json.JsonConvert.SerializeObject(Model);
+        //window.busStops = @*@Newtonsoft.Json.JsonConvert.SerializeObject(Model)*@;
 
 
         function initialize() {
@@ -78,8 +76,6 @@
 
 
     </script>
-</head>
-<body>
     <h2 class="text-center">Majic Bus- Kelowna, BC</h2>
     <div id="googleMap" style="width:1000px;height:500px;"></div>
     &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
@@ -87,5 +83,3 @@
         <label for="route">Bus Route: </label>
         <input type="route" class="form-control" id="route" placeholder="Enter Bus Route: ">
     </div>
-</body>
-</html>
