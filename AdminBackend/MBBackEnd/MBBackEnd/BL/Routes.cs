@@ -26,6 +26,7 @@ namespace MBBackEnd.BL
                     join st in context.StopTimes on t.TripID equals st.TripID
                     join s in context.Stops on st.StopID equals s.StopID
                     where r.RouteID == routeID
+                    orderby st.SortID
                     select s).ToList();
 
             
