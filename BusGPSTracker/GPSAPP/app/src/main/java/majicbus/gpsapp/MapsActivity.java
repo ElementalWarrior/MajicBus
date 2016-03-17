@@ -27,6 +27,7 @@ import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -58,38 +59,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     {
         Gson parser = new Gson();
         List stopslist = parser.fromJson(json, List.class);
-
-        //Display each route
-        //All this code should work, I cant seem to be able to test it
-        for(int i = 0; i < 1; i++){
-            //Get each stoplist from the arraylist passed over
-            double lastLat = 0;
-            double lastLng = 0;
-            //Display all the stops on a route
-            List stopList = parser.fromJson(json, List.class);
-            for (int j = 0; j < stopList.size(); j++) {
-                Map<String, Object> stopMap = (Map)(stopList).get(j);
-                double lat = (Double)stopMap.get("lat");
-                double lng = (Double)stopMap.get("lon");
-                String title = String.valueOf(stopMap.get("StopID"));
-                LatLng point = new LatLng(lat,lng);
-                mMap.addMarker(new MarkerOptions().position(point).title(title));
-                if(j > 0){
-                    mMap.addPolyline((new PolylineOptions())
-                            .add(new LatLng(lastLat,lastLng), new LatLng(lat,lng)).width(5).color(Color.BLUE)
-                            .geodesic(true));
-                }
-                lastLat = lat;
-                lastLng = lng;
-            }
-
+        PolylineOptions ops = new PolylineOptions();
+        for (int j = 0; j < stopslist.size(); j++) {
+            Map<String, Object> stopMap = (Map)(stopslist).get(j);
+            double lat = (Double)stopMap.get("lat");
+            double lng = (Double)stopMap.get("lon");
+            String title = String.valueOf(stopMap.get("StopID"));
+            LatLng point = new LatLng(lat,lng);
+            mMap.addMarker(new MarkerOptions().position(point).title(title));
+            ops.add(point);
         }
-
-        // Move the camera to Kelowna
-        LatLng Kelowna = new LatLng(49.887952, -119.496011);
-        //mMap.addMarker(new MarkerOptions().position(Kelowna).title("Marker in Kelowna!"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(Kelowna));
-        mMap.moveCamera(CameraUpdateFactory.zoomTo(10));
+        ops.color(Color.BLUE);
+        ops.width(5);
+        mMap.addPolyline(ops);
     }
 
     @Override
@@ -99,56 +81,57 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         ArrayList<String> routesList = routeData.getStringArrayListExtra("stopData");
         ArrayList<String> stopsList = routeData.getStringArrayListExtra("stopData");
         mMap = googleMap;
-        //MBBackendConnection conn = new MBBackendConnection(this);
-        //conn.makeConnection("http://206.87.17.93:51783/Home/ShowStopsJSON");
 
-        String stopsjson = "[{\"StopID\":140073,\"lat\":49.8641830000000000,\"lon\":-119.5629160000000000}," +
-                "{\"StopID\":140071,\"lat\":49.8370550000000000,\"lon\":-119.6142810000000000}," +
-                "{\"StopID\":140049,\"lat\":49.8835080000000000,\"lon\":-119.4888160000000000}," +
-                "{\"StopID\":140007,\"lat\":49.8620850000000000,\"lon\":-119.5852810000000000}," +
-                "{\"StopID\":140004,\"lat\":49.8285650000000000,\"lon\":-119.6310950000000000}," +
-                "{\"StopID\":140003,\"lat\":49.8833670000000000,\"lon\":-119.4764410000000000}," +
-                "{\"StopID\":103745,\"lat\":49.8808960000000000,\"lon\":-119.5346980000000000}," +
-                "{\"StopID\":103455,\"lat\":49.9394320000000000,\"lon\":-119.3948930000000000}," +
-                "{\"StopID\":103263,\"lat\":49.9018450000000000,\"lon\":-119.4081140000000000}," +
-                "{\"StopID\":103174,\"lat\":49.8866540000000000,\"lon\":-119.4243860000000000}," +
-                "{\"StopID\":103067,\"lat\":49.8817380000000000,\"lon\":-119.4421570000000000}," +
-                "{\"StopID\":102985,\"lat\":49.8818080000000000,\"lon\":-119.4591870000000000}," +
-                "{\"StopID\":102853,\"lat\":49.8874220000000000,\"lon\":-119.4953990000000000}]";
-
-        Gson parser = new Gson();
-        List stopslist = parser.fromJson(stopsjson, List.class);
-
-        //Display each route
-        //All this code should work, I cant seem to be able to test it
-        for(int i = 0; i < 1; i++){
-            //Get each stoplist from the arraylist passed over
-            double lastLat = 0;
-            double lastLng = 0;
-            //Display all the stops on a route
-            List stopList = parser.fromJson(stopsjson, List.class);
-            for (int j = 0; j < stopList.size(); j++) {
-                Map<String, Object> stopMap = (Map)(stopList).get(j);
-                double lat = (Double)stopMap.get("lat");
-                double lng = (Double)stopMap.get("lon");
-                String title = String.valueOf(stopMap.get("StopID"));
-                LatLng point = new LatLng(lat,lng);
-                mMap.addMarker(new MarkerOptions().position(point).title(title));
-                if(j > 0){
-                    mMap.addPolyline((new PolylineOptions())
-                            .add(new LatLng(lastLat,lastLng), new LatLng(lat,lng)).width(5).color(Color.BLUE)
-                            .geodesic(true));
-                }
-                lastLat = lat;
-                lastLng = lng;
-            }
-
-        }
-
+//        String stopsjson = "[{\"StopID\":140073,\"lat\":49.8641830000000000,\"lon\":-119.5629160000000000}," +
+//                "{\"StopID\":140071,\"lat\":49.8370550000000000,\"lon\":-119.6142810000000000}," +
+//                "{\"StopID\":140049,\"lat\":49.8835080000000000,\"lon\":-119.4888160000000000}," +
+//                "{\"StopID\":140007,\"lat\":49.8620850000000000,\"lon\":-119.5852810000000000}," +
+//                "{\"StopID\":140004,\"lat\":49.8285650000000000,\"lon\":-119.6310950000000000}," +
+//                "{\"StopID\":140003,\"lat\":49.8833670000000000,\"lon\":-119.4764410000000000}," +
+//                "{\"StopID\":103745,\"lat\":49.8808960000000000,\"lon\":-119.5346980000000000}," +
+//                "{\"StopID\":103455,\"lat\":49.9394320000000000,\"lon\":-119.3948930000000000}," +
+//                "{\"StopID\":103263,\"lat\":49.9018450000000000,\"lon\":-119.4081140000000000}," +
+//                "{\"StopID\":103174,\"lat\":49.8866540000000000,\"lon\":-119.4243860000000000}," +
+//                "{\"StopID\":103067,\"lat\":49.8817380000000000,\"lon\":-119.4421570000000000}," +
+//                "{\"StopID\":102985,\"lat\":49.8818080000000000,\"lon\":-119.4591870000000000}," +
+//                "{\"StopID\":102853,\"lat\":49.8874220000000000,\"lon\":-119.4953990000000000}]";
+//
+//        Gson parser = new Gson();
+//        List stopslist = parser.fromJson(stopsjson, List.class);
+//
+//        //Display each route
+//        //All this code should work, I cant seem to be able to test it
+//        for(int i = 0; i < 1; i++){
+//            //Get each stoplist from the arraylist passed over
+//            double lastLat = 0;
+//            double lastLng = 0;
+//            //Display all the stops on a route
+//            List stopList = parser.fromJson(stopsjson, List.class);
+//            for (int j = 0; j < stopList.size(); j++) {
+//                Map<String, Object> stopMap = (Map)(stopList).get(j);
+//                double lat = (Double)stopMap.get("lat");
+//                double lng = (Double)stopMap.get("lon");
+//                String title = String.valueOf(stopMap.get("StopID"));
+//                LatLng point = new LatLng(lat,lng);
+//                mMap.addMarker(new MarkerOptions().position(point).title(title));
+//                if(j > 0){
+//                    mMap.addPolyline((new PolylineOptions())
+//                            .add(new LatLng(lastLat,lastLng), new LatLng(lat,lng)).width(5).color(Color.BLUE)
+//                            .geodesic(true));
+//                }
+//                lastLat = lat;
+//                lastLng = lng;
+//            }
+//
+//        }
+//
         // Move the camera to Kelowna
         LatLng Kelowna = new LatLng(49.887952, -119.496011);
         //mMap.addMarker(new MarkerOptions().position(Kelowna).title("Marker in Kelowna!"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(Kelowna));
         mMap.moveCamera(CameraUpdateFactory.zoomTo(10));
+
+        MBBackendConnection conn = new MBBackendConnection(this);
+        conn.makeConnection("http://206.87.18.178/Home/ShowStopsJSON");
     }
 }

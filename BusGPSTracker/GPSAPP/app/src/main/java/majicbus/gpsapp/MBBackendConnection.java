@@ -88,7 +88,6 @@ public class MBBackendConnection {
             InputStream is = null;
             // Only display the first 500 characters of the retrieved
             // web page content.
-            int len = 1000;
 
             try {
                 URL url = new URL(myUrl);
@@ -103,9 +102,23 @@ public class MBBackendConnection {
                 is = conn.getInputStream();
 
                 // Convert the InputStream into a string
-                String contentAsString = readIt(is, len);
+                String contentAsString = readIt(is, conn.getContentLength());
                 //return contentAsString;
-                ((MapsActivity)appcontext).loadData(contentAsString);
+                MapsActivity active = ((MapsActivity) appcontext);
+                class MyRunnable implements Runnable
+                {
+                    String _data;
+                    MapsActivity _active;
+                    public MyRunnable(String data, MapsActivity activity)
+                    {
+                        _data = data;
+                        _active = activity;
+                    }
+                    public void run() {
+                        _active.loadData(_data);
+                    }
+                }
+                active.runOnUiThread(new MyRunnable(contentAsString, active));
 
                 // Makes sure that the InputStream is closed after the app is
                 // finished using it.
