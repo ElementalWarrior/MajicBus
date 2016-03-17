@@ -35,11 +35,11 @@ int smssent=0;
 public void testClick(View v)
     {
        smssent++;
-        textView1.setText(smssent);
+       // textView1.setText(smssent);
         PendingIntent pi = PendingIntent.getActivity(this, 0,
                 new Intent(this, MainActivity.class), 0);
         SmsManager sms = SmsManager.getDefault();
-        sms.sendTextMessage("12508696381", null, "test msg", pi, null);
+        sms.sendTextMessage("17789961163", null, "test msg", null, null);
     }
     /*
     private void sendSMS(String phoneNumber, String message) {
