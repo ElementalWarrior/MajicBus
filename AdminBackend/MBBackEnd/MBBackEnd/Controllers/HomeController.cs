@@ -11,7 +11,7 @@ namespace MBBackEnd.Controllers
     {
         public ActionResult Index()
         {
-            return View((object)configs);
+            return View();
         }
 
         public ActionResult ShowRoutes()
