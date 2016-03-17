@@ -27,8 +27,11 @@ int smssent=0;
     TextView textView2;
 
     protected void onCreate(Bundle savedInstanceState) {
+
         textView1 = (TextView) findViewById(R.id.textView4);
         textView2 = (TextView) findViewById(R.id.textView5);
+       // textView1.setText(SmsListener.getMsgsent());
+       // textView2.setText(SmsListener.getMsgrec());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
     }
@@ -55,10 +58,12 @@ public void testClick(View v)
             smsrec++;
             textView1.setText(smsrec);
             for (SmsMessage smsMessage : Telephony.Sms.Intents.getMessagesFromIntent(intent)) {
-                //save msg
+                //save msg and number
                 String messageBody = smsMessage.getMessageBody();
+                String messageAddress = message.getOriginatingAddress();
+
             }
-            sendSMS("12508696381", "test msg");
+            sendSMS(messageBody, "test msg");
 
         }
 
@@ -66,20 +71,21 @@ public void testClick(View v)
         /*
         String url = "tcp:mbdev01.database.windows.net,1433;";
         String uid = "majicbus";
-        String pw = "asbrbrchja5";
+        String pw = "AsBrBrChJa5";
         Connection con = null;
+        String sendBack=null;
         try {
+        //convert string message to int
+        int i = Integer.parseInt(messageBody.trim());
             con = DriverManager.getConnection(url, uid, pw);
             Statement stmt = con.createStatement();
-            String sql = "SELECT  "+
-                    " FROM  "+
-                    " WHERE  =  ";
-
+            String sql = "SELECT dtarrival "+
+                    " FROM stoptimes "+
+                    " WHERE stopid = " + i + ";" ;
             ResultSet rst = stmt.executeQuery(sql);
-
-
             while (rst.next())
             {
+            sendBack=rst.getString("stoptimes")
                //prep to send stuff back
             }
             //send text
