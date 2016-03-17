@@ -4,15 +4,21 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.util.Log;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Created by Bronson on 2016-03-11.
@@ -22,12 +28,13 @@ public class MBBackendConnection {
     private ArrayList<String> StopData;
     private String JSON;
     private Context appcontext;
+    private Gson GsonParser;
 
     public MBBackendConnection(Context newContext){
         appcontext = newContext;
         JSON = "";
         RouteData = new ArrayList<String>();
-
+        GsonParser = new Gson();
     }
 
     public int makeConnection(String url){
@@ -41,8 +48,10 @@ public class MBBackendConnection {
         return 1;
     }
 
-    private void parseJSONData(){
+    private void parseJSONData(String json){
         //TODO Parse JSON data into the arraylists
+        Type collectionType = new TypeToken<Collection<String>>(){}.getType();
+        Collection<String> data = GsonParser.fromJson(json, collectionType);
 
     }
 
@@ -60,10 +69,11 @@ public class MBBackendConnection {
         protected String doInBackground(String... urls) {
             // params comes from the execute() call: params[0] is the url.
             try {
-                return downloadUrl(urls[0]);
+                downloadUrl(urls[0]);
             } catch (IOException e) {
-                return "Unable to retrieve web page. URL may be invalid.";
+                Log.v("foo","Unable to retrieve web page. URL may be invalid.");
             }
+            return "";
         }
         // onPostExecute displays the results of the AsyncTask.
         @Override
@@ -74,7 +84,7 @@ public class MBBackendConnection {
         // Given a URL, establishes an HttpUrlConnection and retrieves
         // the web page content as a InputStream, which it returns as
         // a string.
-        private String downloadUrl(String myUrl) throws IOException {
+        private void downloadUrl(String myUrl) throws IOException {
             InputStream is = null;
             // Only display the first 500 characters of the retrieved
             // web page content.
@@ -94,11 +104,15 @@ public class MBBackendConnection {
 
                 // Convert the InputStream into a string
                 String contentAsString = readIt(is, len);
-                return contentAsString;
+                //return contentAsString;
+                ((MapsActivity)appcontext).loadData(contentAsString);
 
                 // Makes sure that the InputStream is closed after the app is
                 // finished using it.
-            } finally {
+            } catch (Exception ex){
+                Log.v("httpBroke", ex.getMessage());
+            }
+            finally {
                 if (is != null) {
                     is.close();
                 }
