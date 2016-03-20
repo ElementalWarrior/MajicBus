@@ -8,14 +8,14 @@ namespace MBBackEnd.BL
     public partial class SMSLog
     {
         IEnumerable<Stop> Stop { get; set; }
-        public static List<SMSLog> GetSMSLog()
-        {
-            var context = new MajicBusEntities();
-            //return (from r in context.Routes
-            //        join t in context.Trips on r.RouteID equals t.RouteID
-            //        select r).Distinct().ToList();
-            return context.Routes.Include("Trips").ToList();
-        }
+        //public static List<SMSLog> GetSMSLog()
+        //{
+        //    var context = new MajicBusEntities();
+        //    //return (from r in context.Routes
+        //    //        join t in context.Trips on r.RouteID equals t.RouteID
+        //    //        select r).Distinct().ToList();
+        //    return context.Routes.Include("Trips").ToList();
+        //}
         //TODO: create stops to return lat / long  and stop ids 
         public static List<Stop> GetStopsByRouteID(int routeID)
         {
