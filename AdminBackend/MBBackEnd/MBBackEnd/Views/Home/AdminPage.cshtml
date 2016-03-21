@@ -1,7 +1,7 @@
-﻿@{
+﻿@model MBBackEnd.Models.SMSLogPage
+@{
     ViewBag.Title = "AdminPage";
 }
-
 <script>
     function startTime() {
         var date = new Date();
@@ -97,13 +97,16 @@
             </thead>
 
             <tbody>
-                <tr>
-                    <td>016/02/24</td>
-                    <td>016/02/24</td>
-                    <td>250-655-7584</td>
-                    <td>250-778-2877</td>
-                    <td>BLEH</td>
-                </tr>
+
+                @foreach(var sms in Model.Weekly)
+                {
+                    
+                    <td>@sms.dtSent</td>
+                    <td>@sms.dtReceived</td>
+                    <td>@sms.ReceivedFrom</td>
+                    <td>@sms.SentTo</td>
+                    <td>@Html.Encode(sms.MessageBody)</td>
+                }
             </tbody>
         </table>
 

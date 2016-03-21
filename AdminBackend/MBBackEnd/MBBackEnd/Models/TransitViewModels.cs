@@ -27,6 +27,7 @@ namespace MBBackEnd.Models
     public class StopView
     {
         public int StopID { get; set; }
+        public String StopName { get; set; }
         public decimal? lat { get; set; }
         public decimal? lon { get; set; }
     }
