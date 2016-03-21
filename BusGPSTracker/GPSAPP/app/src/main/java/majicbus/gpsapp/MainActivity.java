@@ -168,16 +168,19 @@ public class MainActivity extends AppCompatActivity {
         List routeList = parser.fromJson(routesjson, List.class);
 
         for (int i = 0; i < routeList.size(); i++) {
+            StringBuilder build = new StringBuilder();
+
             TableRow row= new TableRow(this);
             TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT);
             row.setLayoutParams(lp);
             CheckBox routeBox = new CheckBox(this);
 
             Map<String, Object> routeMap = (Map)(routeList).get(i);
-            String result = "Route ";
-            result += (String)routeMap.get("NameShort");
-            result += ": ";
-            result += (String)routeMap.get("NameLong");
+            build.append("Route");
+            build.append((String)routeMap.get("NameShort"));
+            build.append(": ");
+            build.append((String) routeMap.get("NameLong"));
+            String result = build.toString();
 
             routeBox.setText(result);
             routeBox.setId(i);

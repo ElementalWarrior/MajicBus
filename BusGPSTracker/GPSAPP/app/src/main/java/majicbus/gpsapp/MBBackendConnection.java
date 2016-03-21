@@ -20,9 +20,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 
-/**
- * Created by Bronson on 2016-03-11.
- */
 public class MBBackendConnection {
     private ArrayList<String> RouteData;
     private ArrayList<String> StopData;
