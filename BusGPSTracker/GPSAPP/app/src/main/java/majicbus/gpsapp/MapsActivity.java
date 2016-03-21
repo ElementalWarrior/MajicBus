@@ -55,8 +55,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      * it inside the SupportMapFragment. This method will only be triggered once the user has
      * installed Google Play services and returned to the app.
      */
-    public void loadData(String json)
-    {
+    public void loadData(String json){
         Gson parser = new Gson();
         List stopslist = parser.fromJson(json, List.class);
         PolylineOptions ops = new PolylineOptions();
@@ -78,7 +77,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         //Get data passed from the previous page
         Intent routeData = getIntent();
-        ArrayList<String> routesList = routeData.getStringArrayListExtra("stopData");
+        //ArrayList<String> routesList = routeData.getStringArrayListExtra("stopData");
         ArrayList<String> stopsList = routeData.getStringArrayListExtra("stopData");
         mMap = googleMap;
 
