@@ -40,7 +40,7 @@
         });
         $('#Monthly').click(function () {
             $('#tblMonthly').show();
-            $('#tblDail').hide();
+            $('#tblDaily').hide();
             $('#tblWeekly').hide();
         });
     });
@@ -48,7 +48,7 @@
 
 <!--TITLE-->
 <div class="container">
-    <h2 class="text-center"><strong><u>Majic Bus Admin page</strong></u></h2>
+    <h2 class="text-center"><strong><u>Majic Bus Admin page</u></strong></h2>
 
 
     <!--DATE-->
@@ -75,13 +75,17 @@
             </thead>
 
             <tbody>
-                <tr>
-                    <td>016/02/23</td>
-                    <td>016/02/23</td>
-                    <td>250-889-4526</td>
-                    <td>250-778-2877</td>
-                    <td>GIMME THE BUS TIMES!!!!</td>
-                </tr>
+                @foreach(var sms in Model.Daily)
+                { 
+                    <tr>
+                        <!--adding the -7 hours takes it from UTC time to our time-->
+                        <td>@sms.dtSent.AddHours(-7)</td>
+                        <td>@sms.dtReceived.AddHours(-7)</td>
+                        <td>@sms.ReceivedFrom</td>
+                        <td>@sms.SentTo</td>
+                        <td>@Html.Encode(sms.MessageBody)</td>
+                    </tr> 
+                }
             </tbody>
         </table>
 
@@ -97,15 +101,15 @@
             </thead>
 
             <tbody>
-
                 @foreach(var sms in Model.Weekly)
                 {
-                    
-                    <td>@sms.dtSent</td>
-                    <td>@sms.dtReceived</td>
-                    <td>@sms.ReceivedFrom</td>
-                    <td>@sms.SentTo</td>
-                    <td>@Html.Encode(sms.MessageBody)</td>
+                    <tr>
+                         <td>@sms.dtSent.AddHours(-7)</td>
+                         <td>@sms.dtReceived.AddHours(-7)</td>
+                         <td>@sms.ReceivedFrom</td>
+                         <td>@sms.SentTo</td>
+                         <td>@Html.Encode(sms.MessageBody)</td>
+                    </tr>
                 }
             </tbody>
         </table>
@@ -122,13 +126,16 @@
             </thead>
 
             <tbody>
-                <tr>
-                    <td>016/01/16</td>
-                    <td>016/01/16</td>
-                    <td>250-165-0026</td>
-                    <td>250-778-2877</td>
-                    <td>This is a nice table :)</td>
-                </tr>
+                @foreach (var sms in Model.Monthly)
+                {
+                    <tr>
+                        <td>@sms.dtSent.AddHours(-7)</td>
+                        <td>@sms.dtReceived.AddHours(-7)</td>
+                        <td>@sms.ReceivedFrom</td>
+                        <td>@sms.SentTo</td>
+                        <td>@Html.Encode(sms.MessageBody)</td>
+                    </tr>
+                }
             </tbody>
         </table>
     </div>
@@ -136,9 +143,9 @@
     <!--summary on each page -->
     <div class="row-fluid">
         <div class="container">
-            <p> Number of Texts Received: 234 </p>
-            <p> Number of Texts Sent: 234 </p>
-            <p> Most popular bus stop (Bus Id): 2342423 </p>
+            <p> Number of Texts Received: </p>
+            <p> Number of Texts Sent: </p>
+            <p> Most popular bus stop (Bus Id): </p>
         </div>
     </div>
 
