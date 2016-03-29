@@ -107,6 +107,7 @@ namespace MBBackEnd.Controllers
 
             return View();
         }
+        [Authorize]
         public ActionResult AdminPage()
         {
             //data domain models.
@@ -161,6 +162,29 @@ namespace MBBackEnd.Controllers
             //get the total number of text sent
             //get the most requested bus stop name (StopName)
             return View(pg);
+        }
+        [Authorize]
+        [Route("Home/SMSByPhone/{phoneNumber}")]
+        public ActionResult SMSByPhone(string phoneNumber)
+        {
+            List<BL.SMSLog> msgs = BL.SMSLog.GetMessagesByPhone(phoneNumber);
+
+            List<Models.SMSLogEntry> modelMsgs = msgs.Select(blLog => new Models.SMSLogEntry
+            {
+                dtReceived = blLog.dtReceived.Value,
+                dtSent = blLog.dtSent.Value,
+                MessageBody = blLog.MessageBody,
+                ReceivedFrom = blLog.ReceivedFrom,
+                SentTo = blLog.SentTo,
+                SMSLogID = blLog.SMSLogID
+            }).ToList();
+
+            return View(new Models.SMSFilterPage
+            {
+                Messages = modelMsgs,
+                PhoneNumber = phoneNumber,
+                SanitizedPhoneNumber = Classes.Utility.SanitizePhoneNumber(phoneNumber)
+            });
         }
     }
 }
