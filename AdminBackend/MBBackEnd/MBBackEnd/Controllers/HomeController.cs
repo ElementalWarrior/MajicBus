@@ -144,7 +144,7 @@ namespace MBBackEnd.Controllers
             beginningOfWeekUtc = beginningOfWeekUtc.AddHours(7);
 
             //get all sms's week
-            pg.Weekly = allSmsMessages.Where(s => s.dtReceived >= beginningOfWeekUtc && s.dtReceived <= beginningOfWeekUtc.AddDays(7)).ToList();
+            pg.Weekly = allSmsMessages.Where(s => s.dtReceived >= beginningOfWeekUtc && s.dtReceived <= beginningOfWeekUtc.AddDays(6)).ToList();
 
             DateTime beginningOfMonthUtc = DateTime.UtcNow.AddHours(-7);
             beginningOfMonthUtc = beginningOfMonthUtc.AddDays(-1 * beginningOfMonthUtc.Day); //set to first day of month
@@ -156,6 +156,10 @@ namespace MBBackEnd.Controllers
             int numDaysInMonth = beginningOfMonthUtc.AddMonths(1).AddDays(-1).Day;
             //get all sms's monthly
             pg.Monthly = allSmsMessages.Where(s => s.dtReceived >= beginningOfMonthUtc && s.dtReceived <= beginningOfMonthUtc.AddDays(numDaysInMonth + 1)).ToList();
+
+            //get the total number of texts received
+            //get the total number of text sent
+            //get the most requested bus stop name (StopName)
             return View(pg);
         }
     }
