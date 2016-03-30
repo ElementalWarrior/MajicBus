@@ -63,33 +63,44 @@
 
     <!--Table-->
     <div class="container">
-        <table id="tblDaily" class="table table-bordered" style="display:none">
-            <thead>
-                <tr>
-                    <th>Date Sent</th>
-                    <th>Date Received</th>
-                    <th>Received From</th>
-                    <th>Sent to</th>
-                    <th>Message</th>
-                </tr>
-            </thead>
 
-            <tbody>
-                @foreach(var sms in Model.Daily)
-                { 
+        <div id="tblDaily" style="display:none">
+            <table class="table table-bordered">
+                <thead>
                     <tr>
-                        <!--adding the -7 hours takes it from UTC time to our time-->
-                        <td>@sms.dtSent.AddHours(-7)</td>
-                        <td>@sms.dtReceived.AddHours(-7)</td>
-                        <td>@sms.ReceivedFrom</td>
-                        <td>@sms.SentTo</td>
-                        <td>@Html.Encode(sms.MessageBody)</td>
-                    </tr> 
-                }
-            </tbody>
-        </table>
+                        <th>Date Sent</th>
+                        <th>Date Received</th>
+                        <th>Received From</th>
+                        <th>Sent to</th>
+                        <th>Message</th>
+                    </tr>
+                </thead>
 
-        <table id="tblWeekly" class="table table-bordered" style="display:none">
+                <tbody>
+                    @foreach (var sms in Model.Daily)
+                    {
+                        <tr>
+                            <!--adding the -7 hours takes it from UTC time to our time-->
+                            <td>@sms.dtSent.AddHours(-7)</td>
+                            <td>@sms.dtReceived.AddHours(-7)</td>
+                            <td><a href="@Url.Action("SMSByPhone")/@sms.ReceivedFrom">@sms.ReceivedFrom</a></td>
+                            <td><a href="@Url.Action("SMSByPhone")/@sms.SentTo">@sms.SentTo</a></td>
+                            <td>@Html.Encode(sms.MessageBody)</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <!--summary on each page -->
+            <div class="row-fluid">
+                <div class="container">
+                    <p> Number of Texts Sent/Received: @Model.Daily.Count()</p>
+                    <p> Most popular bus stop (Bus Id): </p>
+                </div>
+            </div>
+        </div>
+
+        <div id="tblWeekly" style="display:none">
+        <table class="table table-bordered">
             <thead>
                 <tr>
                     <th>Date Sent</th>
@@ -101,20 +112,29 @@
             </thead>
 
             <tbody>
-                @foreach(var sms in Model.Weekly)
+                @foreach (var sms in Model.Weekly)
                 {
                     <tr>
-                         <td>@sms.dtSent.AddHours(-7)</td>
-                         <td>@sms.dtReceived.AddHours(-7)</td>
-                         <td>@sms.ReceivedFrom</td>
-                         <td>@sms.SentTo</td>
-                         <td>@Html.Encode(sms.MessageBody)</td>
+                        <td>@sms.dtSent.AddHours(-7)</td>
+                        <td>@sms.dtReceived.AddHours(-7)</td>
+                        <td><a href="@Url.Action("SMSByPhone")/@sms.ReceivedFrom">@sms.ReceivedFrom</a></td>
+                        <td><a href="@Url.Action("SMSByPhone")/@sms.SentTo">@sms.SentTo</a></td>
+                        <td>@Html.Encode(sms.MessageBody)</td>
                     </tr>
                 }
             </tbody>
         </table>
+        <!--summary on each page -->
+        <div class="row-fluid">
+            <div class="container">
+                <p> Number of Texts Sent/Received: @Model.Weekly.Count()</p>
+                <p> Most popular bus stop (Bus Id): </p>
+            </div>
+        </div>
+    </div>
 
-        <table id="tblMonthly" class="table table-bordered" style="display:none">
+    <div id="tblMonthly" style="display:none">
+        <table class="table table-bordered">
             <thead>
                 <tr>
                     <th>Date Sent</th>
@@ -131,22 +151,19 @@
                     <tr>
                         <td>@sms.dtSent.AddHours(-7)</td>
                         <td>@sms.dtReceived.AddHours(-7)</td>
-                        <td>@sms.ReceivedFrom</td>
-                        <td>@sms.SentTo</td>
+                        <td><a href="@Url.Action("SMSByPhone")/@sms.ReceivedFrom">@sms.ReceivedFrom</a></td>
+                        <td><a href="@Url.Action("SMSByPhone")/@sms.SentTo">@sms.SentTo</a></td>
                         <td>@Html.Encode(sms.MessageBody)</td>
                     </tr>
                 }
             </tbody>
         </table>
-    </div>
-
-    <!--summary on each page -->
-    <div class="row-fluid">
-        <div class="container">
-            <p> Number of Texts Received: </p>
-            <p> Number of Texts Sent: </p>
-            <p> Most popular bus stop (Bus Id): </p>
+        <!--summary on each page -->
+        <div class="row-fluid">
+            <div class="container">
+                <p> Number of Texts Sent/Received: @Model.Monthly.Count()</p>
+                <p> Most popular bus stop (Bus Id): </p>
+            </div>
         </div>
     </div>
-
 </div>

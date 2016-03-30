@@ -16,5 +16,15 @@ namespace MBBackEnd.BL
         }
         //get total sms messages 
         //get stopId
+        public static List<SMSLog> GetMessagesByPhone(string phoneNumber)
+        {
+            MajicBusEntities context = new MajicBusEntities();
+            phoneNumber = Classes.Utility.SanitizePhoneNumber(phoneNumber);
+            List<SMSLog> messages = (from sms in context.SMSLogs
+                                     where sms.ReceivedFrom == phoneNumber
+                                     || sms.SentTo == phoneNumber
+                                     select sms).ToList();
+            return messages; //Classes.Utility.S
+        }
     }
 }
