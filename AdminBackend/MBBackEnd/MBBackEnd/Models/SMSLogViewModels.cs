@@ -12,7 +12,9 @@ namespace MBBackEnd.Models
         public List<SMSLogEntry> Monthly { get; set; }
         public int MessagesSent { get; set; }
         public int MessagesReceived { get; set; }
-        public Models.StopView MostPopular { get; set; }
+        public int MostPopularDaily { get; set; }
+        public int MostPopularWeekly { get; set; }
+        public int MostPopularMonthly { get; set; }
     }
     public class SMSLogEntry
     {

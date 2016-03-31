@@ -157,9 +157,49 @@ namespace MBBackEnd.Controllers
             //get all sms's monthly
             pg.Monthly = allSmsMessages.Where(s => s.dtReceived >= beginningOfMonthUtc && s.dtReceived <= beginningOfMonthUtc.AddDays(numDaysInMonth + 1)).ToList();
 
-            //get the total number of texts received
-            //get the total number of text sent
-            //get the most requested bus stop name (StopName)
+            //get message counts
+            List<BL.SMSLog.MessageCounts> messageCounts = pg.Daily.GroupBy(msg => msg.MessageBody).Select(agg => new BL.SMSLog.MessageCounts { MessageBody = agg.Key, Count = agg.Count() }).OrderByDescending(agg => agg.Count).ToList();
+            int y = 0;
+            if (messageCounts.Count() != 0)
+            {
+                for (int i = 0; i < messageCounts.Count(); i++)
+                {
+                   if(Int32.TryParse(messageCounts[i].MessageBody, out y))
+                    {
+                        break;
+                    }       
+                }
+            }
+            pg.MostPopularDaily = y;
+
+            messageCounts = pg.Weekly.GroupBy(msg => msg.MessageBody).Select(agg => new BL.SMSLog.MessageCounts { MessageBody = agg.Key, Count = agg.Count() }).OrderByDescending(agg => agg.Count).ToList();
+            int x = 0;
+            if (messageCounts.Count() != 0)
+            {
+                for (int i = 0; i < messageCounts.Count(); i++)
+                {
+                    if (Int32.TryParse(messageCounts[i].MessageBody, out x))
+                    {
+                        break;
+                    }
+                }
+            }
+            pg.MostPopularWeekly = x;
+
+            messageCounts = pg.Monthly.GroupBy(msg => msg.MessageBody).Select(agg => new BL.SMSLog.MessageCounts { MessageBody = agg.Key, Count = agg.Count() }).OrderByDescending(agg => agg.Count).ToList();
+            int z = 0;
+            if (messageCounts.Count() != 0)
+            {
+                for (int i = 0; i < messageCounts.Count(); i++)
+                {
+                    if (Int32.TryParse(messageCounts[i].MessageBody, out z))
+                    {
+                        break;
+                    }
+                }
+            }
+            pg.MostPopularMonthly = z;
+
             return View(pg);
         }
     }
