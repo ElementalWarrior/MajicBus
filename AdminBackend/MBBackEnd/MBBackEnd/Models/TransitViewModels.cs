@@ -13,6 +13,7 @@ namespace MBBackEnd.Models
         public string Description { get; set; }
         public DateTime dtCreated { get; set; }
         public int TripCount { get; set; }
+        public List<StopView> Stops { get; set; }
     }
     public class TripView
     {
@@ -30,5 +31,20 @@ namespace MBBackEnd.Models
         public String StopName { get; set; }
         public decimal? lat { get; set; }
         public decimal? lon { get; set; }
+        public string arrival_time { get; set; }
+        public string departure_time { get; set; }
     }
+
+    public class RouteShape
+    {
+        public decimal? lat { get; set; }
+        public decimal? lon { get; set; }
+    }
+
+    public class RouteWrapper
+    {
+        public List<Models.StopView> ViewStops { get; set; }
+        public RouteShape Shape { get; set; }
+    }
+
 }

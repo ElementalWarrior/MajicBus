@@ -25,4 +25,10 @@ namespace MBBackEnd.Models
         public DateTime dtReceived { get; set; }
         public DateTime dtSent { get; set; }
     }
+    public class SMSFilterPage
+    {
+        public List<SMSLogEntry> Messages { get; set; }
+        public String PhoneNumber { get; set; }
+        public String SanitizedPhoneNumber { get; set; }
+    }
 }

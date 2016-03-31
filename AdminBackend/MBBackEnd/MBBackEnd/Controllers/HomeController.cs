@@ -13,7 +13,7 @@ namespace MBBackEnd.Controllers
         {
             return View();
         }
-
+        
         public ActionResult ShowRoutes()
         {
             //get data from the database in the BL folder (BL = Business Logic of the site)
@@ -27,6 +27,8 @@ namespace MBBackEnd.Controllers
             //we want to abstract the information away from the database schema into the view
             //schema therefore we create "View Models" inside the Models folder and convert the 
             //data into those classes
+            
+            //Selects all stops 
             List<Models.RouteView> viewRoutes = routes.Select(r => new Models.RouteView
                 {
                     Description = r.Description,
@@ -34,8 +36,15 @@ namespace MBBackEnd.Controllers
                     NameLong = r.NameLong,
                     NameShort = r.NameShort,
                     RouteID = r.RouteID,
-                    TripCount = r.Trips.Count()
-                }).ToList();
+                    TripCount = r.Trips.Count(),
+                    Stops = r.Trips.First().StopTimes.Select(st => st.Stop).Select(s => new Models.StopView
+                    {
+                        StopID = s.StopID,
+                        lat = s.Lat,
+                        lon = s.Lon,
+
+                    }).ToList()
+            }).ToList();
 
             //pass this information to the view (Views/Home/ShowRoutes.cshtml)
             return View(viewRoutes);
@@ -43,6 +52,7 @@ namespace MBBackEnd.Controllers
             //or for the api return plain JSON data for the app to render.
             //return Json(viewRoutes, JsonRequestBehavior.AllowGet);
         }
+      
 
         public ActionResult ShowStops()
         {
@@ -80,15 +90,14 @@ namespace MBBackEnd.Controllers
             return Json(viewRoutes, JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult ShowStopsJSON()
+        public ActionResult ShowStopsJSON(int routeID)
         {
-            List<BL.Stop> stops = BL.Route.GetStopsByRouteID(97);
+            List<BL.Stop> stops = BL.Route.GetStopsByRouteID(routeID);
             List<Models.StopView> viewStops = stops.Select(r => new Models.StopView
             {
                 StopID = r.StopID,
                 lat = r.Lat,
                 lon = r.Lon,
-
             }).ToList();
             //Return plain JSON data for the app to render.
             return Json(viewStops, JsonRequestBehavior.AllowGet);
@@ -107,6 +116,7 @@ namespace MBBackEnd.Controllers
 
             return View();
         }
+        [Authorize]
         public ActionResult AdminPage()
         {
             //data domain models.
@@ -201,6 +211,29 @@ namespace MBBackEnd.Controllers
             pg.MostPopularMonthly = z;
 
             return View(pg);
+        }
+        [Authorize]
+        [Route("Home/SMSByPhone/{phoneNumber}")]
+        public ActionResult SMSByPhone(string phoneNumber)
+        {
+            List<BL.SMSLog> msgs = BL.SMSLog.GetMessagesByPhone(phoneNumber);
+
+            List<Models.SMSLogEntry> modelMsgs = msgs.Select(blLog => new Models.SMSLogEntry
+            {
+                dtReceived = blLog.dtReceived.Value,
+                dtSent = blLog.dtSent.Value,
+                MessageBody = blLog.MessageBody,
+                ReceivedFrom = blLog.ReceivedFrom,
+                SentTo = blLog.SentTo,
+                SMSLogID = blLog.SMSLogID
+            }).ToList();
+
+            return View(new Models.SMSFilterPage
+            {
+                Messages = modelMsgs,
+                PhoneNumber = phoneNumber,
+                SanitizedPhoneNumber = Classes.Utility.SanitizePhoneNumber(phoneNumber)
+            });
         }
     }
 }

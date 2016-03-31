@@ -25,5 +25,15 @@ namespace MBBackEnd.BL
                     group sms by sms.MessageBody into aggregate
                     select new BL.SMSLog.MessageCounts { MessageBody = aggregate.Key, Count = aggregate.Count() }).ToList();
         }
+        public static List<SMSLog> GetMessagesByPhone(string phoneNumber)
+        {
+            MajicBusEntities context = new MajicBusEntities();
+            phoneNumber = Classes.Utility.SanitizePhoneNumber(phoneNumber);
+            List<SMSLog> messages = (from sms in context.SMSLogs
+                                     where sms.ReceivedFrom == phoneNumber
+                                     || sms.SentTo == phoneNumber
+                                     select sms).ToList();
+            return messages; //Classes.Utility.S
+        }
     }
 }

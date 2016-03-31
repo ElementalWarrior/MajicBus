@@ -193,6 +193,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="App_Classes\Utility.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\IdentityConfig.cs" />
@@ -229,12 +230,14 @@
     <Compile Include="BL\Stop.cs">
       <DependentUpon>MajicBus.tt</DependentUpon>
     </Compile>
+    <Compile Include="BL\Stops.cs" />
     <Compile Include="BL\StopTime.cs">
       <DependentUpon>MajicBus.tt</DependentUpon>
     </Compile>
     <Compile Include="BL\Trip.cs">
       <DependentUpon>MajicBus.tt</DependentUpon>
     </Compile>
+    <Compile Include="BL\usp_estimatedBusLineSegment_Result.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
@@ -330,6 +333,8 @@
     <Content Include="Views\Home\ShowRoutes.cshtml" />
     <Content Include="Views\Home\ShowStops.cshtml" />
     <Content Include="Views\Home\AdminPage.cshtml" />
+    <Content Include="Views\Home\SMSByPhone.cshtml" />
+    <Content Include="Views\Home\ShowTimes.cshtml" />
     <None Include="Web.Staging.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
