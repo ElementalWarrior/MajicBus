@@ -29,7 +29,8 @@ namespace MBBackEnd.BL
         public virtual DbSet<RouteShape> RouteShapes { get; set; }
         public virtual DbSet<Route> Routes { get; set; }
         public virtual DbSet<Stop> Stops { get; set; }
-        public virtual DbSet<StopTime> StopTimes { get; set; }
         public virtual DbSet<Trip> Trips { get; set; }
+        public virtual DbSet<SMSLog> SMSLogs { get; set; }
+        public virtual DbSet<StopTime> StopTimes { get; set; }
     }
 }

@@ -2,33 +2,55 @@ package majicbus.gpsapp;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.ImageButton;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
-import java.util.ArrayList;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
 
-public class MainActivity extends AppCompatActivity {
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
+public class MainActivity extends AppCompatActivity implements OnTaskCompleted{
+    private ArrayList<String> Routes;
+
+    @Override
+    public void onTaskCompleted(String response){
+        loadData(response);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Routes = new ArrayList<String>();
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        initTable();
-        //createRouteLinks();
+
+        createMapButton();
+
+        //Make HTTP Request, will callback to the loadData function
+        HTTPConnection conn = new HTTPConnection(this);
+        conn.makeConnection("http://192.168.1.19/Home/showRoutesJSON");
     }
 
     @Override
@@ -53,77 +75,72 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void createRouteLinks(){
-        /*
-        final ArrayList<String> routeData = new ArrayList<String>();
-        routeData.add("Route 10");
-        final Intent intent = new Intent(MainActivity.this, MapsActivity.class);
-        intent.putStringArrayListExtra("routeData", routeData);
-
-        CompoundButton R97 = (CompoundButton)findViewById(R.id.Box10);
-        btn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                routeData.add("Route 97");
-            }
-        });
-
-        CompoundButton R10 = (CompoundButton)findViewById(R.id.Box10);
-        btn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                routeData.add("Route 10");
-            }
-        });
-
-        CompoundButton R8 = (CompoundButton)findViewById(R.id.Box10);
-        btn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                routeData.add("Route 8");
-            }
-
-        });
-
-
+    public void createMapButton(){
         Button btn = (Button)findViewById(R.id.MapBtn);
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, MapsActivity.class);
+                intent.putStringArrayListExtra("routeData", Routes);
                 startActivity(intent);
             }
         });
-        */
     }
 
-    //Puts data into the table to show route information
-    //Going to be used to dynamically get data from the DB and then
-    //Display it dynamically. Will have to keep track of which are selected
-    //Then put the data into an ArrayList or something to transfer to the map page
-    public void initTable(){
+    /*
+      Puts data into the table to show route information
+      Creates event listeners to keep track of which are selected
+      Then selected routes are put into an ArrayList to transfer to the map
+    */
+    public void loadData(String JSON){
         TableLayout ll = (TableLayout) findViewById(R.id.RouteTable);
-        ArrayList<String> Routes = new ArrayList<String>();
-        Routes.add("name: \"Route 97\", stops: {lat: , lng: }");
-        Routes.add("name: \"Route 10\", stops: {lat: , lng: }");
-        Routes.add("name: \"Route 8\", stops: {lat: , lng: }");
-        Routes.add("name: \"Route 1\", stops: {lat: , lng: }");
-        Routes.add("name: \"Route 23\", stops: {lat: , lng: }");;
+        Gson parser = new Gson();
 
-        //Still going to need to figure out how to get listeners on these then add them to an arraylist
-        //when they're checked
-        for (int i = 0; i < Routes.size(); i++) {
+        try {
+             List routeList = parser.fromJson(JSON, List.class);
+
+            for (int i = 0; i < routeList.size(); i++) {
+                StringBuilder build = new StringBuilder();
+
+                TableRow row= new TableRow(this);
+                TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT);
+                row.setLayoutParams(lp);
+                CheckBox routeBox = new CheckBox(this);
+
+                Map<String, Object> routeMap = (Map)(routeList).get(i);
+                build.append("Route ");
+                build.append((String)routeMap.get("NameShort")).append(": ");
+                build.append((String) routeMap.get("NameLong"));
+                String result = build.toString();
+
+                routeBox.setText(result);
+                routeBox.setId(((Double)routeMap.get("RouteID")).intValue());
+
+                //Create listener
+                CompoundButton Btn = (CompoundButton)routeBox;
+                Btn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        String id = String.valueOf(buttonView.getId());
+                        if (isChecked)
+                            Routes.add(id);
+                        else
+                            Routes.remove(id);
+                    }
+                });
+
+                row.addView(routeBox);
+                ll.addView(row, i + 1);
+            }
+        }catch(JsonSyntaxException e){
+            Log.v("foo",JSON);
             TableRow row= new TableRow(this);
             TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT);
             row.setLayoutParams(lp);
-            CheckBox routeBox = new CheckBox(this);
-            String routeName = Routes.get(i);
-            //Parse out route name
-            //routeName = substring(after name: before rest)
-            routeBox.setText(routeName);
-            routeBox.setId(i);
-            row.addView(routeBox);
-            ll.addView(row,i + 1);
+            TextView text = new TextView(this);
+            text.setText("Error fetching route data.");
+            row.addView(text);
+            ll.addView(row, 1);
         }
-        //theres a good chance none of this works.
     }
 }

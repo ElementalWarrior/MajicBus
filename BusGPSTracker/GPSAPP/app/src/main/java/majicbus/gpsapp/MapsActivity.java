@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -15,70 +16,84 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.gson.Gson;
 
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.net.HttpURLConnection;
+import java.net.ProtocolException;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
-
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, OnTaskCompleted {
+    private ArrayList<String> routeList;
     private GoogleMap mMap;
+
+    @Override
+    public void onTaskCompleted(String response){
+        loadData(response);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
     }
 
+    public void loadData(String json){
+        Gson parser = new Gson();
+        List stopsList = parser.fromJson(json, List.class);
+        PolylineOptions ops = new PolylineOptions();
+        for (int j = 0; j < stopsList.size(); j++) {
+            Map<String, Object> stopMap = (Map)(stopsList).get(j);
+            double lat = (Double)stopMap.get("lat");
+            double lng = (Double)stopMap.get("lon");
 
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
+            //Need to add stop times and route number
+            StringBuilder build = new StringBuilder();
+
+            build.append("Stop: ");
+            build.append(((Double)stopMap.get("StopID")).intValue());
+            LatLng point = new LatLng(lat,lng);
+            mMap.addMarker(new MarkerOptions().position(point).title(build.toString()));
+            ops.add(point);
+        }
+        ops.color(Color.BLUE);
+        ops.width(5);
+        mMap.addPolyline(ops);
+    }
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         //Get data passed from the previous page
         Intent routeData = getIntent();
-        ArrayList<String> routesList = routeData.getStringArrayListExtra("routeData");
+        routeList = routeData.getStringArrayListExtra("routeData");
+
+        //For testing purposes, tests the listeners.
+        for(int i = 0; i < routeList.size(); i++)
+            Log.v("Route", routeList.get(i));
+
+
         mMap = googleMap;
-
-        //Display each route
-        for(int i = 0; i < routesList.size(); i++){
-            String route = routesList.get(i);
-            String stopsString = route.substring(route.indexOf("stops:"));
-            String[] stopArr = stopsString.split(",");
-
-            double lastLat = 0;
-            double lastLng = 0;
-            //Display all the stops on a route
-            for(int j = 0; j < stopArr.length; j++){
-                double lat = (double)stopArr[j].indexOf("lat:");
-                double lng = (double)stopArr[j].indexOf("lng:");
-                LatLng point = new LatLng(lat,lng);
-                mMap.addMarker(new MarkerOptions().position(point));
-                if(j > 0){
-                    mMap.addPolyline((new PolylineOptions())
-                            .add(new LatLng(lastLat,lastLng), new LatLng(lat,lng)).width(5).color(Color.BLUE)
-                            .geodesic(true));
-                }
-                lastLat = lat;
-                lastLng = lng;
-            }
-        //theres a good chance none of this works.
-
-        }
-
-        // Add a marker in Kelowna and move the camera
+//
+        // Move the camera to Kelowna
         LatLng Kelowna = new LatLng(49.887952, -119.496011);
-        //mMap.addMarker(new MarkerOptions().position(Kelowna).title("Marker in Kelowna!"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(Kelowna));
         mMap.moveCamera(CameraUpdateFactory.zoomTo(10));
+
+        HTTPConnection conn = new HTTPConnection(this);
+        conn.makeConnection("http://192.168.1.19/Home/ShowStopsJSON");
+
     }
 }

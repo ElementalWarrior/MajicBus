@@ -9,9 +9,10 @@
         <EntityTypeShape EntityType="BL.Model.RouteShape" Width="1.5" PointX="7.25" PointY="3.875" IsExpanded="true" />
         <EntityTypeShape EntityType="BL.Model.Route" Width="1.5" PointX="0.75" PointY="4" />
         <EntityTypeShape EntityType="BL.Model.Stop" Width="1.5" PointX="3.125" PointY="1.25" />
-        <EntityTypeShape EntityType="BL.Model.StopTime" Width="1.5" PointX="5.25" PointY="3.75" />
         <EntityTypeShape EntityType="BL.Model.Trip" Width="1.5" PointX="3" PointY="3.75" />
         <AssociationConnector Association="BL.Model.fkTripsRouteID" />
+        <EntityTypeShape EntityType="BL.Model.SMSLog" Width="1.5" PointX="0.75" PointY="0.75" />
+        <EntityTypeShape EntityType="BL.Model.StopTime" Width="1.5" PointX="5.25" PointY="2.5" />
         <AssociationConnector Association="BL.Model.fkStopTimesStopID" />
         <AssociationConnector Association="BL.Model.fkStopTimesTripID" />
         </Diagram>
