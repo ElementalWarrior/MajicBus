@@ -5,6 +5,11 @@ using System.Web;
 
 namespace MBBackEnd.Models
 {
+    public class BusPositionPage
+    {
+        public List<StopView> RouteShapes { get; set; }
+        public Classes.Coordinate BusPosition { get; set; }
+    }
     public class RouteView
     {
         public int RouteID { get; set; }

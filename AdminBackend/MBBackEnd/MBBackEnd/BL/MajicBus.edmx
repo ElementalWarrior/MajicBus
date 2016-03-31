@@ -45,12 +45,14 @@ warning 6002: The table/view 'mbdev01.dbo.RouteShapes' does not have a primary k
         <EntityType Name="RouteShapes">
           <Key>
             <PropertyRef Name="RouteShapeID" />
+            <PropertyRef Name="SortID" />
+            <PropertyRef Name="RouteID" />
           </Key>
           <Property Name="RouteShapeID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="RouteID" Type="int" />
+          <Property Name="RouteID" Type="int" Nullable="false" />
           <Property Name="Lon" Type="decimal" Precision="19" Scale="16" />
           <Property Name="Lat" Type="decimal" Precision="19" Scale="16" />
-          <Property Name="SortID" Type="int" />
+          <Property Name="SortID" Type="int" Nullable="false" />
           <Property Name="dtCreated" Type="datetime" />
         </EntityType>
         <EntityType Name="SMSLogs">
@@ -137,6 +139,11 @@ warning 6002: The table/view 'mbdev01.dbo.RouteShapes' does not have a primary k
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Function Name="usp_estimatedBusLineSegment" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="timeUtc" Type="datetime" Mode="In" />
+          <Parameter Name="utcOffset" Type="varchar" Mode="In" />
+          <Parameter Name="routeid" Type="int" Mode="In" />
+        </Function>
         <EntityContainer Name="BLModelStoreContainer">
           <EntitySet Name="Routes" EntityType="Self.Routes" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="SMSLogs" EntityType="Self.SMSLogs" Schema="dbo" store:Type="Tables" />
@@ -210,12 +217,14 @@ warning 6002: The table/view 'mbdev01.dbo.RouteShapes' does not have a primary k
         <EntityType Name="RouteShape">
           <Key>
             <PropertyRef Name="RouteShapeID" />
+            <PropertyRef Name="SortID" />
+            <PropertyRef Name="RouteID" />
           </Key>
           <Property Name="RouteShapeID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="RouteID" Type="Int32" />
+          <Property Name="RouteID" Type="Int32" Nullable="false" />
           <Property Name="Lon" Type="Decimal" Precision="19" Scale="16" />
           <Property Name="Lat" Type="Decimal" Precision="19" Scale="16" />
-          <Property Name="SortID" Type="Int32" />
+          <Property Name="SortID" Type="Int32" Nullable="false" />
           <Property Name="dtCreated" Type="DateTime" Precision="3" />
         </EntityType>
         <EntityContainer Name="MajicBusEntities" annotation:LazyLoadingEnabled="true">
@@ -238,6 +247,11 @@ warning 6002: The table/view 'mbdev01.dbo.RouteShapes' does not have a primary k
             <End Role="Trip" EntitySet="Trips" />
             <End Role="StopTime" EntitySet="StopTimes" />
           </AssociationSet>
+          <FunctionImport Name="usp_estimatedBusLineSegment" ReturnType="Collection(BL.Model.usp_estimatedBusLineSegment_Result)">
+            <Parameter Name="timeUtc" Mode="In" Type="DateTime" />
+            <Parameter Name="utcOffset" Mode="In" Type="String" />
+            <Parameter Name="routeid" Mode="In" Type="Int32" />
+          </FunctionImport>
         </EntityContainer>
         <EntityType Name="Route">
           <Key>
@@ -339,6 +353,18 @@ warning 6002: The table/view 'mbdev01.dbo.RouteShapes' does not have a primary k
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <ComplexType Name="usp_estimatedBusLineSegment_Result">
+          <Property Type="Int32" Name="routeid" Nullable="true" />
+          <Property Type="Int32" Name="tripid" Nullable="false" />
+          <Property Type="Int32" Name="s1ID" Nullable="false" />
+          <Property Type="DateTime" Name="dtS1Departure" Nullable="true" Precision="23" />
+          <Property Type="Decimal" Name="s1Lat" Nullable="true" Precision="19" Scale="16" />
+          <Property Type="Decimal" Name="s1Lon" Nullable="true" Precision="19" Scale="16" />
+          <Property Type="Int32" Name="s2ID" Nullable="false" />
+          <Property Type="DateTime" Name="dtS2Departure" Nullable="true" Precision="23" />
+          <Property Type="Decimal" Name="s2Lat" Nullable="true" Precision="19" Scale="16" />
+          <Property Type="Decimal" Name="s2Lon" Nullable="true" Precision="19" Scale="16" />
+        </ComplexType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -434,6 +460,22 @@ warning 6002: The table/view 'mbdev01.dbo.RouteShapes' does not have a primary k
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="usp_estimatedBusLineSegment" FunctionName="BL.Model.Store.usp_estimatedBusLineSegment">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="BL.Model.usp_estimatedBusLineSegment_Result">
+                <ScalarProperty Name="routeid" ColumnName="routeid" />
+                <ScalarProperty Name="tripid" ColumnName="tripid" />
+                <ScalarProperty Name="s1ID" ColumnName="s1ID" />
+                <ScalarProperty Name="dtS1Departure" ColumnName="dtS1Departure" />
+                <ScalarProperty Name="s1Lat" ColumnName="s1Lat" />
+                <ScalarProperty Name="s1Lon" ColumnName="s1Lon" />
+                <ScalarProperty Name="s2ID" ColumnName="s2ID" />
+                <ScalarProperty Name="dtS2Departure" ColumnName="dtS2Departure" />
+                <ScalarProperty Name="s2Lat" ColumnName="s2Lat" />
+                <ScalarProperty Name="s2Lon" ColumnName="s2Lon" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>
