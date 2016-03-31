@@ -40,4 +40,18 @@ namespace MBBackEnd.Models
         public string departure_time { get; set; }
     }
 
+    public class RouteShape
+    {
+        public int? ShapeID { get; set; }
+        public int? RouteID { get; set; }
+        public decimal? lat { get; set; }
+        public decimal? lon { get; set; }
+    }
+
+    public class RouteWrapper
+    {
+        public List<Models.StopView> ViewStops { get; set; }
+        public RouteShape Shape { get; set; }
+    }
+
 }

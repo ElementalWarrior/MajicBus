@@ -60,6 +60,7 @@
         <button id="Weekly" class="btn btn-default">Weekly</button>
         <button id="Monthly" class="btn btn-default">Monthly</button>
     </div>
+</div>
 
     <!--Table-->
     <div class="container">
@@ -94,44 +95,44 @@
             <div class="row-fluid">
                 <div class="container">
                     <p> Number of Texts Sent/Received: @Model.Daily.Count()</p>
-                    <p> Most popular bus stop (Bus Id): </p>
+                    <p> Most popular bus route: @Model.MostPopularDaily</p>
                 </div>
             </div>
         </div>
 
         <div id="tblWeekly" style="display:none">
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>Date Sent</th>
-                    <th>Date Received</th>
-                    <th>Received From</th>
-                    <th>Sent to</th>
-                    <th>Message</th>
-                </tr>
-            </thead>
-
-            <tbody>
-                @foreach (var sms in Model.Weekly)
-                {
+            <table class="table table-bordered">
+                <thead>
                     <tr>
-                        <td>@sms.dtSent.AddHours(-7)</td>
-                        <td>@sms.dtReceived.AddHours(-7)</td>
+                        <th>Date Sent</th>
+                        <th>Date Received</th>
+                        <th>Received From</th>
+                        <th>Sent to</th>
+                        <th>Message</th>
+                    </tr>
+                </thead>
+
+             <tbody>
+                    @foreach (var sms in Model.Weekly)
+                    {
+                        <tr>
+                            <td>@sms.dtSent.AddHours(-7)</td>
+                            <td>@sms.dtReceived.AddHours(-7)</td>
                         <td><a href="@Url.Action("SMSByPhone")/@sms.ReceivedFrom">@sms.ReceivedFrom</a></td>
                         <td><a href="@Url.Action("SMSByPhone")/@sms.SentTo">@sms.SentTo</a></td>
-                        <td>@Html.Encode(sms.MessageBody)</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-        <!--summary on each page -->
-        <div class="row-fluid">
-            <div class="container">
-                <p> Number of Texts Sent/Received: @Model.Weekly.Count()</p>
-                <p> Most popular bus stop (Bus Id): </p>
+                            <td>@Html.Encode(sms.MessageBody)</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <!--summary on each page -->
+            <div class="row-fluid">
+                <div class="container">
+                    <p> Number of Texts Sent/Received: @Model.Weekly.Count()</p>
+                    <p> Most popular bus route: @Model.MostPopularWeekly</p>
+                </div>
             </div>
         </div>
-    </div>
 
     <div id="tblMonthly" style="display:none">
         <table class="table table-bordered">
@@ -162,7 +163,7 @@
         <div class="row-fluid">
             <div class="container">
                 <p> Number of Texts Sent/Received: @Model.Monthly.Count()</p>
-                <p> Most popular bus stop (Bus Id): </p>
+                <p> Most popular bus route: @Model.MostPopularMonthly</p>
             </div>
         </div>
     </div>

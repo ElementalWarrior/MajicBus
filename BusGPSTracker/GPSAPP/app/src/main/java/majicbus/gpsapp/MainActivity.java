@@ -133,7 +133,11 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleted{
                 ll.addView(row, i + 1);
             }
         }catch(JsonSyntaxException e){
-            Log.v("foo",JSON);
+            //Retry connection
+            HTTPConnection conn = new HTTPConnection(this);
+            conn.makeConnection("http://192.168.1.19/Home/showRoutesJSON");
+
+            /*Log.v("foo",JSON);
             TableRow row= new TableRow(this);
             TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT);
             row.setLayoutParams(lp);
@@ -141,6 +145,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleted{
             text.setText("Error fetching route data.");
             row.addView(text);
             ll.addView(row, 1);
+            */
         }
     }
 }
