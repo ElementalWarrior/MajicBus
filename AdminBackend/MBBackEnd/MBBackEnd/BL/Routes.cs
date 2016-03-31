@@ -30,7 +30,7 @@ namespace MBBackEnd.BL
                                where r.RouteID == routeID
                                orderby st.SortID
                                select s).ToList();
-            //BRONSON LOOK AT THIS
+        
             DateTime now = DateTime.UtcNow.AddHours(-7);
             DateTime utcMidnight = DateTime.UtcNow.AddHours(-7);
             utcMidnight.AddHours(-1 * utcMidnight.Hour);
@@ -38,6 +38,7 @@ namespace MBBackEnd.BL
             utcMidnight.AddSeconds(-1 * utcMidnight.Second);
             TimeSpan ts = now - utcMidnight;
             DateTime normalizedNow = new DateTime(ts.Ticks);
+
             List<StopTime> times = (from r in context.Routes
                                 join t in context.Trips on r.RouteID equals t.RouteID
                                 join st in context.StopTimes on t.TripID equals st.TripID

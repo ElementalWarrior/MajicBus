@@ -31,13 +31,19 @@
             };
             
             for(var  i=0; i < window.busStops.length; i++){
-                
-                var content = "bus stops would show up here"
+              
+                var stop = window.busStops[i];
+                var Dtimes; 
+                for (var i = 0; i < stop.Dtimes.length; i++) {
+                    Dtimes += stop.Dtimes[i] + ", ";
+                } 
+                var content = 
+                    "The next 5 times are" + Dtimes;
+
+
                 var myinfowindow = new google.maps.InfoWindow({
                     content: content
                 });
-
-                var stop = window.busStops[i];
 
                 window.markers.push(new google.maps.Marker({
                     position: {lat: stop.lat, lng: stop.lon},

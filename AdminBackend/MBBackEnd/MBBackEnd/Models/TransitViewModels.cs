@@ -33,6 +33,7 @@ namespace MBBackEnd.Models
         public decimal? lon { get; set; }
         public string arrival_time { get; set; }
         public string departure_time { get; set; }
+        public List<String> Dtimes { get; set; } 
     }
 
 }

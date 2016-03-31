@@ -27,9 +27,9 @@ namespace MBBackEnd.BL
     
         public virtual ICollection<Trip> Trips { get; set; }
 
-        internal static List<BL.Time> GetTimesByRouteID(int v)
-        {
-            throw new NotImplementedException();
-        }
+        //internal static List<BL.Time> GetTimesByRouteID(int v)
+        //{
+        //    throw new NotImplementedException();
+        //}
     }
 }
