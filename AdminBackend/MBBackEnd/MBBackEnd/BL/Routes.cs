@@ -30,7 +30,26 @@ namespace MBBackEnd.BL
                                where r.RouteID == routeID
                                orderby st.SortID
                                select s).ToList();
+            //BRONSON LOOK AT THIS
+            DateTime now = DateTime.UtcNow.AddHours(-7);
+            DateTime utcMidnight = DateTime.UtcNow.AddHours(-7);
+            utcMidnight.AddHours(-1 * utcMidnight.Hour);
+            utcMidnight.AddMinutes(-1 * utcMidnight.Minute);
+            utcMidnight.AddSeconds(-1 * utcMidnight.Second);
+            TimeSpan ts = now - utcMidnight;
+            DateTime normalizedNow = new DateTime(ts.Ticks);
+            List<StopTime> times = (from r in context.Routes
+                                join t in context.Trips on r.RouteID equals t.RouteID
+                                join st in context.StopTimes on t.TripID equals st.TripID
+                                where r.RouteID == routeID && st.dtDeparture >= normalizedNow
+                                    orderby st.SortID
+                                select st).ToList(); 
 
+            foreach(Stop s in stops)
+            {
+                s.Dtimes = times.Where(st => st.StopID == s.StopID).OrderBy(st => st.SortID).Take(5).Select(st => st.Departure).ToList();
+            }
+            
             //TODO: select the next 5 times or so from the database based on routeID (for each stop!!)
             //you will need to compare the time for this, so compare the dtDeparture >= DateTime.UtcNow.AddHours(-7)
             //compile this information into a List<KeyValuePair<int, List<String>>>, the first list's key will be the stopid,
