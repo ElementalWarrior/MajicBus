@@ -37,6 +37,8 @@ namespace MBBackEnd.Models
 
     public class RouteShape
     {
+        public int? ShapeID { get; set; }
+        public int? RouteID { get; set; }
         public decimal? lat { get; set; }
         public decimal? lon { get; set; }
     }
