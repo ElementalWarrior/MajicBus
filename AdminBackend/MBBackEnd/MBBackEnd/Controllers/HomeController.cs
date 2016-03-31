@@ -90,15 +90,14 @@ namespace MBBackEnd.Controllers
             return Json(viewRoutes, JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult ShowStopsJSON()
+        public ActionResult ShowStopsJSON(int routeID)
         {
-            List<BL.Stop> stops = BL.Route.GetStopsByRouteID(97);
+            List<BL.Stop> stops = BL.Route.GetStopsByRouteID(routeID);
             List<Models.StopView> viewStops = stops.Select(r => new Models.StopView
             {
                 StopID = r.StopID,
                 lat = r.Lat,
                 lon = r.Lon,
-  
             }).ToList();
             //Return plain JSON data for the app to render.
             return Json(viewStops, JsonRequestBehavior.AllowGet);
