@@ -15,16 +15,13 @@ namespace MBBackEnd.BL
     {
         public Nullable<int> routeid { get; set; }
         public int tripid { get; set; }
-        public int stopid { get; set; }
-        public Nullable<System.DateTime> dtdeparture { get; set; }
-        public Nullable<int> sortID { get; set; }
-        public Nullable<long> RowNumber { get; set; }
-        public int TripID1 { get; set; }
-        public int StopID1 { get; set; }
-        public string Arrival { get; set; }
-        public string Departure { get; set; }
-        public Nullable<int> SortID1 { get; set; }
-        public System.DateTime dtCreated { get; set; }
-        public Nullable<System.DateTime> dtDeparture1 { get; set; }
+        public int s1ID { get; set; }
+        public Nullable<System.DateTime> dtS1Departure { get; set; }
+        public Nullable<decimal> s1Lat { get; set; }
+        public Nullable<decimal> s1Lon { get; set; }
+        public int s2ID { get; set; }
+        public Nullable<System.DateTime> dtS2Departure { get; set; }
+        public Nullable<decimal> s2Lat { get; set; }
+        public Nullable<decimal> s2Lon { get; set; }
     }
 }
