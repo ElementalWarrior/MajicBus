@@ -16,6 +16,14 @@
                 mapTypeId:google.maps.MapTypeId.ROADMAP
             };
             var map = new google.maps.Map(document.getElementById("googleMap"), mapProp);
+            
+            //where the content would go
+            var contentString = '<b> this would be where the bus stops show </b>'
+            
+            //infowindow 
+            var infowindow = new google.maps.InfoWindow({
+                content: contentString });
+            
             // setMarkers(map);
 
             var image = {
@@ -38,6 +46,9 @@
                     title: stop.RouteID,
             
                 }));
+                marker.addListener('click',function() { 
+                    infowindow.open(map,marker);
+                });
             }
         }
         google.maps.event.addDomListener(window, 'load', initialize);

@@ -27,7 +27,7 @@ namespace MBBackEnd.Controllers
             //schema therefore we create "View Models" inside the Models folder and convert the 
             //data into those classes
             
-            //TO DO: Selects all stops 
+            //Selects all stops 
             List<Models.RouteView> viewRoutes = routes.Select(r => new Models.RouteView
                 {
                     Description = r.Description,
@@ -76,7 +76,7 @@ namespace MBBackEnd.Controllers
             //return Json(viewRoutes, JsonRequestBehavior.AllowGet);
         }
 
-
+  
 
         public ActionResult About()
         {

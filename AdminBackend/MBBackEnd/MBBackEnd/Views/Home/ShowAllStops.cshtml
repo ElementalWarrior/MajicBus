@@ -44,6 +44,7 @@
 
         // Data for the markers consisting of a name, a LatLng and a zIndex for the
         // order in which these markers should display on top of each other.
+       
    
         
 
@@ -81,10 +82,17 @@
                     title: busStop[0],
                     zIndex: busStop[3]
                 });
+
+                google.maps.event.addListener(marker,'click', (function(marker, i){
+                    return function(){
+                        infowindow.setContent(markers[i].getAttribute("stopTimes"));
+                        infowindow.open(map, marker);
+                    }
+                }) (marker,i)); 
             }
         }
 
-
+     
 
 
 

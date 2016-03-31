@@ -26,5 +26,10 @@ namespace MBBackEnd.BL
         public System.DateTime dtCreated { get; set; }
     
         public virtual ICollection<Trip> Trips { get; set; }
+
+        internal static List<BL.Time> GetTimesByRouteID(int v)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

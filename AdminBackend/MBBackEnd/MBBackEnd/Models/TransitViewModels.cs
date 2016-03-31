@@ -30,5 +30,8 @@ namespace MBBackEnd.Models
         public int StopID { get; set; }
         public decimal? lat { get; set; }
         public decimal? lon { get; set; }
+        public string arrival_time { get; set; }
+        public string departure_time { get; set; }
     }
+
 }
