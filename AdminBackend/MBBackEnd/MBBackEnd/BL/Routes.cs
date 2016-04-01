@@ -19,7 +19,21 @@ namespace MBBackEnd.BL
             //
             return context.Routes.Include("Trips.StopTimes.Stop").ToList();
         }
-     //create stops to return lat / long  and stop ids 
+
+        //For RouteList for App
+        public static List<Route> GetRoutesJ()
+        {
+            var context = new MajicBusEntities();
+            //return (from r in context.Routes
+            //        join t in context.Trips on r.RouteID equals t.RouteID
+            //        select r).Distinct().ToList();
+
+            //
+            return context.Routes.ToList();
+        }
+
+
+        //create stops to return lat / long  and stop ids 
         public static List<Stop> GetStopsByRouteID(int routeID)
         {
             var context = new MajicBusEntities();
@@ -59,9 +73,6 @@ namespace MBBackEnd.BL
             //I've added a stops.cs class in the BL folder. you will need to modify that and add the list of stop times to the stop class.
 
             return stops;
-
-            
-            
         }
     }
      

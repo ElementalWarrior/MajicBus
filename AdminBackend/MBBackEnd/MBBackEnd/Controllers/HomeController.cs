@@ -76,7 +76,7 @@ namespace MBBackEnd.Controllers
 
         public ActionResult ShowRoutesJSON()
         {
-            List<BL.Route> routes = BL.Route.GetRoutes();
+            List<BL.Route> routes = BL.Route.GetRoutesJ();
             List<Models.RouteViewJ> viewRoutes = routes.Select(r => new Models.RouteViewJ
             {
                 NameLong = r.NameLong,
