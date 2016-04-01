@@ -36,33 +36,41 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true" />
 
-    <TableLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_above="@+id/MapBtn"
-        android:id="@+id/RouteTable">
 
-        <TableRow
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:scrollbars="none"
+        android:layout_weight="1">
+
+        <TableLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_above="@+id/MapBtn"
+            android:id="@+id/RouteTable">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="Routes"
-                android:id="@+id/RouteView"
-                android:layout_column="0" />
-        </TableRow>
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="Routes"
+                    android:id="@+id/RouteView"
+                    android:layout_column="0" />
+            </TableRow>
 
-        </TableRow>
-    </TableLayout>
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+            </TableRow>
+        </TableLayout>
+    </ScrollView>
 
 </RelativeLayout>
 

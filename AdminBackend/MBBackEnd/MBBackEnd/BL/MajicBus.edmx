@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-    <Schema Namespace="BL.Model.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012.Azure" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="BL.Model.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012.Azure" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <!--Errors Found During Generation:
 warning 6002: The table/view 'mbdev01.dbo.Calendar' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="Calendar">
@@ -45,12 +45,14 @@ warning 6002: The table/view 'mbdev01.dbo.RouteShapes' does not have a primary k
         <EntityType Name="RouteShapes">
           <Key>
             <PropertyRef Name="RouteShapeID" />
+            <PropertyRef Name="SortID" />
+            <PropertyRef Name="RouteID" />
           </Key>
           <Property Name="RouteShapeID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="RouteID" Type="int" />
+          <Property Name="RouteID" Type="int" Nullable="false" />
           <Property Name="Lon" Type="decimal" Precision="19" Scale="16" />
           <Property Name="Lat" Type="decimal" Precision="19" Scale="16" />
-          <Property Name="SortID" Type="int" />
+          <Property Name="SortID" Type="int" Nullable="false" />
           <Property Name="dtCreated" Type="datetime" />
         </EntityType>
         <EntityType Name="SMSLogs">
@@ -79,14 +81,15 @@ warning 6002: The table/view 'mbdev01.dbo.RouteShapes' does not have a primary k
           <Key>
             <PropertyRef Name="TripID" />
             <PropertyRef Name="StopID" />
-            <PropertyRef Name="dtDeparture" />
+            <PropertyRef Name="Departure" />
           </Key>
           <Property Name="TripID" Type="int" Nullable="false" />
           <Property Name="StopID" Type="int" Nullable="false" />
-          <Property Name="dtArrival" Type="varchar" MaxLength="8" />
-          <Property Name="dtDeparture" Type="varchar" MaxLength="8" Nullable="false" />
+          <Property Name="Arrival" Type="varchar" MaxLength="8" />
+          <Property Name="Departure" Type="varchar" MaxLength="8" Nullable="false" />
           <Property Name="SortID" Type="int" />
           <Property Name="dtCreated" Type="datetime" Nullable="false" />
+          <Property Name="dtDeparture" Type="datetime" />
         </EntityType>
         <EntityType Name="Trips">
           <Key>
@@ -136,6 +139,11 @@ warning 6002: The table/view 'mbdev01.dbo.RouteShapes' does not have a primary k
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Function Name="usp_estimatedBusLineSegment" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="timeUtc" Type="datetime" Mode="In" />
+          <Parameter Name="utcOffset" Type="varchar" Mode="In" />
+          <Parameter Name="routeid" Type="int" Mode="In" />
+        </Function>
         <EntityContainer Name="BLModelStoreContainer">
           <EntitySet Name="Routes" EntityType="Self.Routes" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="SMSLogs" EntityType="Self.SMSLogs" Schema="dbo" store:Type="Tables" />
@@ -209,12 +217,14 @@ warning 6002: The table/view 'mbdev01.dbo.RouteShapes' does not have a primary k
         <EntityType Name="RouteShape">
           <Key>
             <PropertyRef Name="RouteShapeID" />
+            <PropertyRef Name="SortID" />
+            <PropertyRef Name="RouteID" />
           </Key>
           <Property Name="RouteShapeID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="RouteID" Type="Int32" />
+          <Property Name="RouteID" Type="Int32" Nullable="false" />
           <Property Name="Lon" Type="Decimal" Precision="19" Scale="16" />
           <Property Name="Lat" Type="Decimal" Precision="19" Scale="16" />
-          <Property Name="SortID" Type="Int32" />
+          <Property Name="SortID" Type="Int32" Nullable="false" />
           <Property Name="dtCreated" Type="DateTime" Precision="3" />
         </EntityType>
         <EntityContainer Name="MajicBusEntities" annotation:LazyLoadingEnabled="true">
@@ -222,12 +232,13 @@ warning 6002: The table/view 'mbdev01.dbo.RouteShapes' does not have a primary k
           <EntitySet Name="RouteShapes" EntityType="Self.RouteShape" />
           <EntitySet Name="Routes" EntityType="BL.Model.Route" />
           <EntitySet Name="Stops" EntityType="BL.Model.Stop" />
-          <EntitySet Name="StopTimes" EntityType="BL.Model.StopTime" />
           <EntitySet Name="Trips" EntityType="BL.Model.Trip" />
           <AssociationSet Name="fkTripsRouteID" Association="BL.Model.fkTripsRouteID">
             <End Role="Route" EntitySet="Routes" />
             <End Role="Trip" EntitySet="Trips" />
           </AssociationSet>
+          <EntitySet Name="SMSLogs" EntityType="BL.Model.SMSLog" />
+          <EntitySet Name="StopTimes" EntityType="BL.Model.StopTime" />
           <AssociationSet Name="fkStopTimesStopID" Association="BL.Model.fkStopTimesStopID">
             <End Role="Stop" EntitySet="Stops" />
             <End Role="StopTime" EntitySet="StopTimes" />
@@ -236,7 +247,11 @@ warning 6002: The table/view 'mbdev01.dbo.RouteShapes' does not have a primary k
             <End Role="Trip" EntitySet="Trips" />
             <End Role="StopTime" EntitySet="StopTimes" />
           </AssociationSet>
-          <EntitySet Name="SMSLogs" EntityType="BL.Model.SMSLog" />
+          <FunctionImport Name="usp_estimatedBusLineSegment" ReturnType="Collection(BL.Model.usp_estimatedBusLineSegment_Result)">
+            <Parameter Name="timeUtc" Mode="In" Type="DateTime" />
+            <Parameter Name="utcOffset" Mode="In" Type="String" />
+            <Parameter Name="routeid" Mode="In" Type="Int32" />
+          </FunctionImport>
         </EntityContainer>
         <EntityType Name="Route">
           <Key>
@@ -260,21 +275,6 @@ warning 6002: The table/view 'mbdev01.dbo.RouteShapes' does not have a primary k
           <Property Name="Lon" Type="Decimal" Precision="19" Scale="16" />
           <Property Name="dtCreated" Type="DateTime" Nullable="false" Precision="3" />
           <NavigationProperty Name="StopTimes" Relationship="BL.Model.fkStopTimesStopID" FromRole="Stop" ToRole="StopTime" />
-        </EntityType>
-        <EntityType Name="StopTime">
-          <Key>
-            <PropertyRef Name="TripID" />
-            <PropertyRef Name="StopID" />
-            <PropertyRef Name="dtDeparture" />
-          </Key>
-          <Property Name="TripID" Type="Int32" Nullable="false" />
-          <Property Name="StopID" Type="Int32" Nullable="false" />
-          <Property Name="dtArrival" Type="String" MaxLength="8" FixedLength="false" Unicode="false" />
-          <Property Name="dtDeparture" Type="String" Nullable="false" MaxLength="8" FixedLength="false" Unicode="false" />
-          <Property Name="SortID" Type="Int32" />
-          <Property Name="dtCreated" Type="DateTime" Nullable="false" Precision="3" />
-          <NavigationProperty Name="Stop" Relationship="BL.Model.fkStopTimesStopID" FromRole="StopTime" ToRole="Stop" />
-          <NavigationProperty Name="Trip" Relationship="BL.Model.fkStopTimesTripID" FromRole="StopTime" ToRole="Trip" />
         </EntityType>
         <EntityType Name="Trip">
           <Key>
@@ -302,6 +302,33 @@ warning 6002: The table/view 'mbdev01.dbo.RouteShapes' does not have a primary k
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <EntityType Name="SMSLog">
+          <Key>
+            <PropertyRef Name="SMSLogID" />
+          </Key>
+          <Property Name="SMSLogID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ReceivedFrom" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="SentTo" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="MessageBody" Type="String" MaxLength="160" FixedLength="false" Unicode="false" />
+          <Property Name="dtReceived" Type="DateTime" Precision="3" />
+          <Property Name="dtSent" Type="DateTime" Precision="3" />
+        </EntityType>
+        <EntityType Name="StopTime">
+          <Key>
+            <PropertyRef Name="TripID" />
+            <PropertyRef Name="StopID" />
+            <PropertyRef Name="Departure" />
+          </Key>
+          <Property Name="TripID" Type="Int32" Nullable="false" />
+          <Property Name="StopID" Type="Int32" Nullable="false" />
+          <Property Name="Arrival" Type="String" MaxLength="8" FixedLength="false" Unicode="false" />
+          <Property Name="Departure" Type="String" Nullable="false" MaxLength="8" FixedLength="false" Unicode="false" />
+          <Property Name="SortID" Type="Int32" />
+          <Property Name="dtCreated" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="dtDeparture" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="Stop" Relationship="BL.Model.fkStopTimesStopID" FromRole="StopTime" ToRole="Stop" />
+          <NavigationProperty Name="Trip" Relationship="BL.Model.fkStopTimesTripID" FromRole="StopTime" ToRole="Trip" />
+        </EntityType>
         <Association Name="fkStopTimesStopID">
           <End Type="BL.Model.Stop" Role="Stop" Multiplicity="1" />
           <End Type="BL.Model.StopTime" Role="StopTime" Multiplicity="*" />
@@ -326,17 +353,18 @@ warning 6002: The table/view 'mbdev01.dbo.RouteShapes' does not have a primary k
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <EntityType Name="SMSLog">
-          <Key>
-            <PropertyRef Name="SMSLogID" />
-          </Key>
-          <Property Name="SMSLogID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="ReceivedFrom" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
-          <Property Name="SentTo" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
-          <Property Name="MessageBody" Type="String" MaxLength="160" FixedLength="false" Unicode="false" />
-          <Property Name="dtReceived" Type="DateTime" Precision="3" />
-          <Property Name="dtSent" Type="DateTime" Precision="3" />
-        </EntityType>
+        <ComplexType Name="usp_estimatedBusLineSegment_Result">
+          <Property Type="Int32" Name="routeid" Nullable="true" />
+          <Property Type="Int32" Name="tripid" Nullable="false" />
+          <Property Type="Int32" Name="s1ID" Nullable="false" />
+          <Property Type="DateTime" Name="dtS1Departure" Nullable="true" Precision="23" />
+          <Property Type="Decimal" Name="s1Lat" Nullable="true" Precision="19" Scale="16" />
+          <Property Type="Decimal" Name="s1Lon" Nullable="true" Precision="19" Scale="16" />
+          <Property Type="Int32" Name="s2ID" Nullable="false" />
+          <Property Type="DateTime" Name="dtS2Departure" Nullable="true" Precision="23" />
+          <Property Type="Decimal" Name="s2Lat" Nullable="true" Precision="19" Scale="16" />
+          <Property Type="Decimal" Name="s2Lon" Nullable="true" Precision="19" Scale="16" />
+        </ComplexType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -394,18 +422,6 @@ warning 6002: The table/view 'mbdev01.dbo.RouteShapes' does not have a primary k
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="StopTimes">
-            <EntityTypeMapping TypeName="BL.Model.StopTime">
-              <MappingFragment StoreEntitySet="StopTimes">
-                <ScalarProperty Name="dtCreated" ColumnName="dtCreated" />
-                <ScalarProperty Name="SortID" ColumnName="SortID" />
-                <ScalarProperty Name="dtDeparture" ColumnName="dtDeparture" />
-                <ScalarProperty Name="dtArrival" ColumnName="dtArrival" />
-                <ScalarProperty Name="StopID" ColumnName="StopID" />
-                <ScalarProperty Name="TripID" ColumnName="TripID" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="Trips">
             <EntityTypeMapping TypeName="BL.Model.Trip">
               <MappingFragment StoreEntitySet="Trips">
@@ -431,6 +447,35 @@ warning 6002: The table/view 'mbdev01.dbo.RouteShapes' does not have a primary k
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="StopTimes">
+            <EntityTypeMapping TypeName="BL.Model.StopTime">
+              <MappingFragment StoreEntitySet="StopTimes">
+                <ScalarProperty Name="dtDeparture" ColumnName="dtDeparture" />
+                <ScalarProperty Name="dtCreated" ColumnName="dtCreated" />
+                <ScalarProperty Name="SortID" ColumnName="SortID" />
+                <ScalarProperty Name="Departure" ColumnName="Departure" />
+                <ScalarProperty Name="Arrival" ColumnName="Arrival" />
+                <ScalarProperty Name="StopID" ColumnName="StopID" />
+                <ScalarProperty Name="TripID" ColumnName="TripID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="usp_estimatedBusLineSegment" FunctionName="BL.Model.Store.usp_estimatedBusLineSegment">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="BL.Model.usp_estimatedBusLineSegment_Result">
+                <ScalarProperty Name="routeid" ColumnName="routeid" />
+                <ScalarProperty Name="tripid" ColumnName="tripid" />
+                <ScalarProperty Name="s1ID" ColumnName="s1ID" />
+                <ScalarProperty Name="dtS1Departure" ColumnName="dtS1Departure" />
+                <ScalarProperty Name="s1Lat" ColumnName="s1Lat" />
+                <ScalarProperty Name="s1Lon" ColumnName="s1Lon" />
+                <ScalarProperty Name="s2ID" ColumnName="s2ID" />
+                <ScalarProperty Name="dtS2Departure" ColumnName="dtS2Departure" />
+                <ScalarProperty Name="s2Lat" ColumnName="s2Lat" />
+                <ScalarProperty Name="s2Lon" ColumnName="s2Lon" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

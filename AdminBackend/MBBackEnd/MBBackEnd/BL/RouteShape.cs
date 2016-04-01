@@ -15,10 +15,10 @@ namespace MBBackEnd.BL
     public partial class RouteShape
     {
         public int RouteShapeID { get; set; }
-        public Nullable<int> RouteID { get; set; }
+        public int RouteID { get; set; }
         public Nullable<decimal> Lon { get; set; }
         public Nullable<decimal> Lat { get; set; }
-        public Nullable<int> SortID { get; set; }
+        public int SortID { get; set; }
         public Nullable<System.DateTime> dtCreated { get; set; }
     }
 }

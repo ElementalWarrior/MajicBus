@@ -1,0 +1,111 @@
+﻿@model List<MBBackEnd.Models.StopView>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="http://maps.googleapis.com/maps/api/js">
+    </script>
+    <script>
+        window.busStops = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model));
+        window.markers = [];
+
+        function initialize() {
+            var mapProp = {
+                center:new google.maps.LatLng(49.882114,-119.477829),
+                zoom:12,
+                mapTypeId:google.maps.MapTypeId.ROADMAP
+            };
+            var map = new google.maps.Map(document.getElementById("googleMap"), mapProp);
+
+            //where the content would go
+            var contentString = '<b> this would be where the bus stops show </b>'
+
+            //infowindow
+            var infowindow = new google.maps.InfoWindow({
+                content: contentString });
+
+            // setMarkers(map);
+
+            var image = {
+                url: 'http://i.imgur.com/qyMqRlM.png',
+                // This marker is 20 pixels wide by 32 pixels high.
+                size: new google.maps.Size(20, 32),
+                // The origin for this image is (0, 0).
+                origin: new google.maps.Point(0, 0),
+                // The anchor for this image is the base of the flagpole at (0, 32).
+                anchor: new google.maps.Point(0, 32)
+            };
+
+            for(var  i=0; i < window.busStops.length; i++){
+                var stop = window.busStops[i];
+                window.markers.push(new google.maps.Marker({
+                    position: {lat: stop.lat, lng: stop.lon},
+                    map: map,
+                    icon: image,
+                    //shape: shape,
+                    title: stop.RouteID,
+
+                }));
+
+            }
+        }
+        google.maps.event.addDomListener(window, 'load', initialize);
+
+        // Data for the markers consisting of a name, a LatLng and a zIndex for the
+        // order in which these markers should display on top of each other.
+
+
+
+        function setMarkers(map) {
+            // Adds markers to the map.
+
+            // Marker sizes are expressed as a Size of X,Y where the origin of the image
+            // (0,0) is located in the top left of the image.
+
+            // Origins, anchor positions and coordinates of the marker increase in the X
+            // direction to the right and in the Y direction down.
+            var image = {
+                url: 'http://i.imgur.com/qyMqRlM.png',
+                // This marker is 20 pixels wide by 32 pixels high.
+                size: new google.maps.Size(20, 32),
+                // The origin for this image is (0, 0).
+                origin: new google.maps.Point(0, 0),
+                // The anchor for this image is the base of the flagpole at (0, 32).
+                anchor: new google.maps.Point(0, 32)
+            };
+            // Shapes define the clickable region of the icon. The type defines an HTML
+            // <area> element 'poly' which traces out a polygon as a series of X,Y points.
+            // The final coordinate closes the poly by connecting to the first coordinate.
+            var shape = {
+                coords: [1, 1, 1, 20, 18, 20, 18, 1],
+                type: 'poly'
+            };
+            for (var i = 0; i < busStops.length; i++) {
+                var busStop = busStops[i];
+                var marker = new google.maps.Marker({
+                    position: { lat: busStop[1], lng: busStop[2] },
+                    map: map,
+                    icon: image,
+                    shape: shape,
+                    title: busStop[0],
+                    zIndex: busStop[3]
+                });
+            }
+        }
+
+
+
+
+
+    </script>
+</head>
+<body>
+    <h2 class="text-center">Majic Bus- Kelowna, BC</h2>
+    <div id="googleMap" style="width:1000px;height:500px;"></div>
+    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+    <div class="form-group">
+        <label for="route">Bus Route: </label>
+        <input type="route" class="form-control" id="route" placeholder="Enter Bus Route: ">
+    </div>
+</body>
+</html>
