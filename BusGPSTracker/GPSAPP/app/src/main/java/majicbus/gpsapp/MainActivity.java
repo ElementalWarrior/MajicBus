@@ -29,8 +29,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+
 public class MainActivity extends AppCompatActivity implements OnTaskCompleted{
     private ArrayList<String> Routes;
+    static String URL = "http://192.168.1.16";
 
     @Override
     public void onTaskCompleted(String response){
@@ -50,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleted{
 
         //Make HTTP Request, will callback to the loadData function
         HTTPConnection conn = new HTTPConnection(this);
-        conn.makeConnection("http://192.168.1.19/Home/showRoutesJSON");
+        conn.makeConnection(URL +"/Home/showRoutesJSON");
     }
 
     @Override
@@ -133,11 +135,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleted{
                 ll.addView(row, i + 1);
             }
         }catch(JsonSyntaxException e){
-            //Retry connection
-            HTTPConnection conn = new HTTPConnection(this);
-            conn.makeConnection("http://192.168.1.19/Home/showRoutesJSON");
-
-            /*Log.v("foo",JSON);
+            Log.v("foo",JSON);
             TableRow row= new TableRow(this);
             TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT);
             row.setLayoutParams(lp);
@@ -145,7 +143,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleted{
             text.setText("Error fetching route data.");
             row.addView(text);
             ll.addView(row, 1);
-            */
+
         }
     }
 }

@@ -63,8 +63,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             //Need to add stop times and route number
             StringBuilder build = new StringBuilder();
 
-            build.append("Stop: ");
-            build.append(((Double)stopMap.get("StopID")).intValue());
+            build.append("Stop: ").append(((Double)stopMap.get("StopID")).intValue());
+            build.append(" ").append(stopMap.get("StopName"));
             LatLng point = new LatLng(lat,lng);
             mMap.addMarker(new MarkerOptions().position(point).title(build.toString()));
             ops.add(point);
@@ -80,10 +80,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Intent routeData = getIntent();
         routeList = routeData.getStringArrayListExtra("routeData");
 
-        //For testing purposes, tests the listeners.
-        for(int i = 0; i < routeList.size(); i++)
-            Log.v("Route", routeList.get(i));
 
+        String url = MainActivity.URL + "/Home/ShowStopsJSON";
+        if(!routeList.isEmpty())
+            url += "?routeID=" + routeList.get(0);
+        else
+            url += "?routeID=97"; //Just for testing
 
         mMap = googleMap;
 //
@@ -93,7 +95,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.moveCamera(CameraUpdateFactory.zoomTo(10));
 
         HTTPConnection conn = new HTTPConnection(this);
-        conn.makeConnection("http://192.168.1.19/Home/ShowStopsJSON");
+        conn.makeConnection(url);
 
     }
 }

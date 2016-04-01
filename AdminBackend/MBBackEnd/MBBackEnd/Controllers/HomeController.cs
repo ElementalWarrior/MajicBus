@@ -77,14 +77,12 @@ namespace MBBackEnd.Controllers
         public ActionResult ShowRoutesJSON()
         {
             List<BL.Route> routes = BL.Route.GetRoutes();
-            List<Models.RouteView> viewRoutes = routes.Select(r => new Models.RouteView
+            List<Models.RouteViewJ> viewRoutes = routes.Select(r => new Models.RouteViewJ
             {
-                Description = r.Description,
-                dtCreated = r.dtCreated,
                 NameLong = r.NameLong,
                 NameShort = r.NameShort,
                 RouteID = r.RouteID,
-                TripCount = r.Trips.Count()
+                //TripCount = r.Trips.Count(),
             }).ToList();
             //Return plain JSON data for the app to render.
             return Json(viewRoutes, JsonRequestBehavior.AllowGet);
@@ -93,11 +91,13 @@ namespace MBBackEnd.Controllers
         public ActionResult ShowStopsJSON(int routeID)
         {
             List<BL.Stop> stops = BL.Route.GetStopsByRouteID(routeID);
-            List<Models.StopView> viewStops = stops.Select(r => new Models.StopView
+            List<Models.StopViewJ> viewStops = stops.Select(r => new Models.StopViewJ
             {
                 StopID = r.StopID,
                 lat = r.Lat,
                 lon = r.Lon,
+                StopName = r.StopName,
+                Dtimes = r.Dtimes,
             }).ToList();
             //Return plain JSON data for the app to render.
             return Json(viewStops, JsonRequestBehavior.AllowGet);
