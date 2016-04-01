@@ -11,8 +11,10 @@
 
 </head>
 <body>
+    <div id="layoutMap"></div>
     <header>
         <div class="container">
+            <a href="#" id="logo"><img src="/content/images/logo.png" /></a>
             <div class="navbar navbar-inverse ">
                 <div class="navbar-header">
                     <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -43,6 +45,58 @@
         </div>
     </div>
 
-    @RenderSection("scripts", required: false)
+        @RenderSection("scripts", required: false)
+    <script src="http://maps.googleapis.com/maps/api/js">
+    </script>
+    <script type="text/javascript">
+        var mapStyle = new google.maps.StyledMapType([
+  {
+      "stylers": [
+        { "hue": "#0008ff" },
+        { "gamma": 0.45 },
+        { "lightness": -46 },
+        { "saturation": -63 }
+      ]
+  }, {
+      "featureType": "landscape",
+      "stylers": [
+        { "saturation": 17 }
+      ]
+  }, {
+      "featureType": "road",
+      "stylers": [
+        { "saturation": 31 },
+        { "hue": "#ff6e00" }
+      ]
+  }, {
+      "featureType": "road.local",
+      "stylers": [
+        { "lightness": 28 },
+        { "hue": "#d400ff" }
+      ]
+  }, {
+      "elementType": "labels",
+      "stylers": [
+        { "visibility": "off" }
+      ]
+  }
+        ]);
+        var headerMap = new google.maps.Map($('#layoutMap')[0], {
+            center: { lat: 49.883523, lng: -119.459585 },
+            zoom: 12,
+            mapTypeControlOptions: {
+                mapTypeIds: [google.maps.MapTypeId.ROADMAP, 'headermap']
+            },
+            disableDefaultUI: true,
+            draggable: false,
+            zoomControl: false,
+            scrollwheel: false,
+            disableDoubleClickZoom: true
+        });
+        headerMap.mapTypes.set('headermap', mapStyle);
+        headerMap.setMapTypeId('headermap');
+
+
+    </script>
 </body>
 </html>
