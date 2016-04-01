@@ -1,10 +1,15 @@
 package majicbus.gpsapp;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -12,11 +17,14 @@ import com.google.android.gms.maps.GoogleMapOptions;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 
 
 import java.io.IOException;
@@ -53,49 +61,89 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     public void loadData(String json){
         Gson parser = new Gson();
-        List stopsList = parser.fromJson(json, List.class);
-        PolylineOptions ops = new PolylineOptions();
-        for (int j = 0; j < stopsList.size(); j++) {
-            Map<String, Object> stopMap = (Map)(stopsList).get(j);
-            double lat = (Double)stopMap.get("lat");
-            double lng = (Double)stopMap.get("lon");
+        try {
+            List stopsList = parser.fromJson(json, List.class);
+            PolylineOptions pOps = new PolylineOptions();
+            for (int j = 0; j < stopsList.size(); j++) {
+                Map<String, Object> stopMap = (Map) (stopsList).get(j);
+                double lat = (Double) stopMap.get("lat");
+                double lng = (Double) stopMap.get("lon");
 
-            //Need to add stop times and route number
-            StringBuilder build = new StringBuilder();
+                LatLng point = new LatLng(lat, lng);
+                MarkerOptions mOps = new MarkerOptions();
 
-            build.append("Stop: ").append(((Double)stopMap.get("StopID")).intValue());
-            build.append(" ").append(stopMap.get("StopName"));
-            LatLng point = new LatLng(lat,lng);
-            mMap.addMarker(new MarkerOptions().position(point).title(build.toString()));
-            ops.add(point);
+                mOps.title("Stop: " + ((Double) stopMap.get("StopID")).intValue());
+
+                StringBuilder build = new StringBuilder();
+                build.append(stopMap.get("StopName"));
+                build.append("\nNext 5 Times:\n");
+                List TimeList = (List)stopMap.get("Dtimes");
+                for(int k = 0; k < TimeList.size(); k++)
+                    build.append(TimeList.get(k)).append("\n");
+
+                mOps.position(point);
+                mOps.snippet(build.toString());
+                mOps.icon(BitmapDescriptorFactory.fromResource(R.mipmap.stop_icon));
+
+                mMap.addMarker(mOps);
+                mMap.setInfoWindowAdapter(new MarkerInfoWindowAdapter());
+                pOps.add(point);
+            }
+            pOps.color(Color.BLUE);
+            pOps.width(5);
+            mMap.addPolyline(pOps);
         }
-        ops.color(Color.BLUE);
-        ops.width(5);
-        mMap.addPolyline(ops);
+        catch(JsonSyntaxException ex){
+            Log.v("JSON", json);
+        }
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(49.887952, -119.496011)));
+        mMap.moveCamera(CameraUpdateFactory.zoomTo(10));
+
         //Get data passed from the previous page
         Intent routeData = getIntent();
         routeList = routeData.getStringArrayListExtra("routeData");
 
+        //If there was a route selected, do the stuff.
+        if(!routeList.isEmpty()) {
+            String url = MainActivity.URL + "/Home/ShowStopsJSON?routeID=" + routeList.get(0);
 
-        String url = MainActivity.URL + "/Home/ShowStopsJSON";
-        if(!routeList.isEmpty())
-            url += "?routeID=" + routeList.get(0);
-        else
-            url += "?routeID=97"; //Just for testing
+            HTTPConnection conn = new HTTPConnection(this);
+            conn.makeConnection(url);
+        }
 
-        mMap = googleMap;
-//
-        // Move the camera to Kelowna
-        LatLng Kelowna = new LatLng(49.887952, -119.496011);
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(Kelowna));
-        mMap.moveCamera(CameraUpdateFactory.zoomTo(10));
+    }
 
-        HTTPConnection conn = new HTTPConnection(this);
-        conn.makeConnection(url);
 
+
+
+
+    public class MarkerInfoWindowAdapter implements GoogleMap.InfoWindowAdapter
+    {
+        public MarkerInfoWindowAdapter()
+        {
+        }
+
+        @Override
+        public View getInfoWindow(Marker marker){return null;}
+
+        @Override
+        public View getInfoContents(Marker marker) {
+
+            View v  = getLayoutInflater().inflate(R.layout.infowindow_layout, null);
+
+            //ImageView markerIcon = (ImageView) v.findViewById(R.mipmap.stop_icon);
+
+            TextView markerLabel = (TextView)v.findViewById(R.id.marker_label);
+
+            //  markerIcon.setImageResource(manageMarkerIcon(myMarker.getmIcon()));
+
+            markerLabel.setText(marker.getTitle() + "\n" +  marker.getSnippet());
+            return v;
+        }
     }
 }
