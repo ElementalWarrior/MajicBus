@@ -19,9 +19,9 @@ namespace MBBackEnd.Controllers
             List<RouteShape> shapePosition = (from rs in context.RouteShapes
                                               where rs.RouteID == routeID
                                               select rs).ToList();
-            int routeShape = shapePosition.First().RouteShapeID;
+            int routeShape = shapePosition.GroupBy(rs => rs.RouteShapeID).OrderByDescending(agg => agg.Count()).First().Key;
             shapePosition = shapePosition.Where(s => s.RouteShapeID == routeShape).OrderBy(rs => rs.SortID).ToList();
-            BL.Coordinate busPos = BL.Bus.GetBusPosition(routeID);
+            List<BL.Coordinate> busPos = BL.Bus.GetBusPosition(routeID);
             return View(new Models.BusPositionPage
             {
                 RouteShapes = shapePosition.Select(s => new Models.StopView
@@ -29,7 +29,7 @@ namespace MBBackEnd.Controllers
                     lat = s.Lat,
                     lon = s.Lon
                 }).ToList(),
-                BusPosition = new Classes.Coordinate(busPos.Latitude, busPos.Longitude)
+                BusPositions = busPos.Select(bp => new Classes.Coordinate(bp.Latitude, bp.Longitude)).ToList()
             });
         }
 	}
