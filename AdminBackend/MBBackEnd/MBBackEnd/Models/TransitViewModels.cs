@@ -8,7 +8,7 @@ namespace MBBackEnd.Models
     public class BusPositionPage
     {
         public List<StopView> RouteShapes { get; set; }
-        public Classes.Coordinate BusPosition { get; set; }
+        public List<Classes.Coordinate> BusPositions { get; set; }
     }
     public class RouteView
     {
