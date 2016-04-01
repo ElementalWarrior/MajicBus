@@ -67,7 +67,7 @@ namespace MBBackEnd.Controllers
                 StopID = r.StopID,
                 lat = r.Lat,
                 lon = r.Lon,
-          
+                Dtimes = r.Dtimes
             }).ToList();
 
             //pass this information to the view (Views/Home/ShowRoutes.cshtml)

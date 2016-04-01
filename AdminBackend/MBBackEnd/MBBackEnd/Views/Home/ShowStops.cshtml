@@ -30,14 +30,21 @@
                 anchor: new google.maps.Point(0, 32)
             };
             
+     
             for(var  i=0; i < window.busStops.length; i++){
-                
-                var content = "bus stops would show up here"
+                var Dtimes = ''; 
+                var stop = window.busStops[i];
+
+                for (var j = 0; j < stop.Dtimes.length; j++) {
+                    Dtimes += stop.Dtimes[j] + "<br>";
+                } 
+                var content = 
+                    "The next 5 times are <br> " + Dtimes;
+
+
                 var myinfowindow = new google.maps.InfoWindow({
                     content: content
                 });
-
-                var stop = window.busStops[i];
 
                 window.markers.push(new google.maps.Marker({
                     position: {lat: stop.lat, lng: stop.lon},
