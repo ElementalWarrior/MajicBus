@@ -35,12 +35,14 @@ import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, OnTaskCompleted {
     private ArrayList<String> routeList;
+    private HashMap<Integer, MarkerOptions> BusHashMap; //possible way to keep track of buses?
     private GoogleMap mMap;
 
     @Override
