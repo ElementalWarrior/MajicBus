@@ -13,7 +13,8 @@ namespace MBBackEnd.BL
             MajicBusEntities context = new MajicBusEntities();
             List<RouteShape> shapePosition = (from rs in context.RouteShapes
                                               where rs.RouteID == routeID
-                                              select rs).OrderBy(rs => rs.SortID).ToList();
+                                              orderby rs.RouteShapeID, rs.SortID
+                                              select rs).ToList();
             return shapePosition;
         }
 
