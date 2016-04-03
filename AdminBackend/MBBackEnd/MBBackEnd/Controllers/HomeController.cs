@@ -148,20 +148,20 @@ namespace MBBackEnd.Controllers
         }
 
 
-        //This Doesn't Work, Please help
+        //This Doesn't Work?, Please help
         public ActionResult ShowBusPositionsJSON(List<int> routeIDs)
         {
             //Wrapper to hold route id and the stops
-            List<Models.RouteBusViewJ> Routes = new List<Models.RouteBusViewJ>();
+            List<RouteBusViewJ> Routes = new List<RouteBusViewJ>();
 
             //For each route given
             for (int i = 0; i < routeIDs.Count; i++)
             {
                 //Add a list of buses to the routeviewJ
-                Models.RouteBusViewJ Route = new Models.RouteBusViewJ
+                RouteBusViewJ Route = new RouteBusViewJ
                 {
                     routeID = routeIDs.ElementAt(i),
-                    Buses = BL.Bus.GetBusPosition(routeIDs.ElementAt(i)).Select(r => new Models.BusJ
+                    Buses = BL.Bus.GetBusPosition(routeIDs.ElementAt(i)).Select(r => new BusJ
                     {
                         Lat = r.Latitude,
                         Lon = r.Longitude
