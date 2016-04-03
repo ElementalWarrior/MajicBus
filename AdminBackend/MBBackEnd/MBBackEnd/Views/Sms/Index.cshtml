@@ -84,8 +84,8 @@
                             <!--adding the -7 hours takes it from UTC time to our time-->
                             <td>@sms.dtSent.AddHours(-7)</td>
                             <td>@sms.dtReceived.AddHours(-7)</td>
-                            <td><a href="@Url.Action("SMSByPhone")/@sms.ReceivedFrom">@sms.ReceivedFrom</a></td>
-                            <td><a href="@Url.Action("SMSByPhone")/@sms.SentTo">@sms.SentTo</a></td>
+                            <td><a href="@Url.Action("ByPhone")/@sms.ReceivedFrom">@sms.ReceivedFrom</a></td>
+                            <td><a href="@Url.Action("ByPhone")/@sms.SentTo">@sms.SentTo</a></td>
                             <td>@Html.Encode(sms.MessageBody)</td>
                         </tr>
                     }
@@ -118,8 +118,8 @@
                         <tr>
                             <td>@sms.dtSent.AddHours(-7)</td>
                             <td>@sms.dtReceived.AddHours(-7)</td>
-                        <td><a href="@Url.Action("SMSByPhone")/@sms.ReceivedFrom">@sms.ReceivedFrom</a></td>
-                        <td><a href="@Url.Action("SMSByPhone")/@sms.SentTo">@sms.SentTo</a></td>
+                        <td><a href="@Url.Action("ByPhone")/@sms.ReceivedFrom">@sms.ReceivedFrom</a></td>
+                        <td><a href="@Url.Action("ByPhone")/@sms.SentTo">@sms.SentTo</a></td>
                             <td>@Html.Encode(sms.MessageBody)</td>
                         </tr>
                     }
@@ -152,8 +152,8 @@
                     <tr>
                         <td>@sms.dtSent.AddHours(-7)</td>
                         <td>@sms.dtReceived.AddHours(-7)</td>
-                        <td><a href="@Url.Action("SMSByPhone")/@sms.ReceivedFrom">@sms.ReceivedFrom</a></td>
-                        <td><a href="@Url.Action("SMSByPhone")/@sms.SentTo">@sms.SentTo</a></td>
+                        <td><a href="@Url.Action("ByPhone")/@sms.ReceivedFrom">@sms.ReceivedFrom</a></td>
+                        <td><a href="@Url.Action("ByPhone")/@sms.SentTo">@sms.SentTo</a></td>
                         <td>@Html.Encode(sms.MessageBody)</td>
                     </tr>
                 }

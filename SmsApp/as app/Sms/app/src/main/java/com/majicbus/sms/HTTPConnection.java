@@ -5,6 +5,7 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.provider.Telephony;
 import android.util.Log;
 
 import com.majicbus.sms.OnTaskCompleted;
@@ -20,12 +21,21 @@ import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.URL;
+import java.net.URLEncoder;
 
 public class HTTPConnection extends AsyncTask<String, Void, String> {
     protected Context appContext;
+    private String _type;
+    private String _returnPhoneNumber;
 
-    public HTTPConnection(Context newContext){
+    public HTTPConnection(Context newContext, String type){
         appContext = newContext;
+        _type = type;
+    }
+    public HTTPConnection(Context newContext, String type, String retNumber)
+    {
+        this(newContext, type);
+        _returnPhoneNumber = retNumber;
     }
 
     public int makeConnection(String url){
@@ -72,8 +82,22 @@ public class HTTPConnection extends AsyncTask<String, Void, String> {
 
     @Override // onPostExecute displays the results of the AsyncTask.
     protected void onPostExecute(String response) {
-        ((OnTaskCompleted)appContext).onTaskCompleted(response);
+        if(response != null) {
+            ((OnTaskCompleted) appContext).onTaskCompleted(response, _type);
+        }
+        if(response == null && _returnPhoneNumber != null)
+        {
+            String body = "There was a problem contacting the server. Please try again.";
+            SmsListener.sendSMS(_returnPhoneNumber, body);
+            try {
+                body = URLEncoder.encode(body, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+            ((MainActivity)appContext).LogMessageSent(body, _returnPhoneNumber);
+        }
     }
+
 
 
     //Converts the Input stream to a string

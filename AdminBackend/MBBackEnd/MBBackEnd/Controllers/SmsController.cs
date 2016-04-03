@@ -16,6 +16,11 @@ namespace MBBackEnd.Controllers
             int stopID = Int32.Parse(body);
             return Json(new { Phone = from, Data = BL.Route.GetStopByStopID(stopID) }, JsonRequestBehavior.AllowGet);
         }
+        public ActionResult LogMessageSent(String from, String to, String body)
+        {
+            BL.SMSLog.UpdateSmsLog(from, to, body);
+            return Json("", JsonRequestBehavior.AllowGet);
+        }
         [Authorize]
         public ActionResult Index()
         {

@@ -27,6 +27,22 @@ public class SmsListener extends BroadcastReceiver {
         SmsManager sms = SmsManager.getDefault();
         sms.sendTextMessage(phoneNumber, null, message, null, null);
         MainActivity.TotalSent++;
+
+        class ToastRunnable implements Runnable {
+            Activity _active;
+            String _body;
+            String _address;
+            public ToastRunnable(Activity active, String msgBody, String msgAddress)
+            {
+                _active = active;
+                _body = msgBody;
+                _address = msgAddress;
+            }
+            public void run(){
+                ((MainActivity)_active).LogMessageSent(_body, _address);
+            }
+        }
+        _activity.runOnUiThread(new ToastRunnable(_activity, message, phoneNumber));
     }
     public void setActivity(Activity active)
     {

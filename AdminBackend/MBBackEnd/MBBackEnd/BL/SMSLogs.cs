@@ -47,6 +47,7 @@ namespace MBBackEnd.BL
                 dtSent = DateTime.UtcNow,
                 dtReceived = DateTime.UtcNow
             });
+            context.SaveChanges();
         }
     }
 }
