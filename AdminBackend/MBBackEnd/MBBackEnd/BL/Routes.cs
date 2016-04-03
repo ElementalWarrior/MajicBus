@@ -101,6 +101,7 @@ namespace MBBackEnd.BL
             utcMidnight = utcMidnight.AddSeconds(-1 * utcMidnight.Second);
             TimeSpan ts = now - utcMidnight;
             DateTime normalizedNow = new DateTime(1900, 1, 1) + ts;
+
             List<S> times = (from st in context.StopTimes
                                     join t in context.Trips on st.TripID equals t.TripID
                                     where st.StopID == stopID && st.dtDeparture >= normalizedNow

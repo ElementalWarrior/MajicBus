@@ -38,6 +38,7 @@ import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements OnTaskCompleted {
     public static int TotalReceived;
@@ -50,13 +51,6 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleted {
 
     public void onTaskCompleted(String response) {
 
-        //TODO: parse json for message body and phone number
-
-
-        String body = "";
-        //TODO: parse the stop times from the response and turn into string max 128 characters long
-
-        //TODO: send to phone number the times
 
         Gson parser = new Gson();
         JsonParser jp = new JsonParser();
@@ -94,7 +88,47 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleted {
                     e.printStackTrace();
                 }
             }
-            SmsListener.sendSMS(phone, "hihi");
+
+            Object[] keys = routes.keySet().toArray();
+
+            int currentKey = (int)keys[0];
+            int i = 0;
+            int timeIndexToAppend = 0;
+            String smsResponse = "";
+            String[] routetimes = new String[keys.length];
+            while(smsResponse.length() < 128 && timeIndexToAppend < 5)
+            {
+                currentKey = (int)keys[i];
+                if(timeIndexToAppend == 0)
+                {
+                    routetimes[i] = "{" + currentKey + "} ";
+                }
+                try {
+                    String t = routes.get(currentKey).get(timeIndexToAppend).toString();
+                    int lastColon = t.lastIndexOf(":");
+                    t = t.substring(0, lastColon);
+                    if((smsResponse + t + ",").length() > 128)
+                    {
+                        break;
+                    } else{
+                        routetimes[i] += t + ",";
+                    }
+                } catch(IndexOutOfBoundsException ex)
+                {
+                }
+                i++;
+
+                if(i > keys.length-1)
+                {
+                    i = 0;
+                    timeIndexToAppend++;
+                }
+            }
+            for(i = 0; i < keys.length; i++)
+            {
+                smsResponse += routetimes[i].substring(0, routetimes[i].length()-1) + " ";
+            }
+            SmsListener.sendSMS(phone, smsResponse);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -123,12 +157,15 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleted {
 
         intentreceiver = new SmsListener();
         intentreceiver.setActivity(this);
+//        IntentFilter filter = new IntentFilter(Telephony.Sms.Intents.SMS_RECEIVED_ACTION);
+//        filter.setPriority(998);
+//        registerReceiver(intentreceiver, filter);
     }
     public void GetStopInformation(String body, String address)
     {
         HTTPConnection conn = new HTTPConnection(this);
         String number = ((TelephonyManager)this.getSystemService(Context.TELEPHONY_SERVICE)).getLine1Number();
-        conn.makeConnection("http://192.168.1.11/Sms/Receive?from=" + address + "&to=" + number + "&body=" + body, "");
+        conn.makeConnection("http://192.168.0.11/Sms/Receive?from=" + address + "&to=" + number + "&body=" + body);
     }
 
 

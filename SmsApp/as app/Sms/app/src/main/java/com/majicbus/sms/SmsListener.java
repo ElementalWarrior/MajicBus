@@ -35,10 +35,9 @@ public class SmsListener extends BroadcastReceiver {
 @Override
     public void onReceive(Context context, Intent intent) {
 //check if action is received text
-    Bundle extras = intent.getExtras();
-    if (extras == null)
-        return;
-    if (Telephony.Sms.Intents.SMS_RECEIVED_ACTION.equals(intent.getAction())) {
+
+    if (Telephony.Sms.Intents.DATA_SMS_RECEIVED_ACTION.equals(intent.getAction())
+        || Telephony.Sms.Intents.SMS_RECEIVED_ACTION.equals(intent.getAction())) {
         for (SmsMessage smsMessage : Telephony.Sms.Intents.getMessagesFromIntent(intent)) {
             //save msg and address
 
