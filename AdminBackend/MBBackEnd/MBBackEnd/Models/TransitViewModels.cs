@@ -8,7 +8,7 @@ namespace MBBackEnd.Models
     public class BusPositionPage
     {
         public List<StopView> RouteShapes { get; set; }
-        public Classes.Coordinate BusPosition { get; set; }
+        public List<Classes.Coordinate> BusPositions { get; set; }
     }
     public class RouteView
     {
@@ -20,6 +20,7 @@ namespace MBBackEnd.Models
         public int TripCount { get; set; }
         public List<StopView> Stops { get; set; }
     }
+
     public class TripView
     {
         public int TripID { get; set; }
@@ -38,6 +39,7 @@ namespace MBBackEnd.Models
         public decimal? lon { get; set; }
         public string arrival_time { get; set; }
         public string departure_time { get; set; }
+        public List<String> Dtimes { get; set; } 
     }
 
     public class RouteShape
@@ -54,4 +56,26 @@ namespace MBBackEnd.Models
         public RouteShape Shape { get; set; }
     }
 
+
+    public class RouteViewJ
+    {
+        public int RouteID { get; set; }
+        public string NameShort { get; set; }
+        public string NameLong { get; set; }
+    }
+
+    public class StopViewJ
+    {
+        public int StopID { get; set; }
+        public String StopName { get; set; }
+        public decimal? lat { get; set; }
+        public decimal? lon { get; set; }
+        public List<String> Dtimes { get; set; }
+    }
+
+    public class RouteStopViewJ
+    {
+        public int routeID { get; set; }
+        public List<StopViewJ> routeStops { get; set; }
+    }
 }

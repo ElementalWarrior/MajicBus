@@ -67,7 +67,7 @@ namespace MBBackEnd.Controllers
                 StopID = r.StopID,
                 lat = r.Lat,
                 lon = r.Lon,
-          
+                Dtimes = r.Dtimes
             }).ToList();
 
             //pass this information to the view (Views/Home/ShowRoutes.cshtml)
@@ -76,31 +76,48 @@ namespace MBBackEnd.Controllers
 
         public ActionResult ShowRoutesJSON()
         {
-            List<BL.Route> routes = BL.Route.GetRoutes();
-            List<Models.RouteView> viewRoutes = routes.Select(r => new Models.RouteView
+            List<BL.Route> routes = BL.Route.GetRoutesJ();
+            List<Models.RouteViewJ> viewRoutes = routes.Select(r => new Models.RouteViewJ
             {
-                Description = r.Description,
-                dtCreated = r.dtCreated,
                 NameLong = r.NameLong,
                 NameShort = r.NameShort,
                 RouteID = r.RouteID,
-                TripCount = r.Trips.Count()
+                //TripCount = r.Trips.Count(),
             }).ToList();
             //Return plain JSON data for the app to render.
             return Json(viewRoutes, JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult ShowStopsJSON(int routeID)
+        public ActionResult ShowStopsJSON(List<int> routeIDs)
         {
-            List<BL.Stop> stops = BL.Route.GetStopsByRouteID(routeID);
-            List<Models.StopView> viewStops = stops.Select(r => new Models.StopView
-            {
-                StopID = r.StopID,
-                lat = r.Lat,
-                lon = r.Lon,
-            }).ToList();
+            //Wrapper to hold route id and the stops
+            List<Models.RouteStopViewJ> Routes = new List<Models.RouteStopViewJ>();
+
+            //For each route given
+            for (int i = 0; i < routeIDs.Count; i++) {
+                //Find the stops of the route, make the stopView
+                List<BL.Stop> stops = BL.Route.GetStopsByRouteID(routeIDs.ElementAt(i));
+                List<Models.StopViewJ> viewStops = stops.Select(r => new Models.StopViewJ
+                {
+                    StopID = r.StopID,
+                    lat = r.Lat,
+                    lon = r.Lon,
+                    StopName = r.StopName,
+                    Dtimes = r.Dtimes,
+                }).ToList();
+
+                //Add the stopView and id to the list
+                Models.RouteStopViewJ Route = new Models.RouteStopViewJ
+                {
+                    routeID = routeIDs.ElementAt(i),
+                    routeStops = viewStops,
+                };
+                Routes.Add(Route);
+            }
+            Routes.ToList();
+            
             //Return plain JSON data for the app to render.
-            return Json(viewStops, JsonRequestBehavior.AllowGet);
+            return Json(Routes, JsonRequestBehavior.AllowGet);
         }
 
         public ActionResult About()

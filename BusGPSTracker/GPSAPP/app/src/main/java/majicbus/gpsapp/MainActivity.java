@@ -13,24 +13,17 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TableLayout;
 import android.widget.TableRow;
-import android.widget.TextView;
-
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
-import com.google.gson.reflect.TypeToken;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+
 public class MainActivity extends AppCompatActivity implements OnTaskCompleted{
     private ArrayList<String> Routes;
+    static String URL = "http://192.168.1.16";
 
     @Override
     public void onTaskCompleted(String response){
@@ -50,7 +43,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleted{
 
         //Make HTTP Request, will callback to the loadData function
         HTTPConnection conn = new HTTPConnection(this);
-        conn.makeConnection("http://192.168.1.19/Home/showRoutesJSON");
+        conn.makeConnection(URL +"/Home/showRoutesJSON");
     }
 
     @Override
@@ -133,19 +126,19 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleted{
                 ll.addView(row, i + 1);
             }
         }catch(JsonSyntaxException e){
-            //Retry connection
+            Log.v("Dirty JSON", JSON);
             HTTPConnection conn = new HTTPConnection(this);
-            conn.makeConnection("http://192.168.1.19/Home/showRoutesJSON");
+            conn.makeConnection(URL + "/Home/showRoutesJSON");
 
-            /*Log.v("foo",JSON);
-            TableRow row= new TableRow(this);
-            TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT);
-            row.setLayoutParams(lp);
-            TextView text = new TextView(this);
-            text.setText("Error fetching route data.");
-            row.addView(text);
-            ll.addView(row, 1);
-            */
+            /*
+                TableRow row= new TableRow(this);
+                TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT);
+                row.setLayoutParams(lp);
+                TextView text = new TextView(this);
+                text.setText("Error fetching route data.");
+                row.addView(text);
+                ll.addView(row, 1);
+             */
         }
     }
 }

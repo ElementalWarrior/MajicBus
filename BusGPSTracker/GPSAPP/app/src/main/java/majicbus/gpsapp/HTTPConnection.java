@@ -94,7 +94,7 @@ public class HTTPConnection {
 
                     // Makes sure that the InputStream is closed after the app finished using it.
                 } catch (Exception ex){
-                    Log.v("httpBroke", ex.getMessage());
+                    Log.v("httpBroke", "" + ex.getMessage());
                 }
                 finally {
                     if (is != null)
@@ -103,7 +103,7 @@ public class HTTPConnection {
             }
 
             //Converts the Input stream to a string
-            public String readIt(InputStream stream, int len) throws IOException, UnsupportedEncodingException {
+            public String readIt(InputStream stream, int len) throws IOException {
                 Reader reader = null;
                 reader = new InputStreamReader(stream, "UTF-8");
                 char[] buffer = new char[len];

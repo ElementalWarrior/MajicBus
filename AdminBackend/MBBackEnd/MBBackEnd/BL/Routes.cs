@@ -19,7 +19,21 @@ namespace MBBackEnd.BL
             //
             return context.Routes.Include("Trips.StopTimes.Stop").ToList();
         }
-     //create stops to return lat / long  and stop ids 
+
+        //For RouteList for App
+        public static List<Route> GetRoutesJ()
+        {
+            var context = new MajicBusEntities();
+            //return (from r in context.Routes
+            //        join t in context.Trips on r.RouteID equals t.RouteID
+            //        select r).Distinct().ToList();
+
+            //
+            return context.Routes.ToList();
+        }
+
+
+        //create stops to return lat / long  and stop ids 
         public static List<Stop> GetStopsByRouteID(int routeID)
         {
             var context = new MajicBusEntities();
@@ -30,7 +44,7 @@ namespace MBBackEnd.BL
                                where r.RouteID == routeID
                                orderby st.SortID
                                select s).ToList();
-            //BRONSON LOOK AT THIS
+        
             DateTime now = DateTime.UtcNow.AddHours(-7);
             DateTime utcMidnight = DateTime.UtcNow.AddHours(-7);
             utcMidnight.AddHours(-1 * utcMidnight.Hour);
@@ -38,6 +52,7 @@ namespace MBBackEnd.BL
             utcMidnight.AddSeconds(-1 * utcMidnight.Second);
             TimeSpan ts = now - utcMidnight;
             DateTime normalizedNow = new DateTime(ts.Ticks);
+
             List<StopTime> times = (from r in context.Routes
                                 join t in context.Trips on r.RouteID equals t.RouteID
                                 join st in context.StopTimes on t.TripID equals st.TripID
