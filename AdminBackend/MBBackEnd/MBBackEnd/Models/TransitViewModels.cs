@@ -62,7 +62,6 @@ namespace MBBackEnd.Models
         public int RouteID { get; set; }
         public string NameShort { get; set; }
         public string NameLong { get; set; }
-        //public int TripCount { get; set; }
     }
 
     public class StopViewJ
@@ -74,4 +73,9 @@ namespace MBBackEnd.Models
         public List<String> Dtimes { get; set; }
     }
 
+    public class RouteStopViewJ
+    {
+        public int routeID { get; set; }
+        public List<StopViewJ> routeStops { get; set; }
+    }
 }

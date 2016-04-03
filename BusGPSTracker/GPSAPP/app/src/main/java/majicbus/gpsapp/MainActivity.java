@@ -13,19 +13,10 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TableLayout;
 import android.widget.TableRow;
-import android.widget.TextView;
-
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
-import com.google.gson.reflect.TypeToken;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -135,15 +126,19 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleted{
                 ll.addView(row, i + 1);
             }
         }catch(JsonSyntaxException e){
-            Log.v("foo",JSON);
-            TableRow row= new TableRow(this);
-            TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT);
-            row.setLayoutParams(lp);
-            TextView text = new TextView(this);
-            text.setText("Error fetching route data.");
-            row.addView(text);
-            ll.addView(row, 1);
+            Log.v("Dirty JSON", JSON);
+            HTTPConnection conn = new HTTPConnection(this);
+            conn.makeConnection(URL + "/Home/showRoutesJSON");
 
+            /*
+                TableRow row= new TableRow(this);
+                TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT);
+                row.setLayoutParams(lp);
+                TextView text = new TextView(this);
+                text.setText("Error fetching route data.");
+                row.addView(text);
+                ll.addView(row, 1);
+             */
         }
     }
 }
