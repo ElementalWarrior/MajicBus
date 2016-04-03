@@ -35,5 +35,18 @@ namespace MBBackEnd.BL
                                      select sms).ToList();
             return messages; //Classes.Utility.S
         }
+
+        public static void UpdateSmsLog(String from, String to, String body)
+        {
+            MajicBusEntities context = new MajicBusEntities();
+            context.SMSLogs.Add(new SMSLog
+            {
+                MessageBody = body,
+                ReceivedFrom = from,
+                SentTo = to,
+                dtSent = DateTime.UtcNow,
+                dtReceived = DateTime.UtcNow
+            });
+        }
     }
 }

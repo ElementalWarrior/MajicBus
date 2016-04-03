@@ -74,6 +74,40 @@ namespace MBBackEnd.BL
 
             return stops;
         }
+
+        public class S
+        {
+            public int RouteID { get; set; }
+            public int StopID { get; set; }
+            public List<string> Dtimes { get; set; }
+        }
+        public static List<S> GetStopByStopID(int stopID)
+        {
+            MajicBusEntities context = new MajicBusEntities();
+
+            DateTime now = DateTime.UtcNow.AddHours(-7);
+            DateTime utcMidnight = DateTime.UtcNow.AddHours(-7);
+            utcMidnight.AddHours(-1 * utcMidnight.Hour);
+            utcMidnight.AddMinutes(-1 * utcMidnight.Minute);
+            utcMidnight.AddSeconds(-1 * utcMidnight.Second);
+            TimeSpan ts = now - utcMidnight;
+            DateTime normalizedNow = new DateTime(ts.Ticks);
+            List<S> times = (from st in context.StopTimes
+                                    join t in context.Trips on st.TripID equals t.TripID
+                                    where st.StopID == stopID && st.dtDeparture >= normalizedNow
+                                     orderby st.dtDeparture.Value
+                                     group new { t, st } by t.RouteID into aggregate
+                                     select new S
+                                     {
+                                         RouteID = aggregate.Select(a => a.t.RouteID.Value).FirstOrDefault(),
+                                         StopID = stopID,
+                                         Dtimes = aggregate.Select(a => a.st.Departure).Take(5).ToList()
+                                         
+                                     }).ToList();
+            
+            
+            return times;
+        }
     }
      
 
