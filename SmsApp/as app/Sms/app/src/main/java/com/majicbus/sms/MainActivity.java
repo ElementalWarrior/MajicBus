@@ -28,6 +28,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -38,6 +40,7 @@ import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements OnTaskCompleted {
     public static int TotalReceived;
@@ -48,59 +51,83 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleted {
     TextView textView4;
     TextView textView5;
 
-    public void onTaskCompleted(String response) {
-
-        //TODO: parse json for message body and phone number
-
-
-        String body = "";
-        //TODO: parse the stop times from the response and turn into string max 128 characters long
-
-        //TODO: send to phone number the times
-
-        Gson parser = new Gson();
-        JsonParser jp = new JsonParser();
-        JsonElement jelement = jp.parse(response);
-        JsonObject base = jelement.getAsJsonObject();
-        try {
-            String phone = base.get("Phone").getAsString();
-
-            JsonArray jarray = null;
-            HashMap<Integer, ArrayList> routes = new HashMap<Integer, ArrayList>();
+    public void onTaskCompleted(String response, String type) {
+        if(type == "MsgReceived") {
+            Gson parser = new Gson();
+            JsonParser jp = new JsonParser();
+            JsonElement jelement = jp.parse(response);
+            JsonObject base = jelement.getAsJsonObject();
             try {
-                jarray = base.get("Data").getAsJsonArray();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            for(int i = 0; i < jarray.size(); i++)
-            {
-                JsonObject obj;
-                try {
-                    obj  = (JsonObject) jarray.get(i);
-                    int RouteID = obj.get("RouteID").getAsInt();
-                    JsonArray times = obj.get("Dtimes").getAsJsonArray();
-                    ArrayList sTimes = new ArrayList();
-                    Iterator<JsonElement> iter = times.iterator();
-                    int j = 0;
-                    while(iter.hasNext())
-                    {
-                        String time = iter.next().getAsString();
-                        sTimes.add(time);
-                        j++;
-                    }
-                    routes.put(RouteID, sTimes);
+                String phone = base.get("Phone").getAsString();
 
+                JsonArray jarray = null;
+                HashMap<Integer, ArrayList> routes = new HashMap<Integer, ArrayList>();
+                try {
+                    jarray = base.get("Data").getAsJsonArray();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+                for (int i = 0; i < jarray.size(); i++) {
+                    JsonObject obj;
+                    try {
+                        obj = (JsonObject) jarray.get(i);
+                        int RouteID = obj.get("RouteID").getAsInt();
+                        JsonArray times = obj.get("Dtimes").getAsJsonArray();
+                        ArrayList sTimes = new ArrayList();
+                        Iterator<JsonElement> iter = times.iterator();
+                        int j = 0;
+                        while (iter.hasNext()) {
+                            String time = iter.next().getAsString();
+                            sTimes.add(time);
+                            j++;
+                        }
+                        routes.put(RouteID, sTimes);
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                Object[] keys = routes.keySet().toArray();
+
+                int currentKey = (int) keys[0];
+                int i = 0;
+                int timeIndexToAppend = 0;
+                String smsResponse = "";
+                String[] routetimes = new String[keys.length];
+                while (smsResponse.length() < 128 && timeIndexToAppend < 5) {
+                    currentKey = (int) keys[i];
+                    if (timeIndexToAppend == 0) {
+                        routetimes[i] = "{" + currentKey + "} ";
+                    }
+                    try {
+                        String t = routes.get(currentKey).get(timeIndexToAppend).toString();
+                        int lastColon = t.lastIndexOf(":");
+                        t = t.substring(0, lastColon);
+                        if ((smsResponse + t + ",").length() > 128) {
+                            break;
+                        } else {
+                            routetimes[i] += t + ",";
+                        }
+                    } catch (IndexOutOfBoundsException ex) {
+                    }
+                    i++;
+
+                    if (i > keys.length - 1) {
+                        i = 0;
+                        timeIndexToAppend++;
+                    }
+                }
+                for (i = 0; i < keys.length; i++) {
+                    smsResponse += routetimes[i].substring(0, routetimes[i].length() - 1) + " ";
+                }
+                SmsListener.sendSMS(phone, smsResponse);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-            SmsListener.sendSMS(phone, "hihi");
-        } catch (Exception e) {
-            e.printStackTrace();
+            //String pNum = jobject.get("Phone").toString();
+
         }
-        //String pNum = jobject.get("Phone").toString();
-
-
     }
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,9 +153,15 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleted {
     }
     public void GetStopInformation(String body, String address)
     {
-        HTTPConnection conn = new HTTPConnection(this);
         String number = ((TelephonyManager)this.getSystemService(Context.TELEPHONY_SERVICE)).getLine1Number();
-        conn.makeConnection("http://192.168.1.11/Sms/Receive?from=" + address + "&to=" + number + "&body=" + body, "");
+        HTTPConnection conn = new HTTPConnection(this, "MsgReceived", address);
+        conn.makeConnection("http://192.168.0.11/Sms/Receive?from=" + address.trim() + "&to=" + number.trim() + "&body=" + body);
+    }
+    public void LogMessageSent(String body, String address)
+    {
+        HTTPConnection conn = new HTTPConnection(this, "LogSent");
+        String number = ((TelephonyManager)this.getSystemService(Context.TELEPHONY_SERVICE)).getLine1Number();
+        conn.makeConnection("http://192.168.0.11/Sms/LogMessageSent?from=" + number.trim() + "&to=" + address.trim()+ "&body=" + body);
     }
 
 

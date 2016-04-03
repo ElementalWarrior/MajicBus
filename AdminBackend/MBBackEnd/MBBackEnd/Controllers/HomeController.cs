@@ -4,6 +4,7 @@ using System.Configuration;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using MBBackEnd.Models.TransitViewModels;
 
 namespace MBBackEnd.Controllers
 {
@@ -29,7 +30,7 @@ namespace MBBackEnd.Controllers
             //data into those classes
             
             //Selects all stops 
-            List<Models.RouteView> viewRoutes = routes.Select(r => new Models.RouteView
+            List<RouteView> viewRoutes = routes.Select(r => new RouteView
                 {
                     Description = r.Description,
                     dtCreated = r.dtCreated,
@@ -37,7 +38,7 @@ namespace MBBackEnd.Controllers
                     NameShort = r.NameShort,
                     RouteID = r.RouteID,
                     TripCount = r.Trips.Count(),
-                    Stops = r.Trips.First().StopTimes.Select(st => st.Stop).Select(s => new Models.StopView
+                    Stops = r.Trips.First().StopTimes.Select(st => st.Stop).Select(s => new StopView
                     {
                         StopID = s.StopID,
                         lat = s.Lat,
@@ -62,7 +63,7 @@ namespace MBBackEnd.Controllers
             //we want to abstract the information away from the database schema into the view
             //schema therefore we create "View Models" inside the Models folder and convert the 
             //data into those classes
-            List<Models.StopView> viewStops = stops.Select(r => new Models.StopView
+            List<StopView> viewStops = stops.Select(r => new StopView
             {
                 StopID = r.StopID,
                 lat = r.Lat,
@@ -77,7 +78,7 @@ namespace MBBackEnd.Controllers
         public ActionResult ShowRoutesJSON()
         {
             List<BL.Route> routes = BL.Route.GetRoutesJ();
-            List<Models.RouteViewJ> viewRoutes = routes.Select(r => new Models.RouteViewJ
+            List<RouteViewJ> viewRoutes = routes.Select(r => new RouteViewJ
             {
                 NameLong = r.NameLong,
                 NameShort = r.NameShort,
@@ -91,13 +92,13 @@ namespace MBBackEnd.Controllers
         public ActionResult ShowStopsJSON(List<int> routeIDs)
         {
             //Wrapper to hold route id and the stops
-            List<Models.RouteStopViewJ> Routes = new List<Models.RouteStopViewJ>();
+            List<RouteStopViewJ> Routes = new List<RouteStopViewJ>();
 
             //For each route given
             for (int i = 0; i < routeIDs.Count; i++) {
                 //Find the stops of the route, make the stopView
                 List<BL.Stop> stops = BL.Route.GetStopsByRouteID(routeIDs.ElementAt(i));
-                List<Models.StopViewJ> viewStops = stops.Select(r => new Models.StopViewJ
+                List<StopViewJ> viewStops = stops.Select(r => new StopViewJ
                 {
                     StopID = r.StopID,
                     lat = (double)r.Lat,
@@ -107,7 +108,7 @@ namespace MBBackEnd.Controllers
                 }).ToList();
 
                 //Add the stopView and id to the list
-                Models.RouteStopViewJ Route = new Models.RouteStopViewJ
+                RouteStopViewJ Route = new RouteStopViewJ
                 {
                     routeID = routeIDs.ElementAt(i),
                     routeStops = viewStops,
@@ -123,16 +124,16 @@ namespace MBBackEnd.Controllers
         public ActionResult ShowShapesJSON(List<int> routeIDs)
         {
             //Wrapper to hold route id and the stops
-            List<Models.RouteShapeViewJ> Routes = new List<Models.RouteShapeViewJ>();
+            List<RouteShapeViewJ> Routes = new List<RouteShapeViewJ>();
 
             //For each route given
             for (int i = 0; i < routeIDs.Count; i++)
             {
                 //Find the shapes of the route and add the route id
-                Models.RouteShapeViewJ Route = new Models.RouteShapeViewJ
+                RouteShapeViewJ Route = new RouteShapeViewJ
                 {
                     routeID = routeIDs.ElementAt(i),
-                    Shape = BL.Route.GetRouteShapeByRouteID(routeIDs.ElementAt(i)).Select(r => new Models.RouteShapeJ
+                    Shape = BL.Route.GetRouteShapeByRouteID(routeIDs.ElementAt(i)).Select(r => new RouteShapeJ
                     {
                         Lat = (double)r.Lat,
                         Lon = (double)r.Lon
@@ -188,125 +189,6 @@ namespace MBBackEnd.Controllers
             ViewBag.Message = "Your contact page.";
 
             return View();
-        }
-        [Authorize]
-        public ActionResult AdminPage()
-        {
-            //data domain models.
-            List<BL.SMSLog> smsLogs = BL.SMSLog.GetSMSLogs();
-
-            //create our page model
-            Models.SMSLogPage pg = new Models.SMSLogPage();
-            
-            //we need to convert to the mvc model to view on the page
-            List<Models.SMSLogEntry> allSmsMessages = smsLogs.Select(smsRecord => new Models.SMSLogEntry
-            {
-                SMSLogID = smsRecord.SMSLogID,
-                SentTo = smsRecord.SentTo,
-                ReceivedFrom = smsRecord.ReceivedFrom,
-                MessageBody = smsRecord.MessageBody, //need to be wary of XSS scripting
-                dtSent = smsRecord.dtSent.Value,
-                dtReceived = smsRecord.dtReceived.Value
-            }).ToList();
-
-            DateTime beginningOfDayUTC = DateTime.UtcNow;
-            beginningOfDayUTC.AddHours(-7); //kelowna = PST, PST w/o DST = -7
-            beginningOfDayUTC = beginningOfDayUTC.AddHours(beginningOfDayUTC.Hour * -1); //change to midnight
-            beginningOfDayUTC = beginningOfDayUTC.AddMinutes(beginningOfDayUTC.Minute * -1); //change to midnight
-            beginningOfDayUTC = beginningOfDayUTC.AddSeconds(beginningOfDayUTC.Second * -1); //change to midnight
-            beginningOfDayUTC.AddHours(7); //convert back to utc
-
-            //get all sms's today
-            pg.Daily = allSmsMessages.Where(s => s.dtReceived >= beginningOfDayUTC && s.dtReceived <= beginningOfDayUTC.AddHours(24)).ToList();
-
-            DateTime beginningOfWeekUtc = DateTime.UtcNow.AddHours(-7);
-            beginningOfWeekUtc = beginningOfWeekUtc.AddDays(-1 * (int)beginningOfWeekUtc.DayOfWeek); // change to sunday
-            beginningOfWeekUtc = beginningOfWeekUtc.AddHours(beginningOfWeekUtc.Hour * -1); //change to midnight
-            beginningOfWeekUtc = beginningOfWeekUtc.AddMinutes(beginningOfWeekUtc.Minute * -1); //change to midnight
-            beginningOfWeekUtc = beginningOfWeekUtc.AddSeconds(beginningOfWeekUtc.Second * -1); //change to midnight
-            beginningOfWeekUtc = beginningOfWeekUtc.AddHours(7);
-
-            //get all sms's week
-            pg.Weekly = allSmsMessages.Where(s => s.dtReceived >= beginningOfWeekUtc && s.dtReceived <= beginningOfWeekUtc.AddDays(6)).ToList();
-
-            DateTime beginningOfMonthUtc = DateTime.UtcNow.AddHours(-7);
-            beginningOfMonthUtc = beginningOfMonthUtc.AddDays(-1 * beginningOfMonthUtc.Day); //set to first day of month
-            beginningOfMonthUtc = beginningOfMonthUtc.AddHours(beginningOfMonthUtc.Hour * -1); //change to midnight
-            beginningOfMonthUtc = beginningOfMonthUtc.AddMinutes(beginningOfMonthUtc.Minute * -1); //change to midnight
-            beginningOfMonthUtc = beginningOfMonthUtc.AddSeconds(beginningOfMonthUtc.Second * -1); //change to midnight
-            beginningOfMonthUtc = beginningOfMonthUtc.AddHours(7);
-
-            int numDaysInMonth = beginningOfMonthUtc.AddMonths(1).AddDays(-1).Day;
-            //get all sms's monthly
-            pg.Monthly = allSmsMessages.Where(s => s.dtReceived >= beginningOfMonthUtc && s.dtReceived <= beginningOfMonthUtc.AddDays(numDaysInMonth + 1)).ToList();
-
-            //get message counts
-            List<BL.SMSLog.MessageCounts> messageCounts = pg.Daily.GroupBy(msg => msg.MessageBody).Select(agg => new BL.SMSLog.MessageCounts { MessageBody = agg.Key, Count = agg.Count() }).OrderByDescending(agg => agg.Count).ToList();
-            int y = 0;
-            if (messageCounts.Count() != 0)
-            {
-                for (int i = 0; i < messageCounts.Count(); i++)
-                {
-                   if(Int32.TryParse(messageCounts[i].MessageBody, out y))
-                    {
-                        break;
-                    }       
-                }
-            }
-            pg.MostPopularDaily = y;
-
-            messageCounts = pg.Weekly.GroupBy(msg => msg.MessageBody).Select(agg => new BL.SMSLog.MessageCounts { MessageBody = agg.Key, Count = agg.Count() }).OrderByDescending(agg => agg.Count).ToList();
-            int x = 0;
-            if (messageCounts.Count() != 0)
-            {
-                for (int i = 0; i < messageCounts.Count(); i++)
-                {
-                    if (Int32.TryParse(messageCounts[i].MessageBody, out x))
-                    {
-                        break;
-                    }
-                }
-            }
-            pg.MostPopularWeekly = x;
-
-            messageCounts = pg.Monthly.GroupBy(msg => msg.MessageBody).Select(agg => new BL.SMSLog.MessageCounts { MessageBody = agg.Key, Count = agg.Count() }).OrderByDescending(agg => agg.Count).ToList();
-            int z = 0;
-            if (messageCounts.Count() != 0)
-            {
-                for (int i = 0; i < messageCounts.Count(); i++)
-                {
-                    if (Int32.TryParse(messageCounts[i].MessageBody, out z))
-                    {
-                        break;
-                    }
-                }
-            }
-            pg.MostPopularMonthly = z;
-
-            return View(pg);
-        }
-        [Authorize]
-        [Route("Home/SMSByPhone/{phoneNumber}")]
-        public ActionResult SMSByPhone(string phoneNumber)
-        {
-            List<BL.SMSLog> msgs = BL.SMSLog.GetMessagesByPhone(phoneNumber);
-
-            List<Models.SMSLogEntry> modelMsgs = msgs.Select(blLog => new Models.SMSLogEntry
-            {
-                dtReceived = blLog.dtReceived.Value,
-                dtSent = blLog.dtSent.Value,
-                MessageBody = blLog.MessageBody,
-                ReceivedFrom = blLog.ReceivedFrom,
-                SentTo = blLog.SentTo,
-                SMSLogID = blLog.SMSLogID
-            }).ToList();
-
-            return View(new Models.SMSFilterPage
-            {
-                Messages = modelMsgs,
-                PhoneNumber = phoneNumber,
-                SanitizedPhoneNumber = Classes.Utility.SanitizePhoneNumber(phoneNumber)
-            });
         }
     }
 }

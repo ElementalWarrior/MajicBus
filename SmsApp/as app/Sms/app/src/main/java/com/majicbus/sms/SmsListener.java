@@ -27,6 +27,22 @@ public class SmsListener extends BroadcastReceiver {
         SmsManager sms = SmsManager.getDefault();
         sms.sendTextMessage(phoneNumber, null, message, null, null);
         MainActivity.TotalSent++;
+
+        class ToastRunnable implements Runnable {
+            Activity _active;
+            String _body;
+            String _address;
+            public ToastRunnable(Activity active, String msgBody, String msgAddress)
+            {
+                _active = active;
+                _body = msgBody;
+                _address = msgAddress;
+            }
+            public void run(){
+                ((MainActivity)_active).LogMessageSent(_body, _address);
+            }
+        }
+        _activity.runOnUiThread(new ToastRunnable(_activity, message, phoneNumber));
     }
     public void setActivity(Activity active)
     {
@@ -35,10 +51,9 @@ public class SmsListener extends BroadcastReceiver {
 @Override
     public void onReceive(Context context, Intent intent) {
 //check if action is received text
-    Bundle extras = intent.getExtras();
-    if (extras == null)
-        return;
-    if (Telephony.Sms.Intents.SMS_RECEIVED_ACTION.equals(intent.getAction())) {
+
+    if (Telephony.Sms.Intents.DATA_SMS_RECEIVED_ACTION.equals(intent.getAction())
+        || Telephony.Sms.Intents.SMS_RECEIVED_ACTION.equals(intent.getAction())) {
         for (SmsMessage smsMessage : Telephony.Sms.Intents.getMessagesFromIntent(intent)) {
             //save msg and address
 

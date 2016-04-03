@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace MBBackEnd.Models
+namespace MBBackEnd.Models.TransitViewModels
 {
     public class BusPositionPage
     {

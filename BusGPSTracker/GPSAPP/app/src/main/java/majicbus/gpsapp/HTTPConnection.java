@@ -20,12 +20,10 @@ import java.net.Proxy;
 import java.net.URL;
 
 public class HTTPConnection extends AsyncTask<String, Void, String> {
-    protected String JSON;
     protected Context appContext;
 
     public HTTPConnection(Context newContext){
         appContext = newContext;
-        JSON = "";
     }
 
     public int makeConnection(String url){

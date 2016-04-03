@@ -337,8 +337,8 @@
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
     <Content Include="Views\Home\ShowRoutes.cshtml" />
     <Content Include="Views\Home\ShowStops.cshtml" />
-    <Content Include="Views\Home\AdminPage.cshtml" />
-    <Content Include="Views\Home\SMSByPhone.cshtml" />
+    <Content Include="Views\Sms\Index.cshtml" />
+    <Content Include="Views\Sms\SMSByPhone.cshtml" />
     <Content Include="Views\Home\ShowTimes.cshtml" />
     <Content Include="Views\Bus\GetBusPosition.cshtml" />
     <None Include="Web.Staging.config">
@@ -347,7 +347,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Views\Sms\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />

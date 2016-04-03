@@ -5,117 +5,112 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.provider.Telephony;
 import android.util.Log;
+
+import com.majicbus.sms.OnTaskCompleted;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.net.URL;
+import java.net.URLEncoder;
 
-public class HTTPConnection {
-    protected String JSON;
+public class HTTPConnection extends AsyncTask<String, Void, String> {
     protected Context appContext;
+    private String _type;
+    private String _returnPhoneNumber;
 
-    public HTTPConnection(Context newContext){
+    public HTTPConnection(Context newContext, String type){
         appContext = newContext;
-        JSON = "";
+        _type = type;
+    }
+    public HTTPConnection(Context newContext, String type, String retNumber)
+    {
+        this(newContext, type);
+        _returnPhoneNumber = retNumber;
     }
 
-    public int makeConnection(String url, String json){
-        try {
-            ConnectivityManager connMgr = (ConnectivityManager) appContext.getSystemService(Context.CONNECTIVITY_SERVICE);
-            NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-            if (networkInfo != null && networkInfo.isConnected())
-                new getData().execute(url, json);
-            else
-                return -1;
-        } catch (Exception ex)
-        {
-            Log.v("connectivityManager", ex.getCause() + " " + ex.getMessage() + " \n" + ex.getStackTrace());
-        }
+    public int makeConnection(String url){
+        ConnectivityManager connMgr = (ConnectivityManager)appContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        if (networkInfo != null && networkInfo.isConnected())
+            this.execute(url);
+        else
+            return -1;
         return 1;
     }
 
-    /* Uses AsyncTask to create a task away from the main UI thread. This task takes a
-       URL string and uses it to create an HttpUrlConnection. Once the connection
-       has been established, the AsyncTask downloads the contents of the webpage as
-       an InputStream. Finally, the InputStream is converted into a string, which is
-       displayed in the UI by the AsyncTask's onPostExecute method.
-    */
-    private class getData extends AsyncTask<String, Void, String> {
-        @Override
-        protected String doInBackground(String... urls) {
-            try { // params comes from the execute() call: params[0] is the url.
-                downloadUrl(urls[0], urls[1]);
-            } catch (IOException e) {
-                Log.v("foo", "Unable to retrieve web page. URL may be invalid.");
-            }
-            return "";
-        }
+    @Override
+    protected String doInBackground(String... urls) {
+        try { // params comes from the execute() call: params[0] is the url.
 
-        @Override // onPostExecute displays the results of the AsyncTask.
-        protected void onPostExecute(String result) {
-            JSON = result;
-        }
-
-        /* Given a URL, establishes an HttpUrlConnection and retrieves
-           the web page content as a InputStream, which it returns as
-           a string.
-        */
-        private void downloadUrl(String myUrl, String json) throws IOException {
             InputStream is = null;
             try {
-                URL url = new URL(myUrl);
+                URL url = new URL(urls[0]);
+                //Proxy prx = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("192.168.1.37", 8888));
+                //HttpURLConnection conn = (HttpURLConnection) url.openConnection(prx);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setReadTimeout(10000 /* milliseconds */);
                 conn.setConnectTimeout(15000 /* milliseconds */);
+                conn.setRequestMethod("GET");
                 conn.setRequestProperty("charset", "UTF-8");
                 conn.setDoInput(true);
-                conn.setDoOutput(true);
-                conn.setRequestMethod("GET");
                 conn.connect(); // Starts the query
-                int response = conn.getResponseCode();
-                is = conn.getInputStream();
 
-                // Convert the InputStream into a string
-                String contentAsString = readIt(is, conn.getContentLength());
-
-                Activity active = (Activity) appContext;
-
-                class MyRunnable implements Runnable {
-                    String data;
-                    Activity active;
-                    public MyRunnable(String newData, Activity newActivity) {
-                        data = newData;
-                        active = newActivity;
-                    }
-                    public void run() {
-                        ((OnTaskCompleted)active).onTaskCompleted(data);
-                    }
-                }
-
-                active.runOnUiThread(new MyRunnable(contentAsString, active));
-
-                // Makes sure that the InputStream is closed after the app finished using it.
+                InputStream input = conn.getInputStream();
+                return readIt(input, conn.getContentLength());
             } catch (Exception ex){
-                Log.v("httpBroke", ex.getMessage());
+                Log.v("httpBroke", "" + ex.getMessage());
             }
             finally {
                 if (is != null)
                     is.close();
             }
+        } catch (IOException e) {
+            Log.v("foo", "Unable to retrieve web page. URL may be invalid.");
         }
+        return null;
+    }
 
-        //Converts the Input stream to a string
-        public String readIt(InputStream stream, int len) throws IOException, UnsupportedEncodingException {
-            Reader reader = null;
-            reader = new InputStreamReader(stream, "UTF-8");
-            char[] buffer = new char[len];
-            reader.read(buffer);
-            return new String(buffer);
+    @Override // onPostExecute displays the results of the AsyncTask.
+    protected void onPostExecute(String response) {
+        if(response != null) {
+            ((OnTaskCompleted) appContext).onTaskCompleted(response, _type);
         }
+        if(response == null && _returnPhoneNumber != null)
+        {
+            String body = "There was a problem contacting the server. Please try again.";
+            SmsListener.sendSMS(_returnPhoneNumber, body);
+            try {
+                body = URLEncoder.encode(body, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+            ((MainActivity)appContext).LogMessageSent(body, _returnPhoneNumber);
+        }
+    }
+
+
+
+    //Converts the Input stream to a string
+    public String readIt(InputStream stream, int len) throws IOException {
+        StringBuilder sb = new StringBuilder();
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+
+        String line;
+        while((line = reader.readLine()) != null)
+        {
+            sb.append(line);
+        }
+        return sb.toString();
     }
 }

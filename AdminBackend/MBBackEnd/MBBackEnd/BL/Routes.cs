@@ -57,22 +57,22 @@ namespace MBBackEnd.BL
         
             DateTime now = DateTime.UtcNow.AddHours(-7);
             DateTime utcMidnight = DateTime.UtcNow.AddHours(-7);
-            utcMidnight.AddHours(-1 * utcMidnight.Hour);
-            utcMidnight.AddMinutes(-1 * utcMidnight.Minute);
-            utcMidnight.AddSeconds(-1 * utcMidnight.Second);
+            utcMidnight = utcMidnight.AddHours(-1 * utcMidnight.Hour);
+            utcMidnight = utcMidnight.AddMinutes(-1 * utcMidnight.Minute);
+            utcMidnight = utcMidnight.AddSeconds(-1 * utcMidnight.Second);
             TimeSpan ts = now - utcMidnight;
-            DateTime normalizedNow = new DateTime(ts.Ticks);
+            DateTime normalizedNow = new DateTime(1900,1,1) + ts;
 
             List<StopTime> times = (from r in context.Routes
                                 join t in context.Trips on r.RouteID equals t.RouteID
                                 join st in context.StopTimes on t.TripID equals st.TripID
                                 where r.RouteID == routeID && st.dtDeparture >= normalizedNow
-                                    orderby st.SortID, st.dtDeparture
+                                    orderby st.dtDeparture, st.SortID
                                 select st).ToList(); 
 
             foreach(Stop s in stops)
             {
-                s.Dtimes = times.Where(st => st.StopID == s.StopID).OrderBy(st => st.SortID).Take(5).Select(st => st.Departure).ToList();
+                s.Dtimes = times.Where(st => st.StopID == s.StopID).Take(5).Select(st => st.Departure).ToList();
             }
             
             //TODO: select the next 5 times or so from the database based on routeID (for each stop!!)
@@ -97,11 +97,12 @@ namespace MBBackEnd.BL
 
             DateTime now = DateTime.UtcNow.AddHours(-7);
             DateTime utcMidnight = DateTime.UtcNow.AddHours(-7);
-            utcMidnight.AddHours(-1 * utcMidnight.Hour);
-            utcMidnight.AddMinutes(-1 * utcMidnight.Minute);
-            utcMidnight.AddSeconds(-1 * utcMidnight.Second);
+            utcMidnight = utcMidnight.AddHours(-1 * utcMidnight.Hour);
+            utcMidnight = utcMidnight.AddMinutes(-1 * utcMidnight.Minute);
+            utcMidnight = utcMidnight.AddSeconds(-1 * utcMidnight.Second);
             TimeSpan ts = now - utcMidnight;
-            DateTime normalizedNow = new DateTime(ts.Ticks);
+            DateTime normalizedNow = new DateTime(1900, 1, 1) + ts;
+
             List<S> times = (from st in context.StopTimes
                                     join t in context.Trips on st.TripID equals t.TripID
                                     where st.StopID == stopID && st.dtDeparture >= normalizedNow

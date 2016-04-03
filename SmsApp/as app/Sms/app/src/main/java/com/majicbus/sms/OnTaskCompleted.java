@@ -6,5 +6,5 @@ package com.majicbus.sms;
   call back to that activity.
  */
 public interface OnTaskCompleted {
-   public void onTaskCompleted(String response);
+   public void onTaskCompleted(String response, String type);
 }

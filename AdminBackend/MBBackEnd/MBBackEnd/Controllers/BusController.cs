@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using MBBackEnd.Models.TransitViewModels;
 
 namespace MBBackEnd.Controllers
 {
@@ -22,9 +23,9 @@ namespace MBBackEnd.Controllers
             int routeShape = shapePosition.GroupBy(rs => rs.RouteShapeID).OrderByDescending(agg => agg.Count()).First().Key;
             shapePosition = shapePosition.Where(s => s.RouteShapeID == routeShape).OrderBy(rs => rs.SortID).ToList();
             List<BL.Coordinate> busPos = BL.Bus.GetBusPosition(routeID);
-            return View(new Models.BusPositionPage
+            return View(new BusPositionPage
             {
-                RouteShapes = shapePosition.Select(s => new Models.StopView
+                RouteShapes = shapePosition.Select(s => new StopView
                 {
                     lat = s.Lat,
                     lon = s.Lon
