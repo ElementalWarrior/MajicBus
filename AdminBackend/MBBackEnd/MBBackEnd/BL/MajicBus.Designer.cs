@@ -1,4 +1,4 @@
-﻿// T4 code generation is enabled for model 'C:\Users\user\Documents\UBCO (year 3)\COSC 310\MajicBus\AdminBackend\MBBackEnd\MBBackEnd\BL\MajicBus.edmx'. 
+﻿// T4 code generation is enabled for model 'C:\Users\James\Documents\Projects\MajicBus\AdminBackend\MBBackEnd\MBBackEnd\BL\MajicBus.edmx'. 
 // To enable legacy code generation, change the value of the 'Code Generation Strategy' designer
 // property to 'Legacy ObjectContext'. This property is available in the Properties Window when the model
 // is open in the designer.

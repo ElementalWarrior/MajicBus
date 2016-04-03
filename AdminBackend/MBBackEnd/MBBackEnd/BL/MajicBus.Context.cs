@@ -12,6 +12,8 @@ namespace MBBackEnd.BL
     using System;
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
+    using System.Data.Entity.Core.Objects;
+    using System.Linq;
     
     public partial class MajicBusEntities : DbContext
     {
@@ -29,8 +31,25 @@ namespace MBBackEnd.BL
         public virtual DbSet<RouteShape> RouteShapes { get; set; }
         public virtual DbSet<Route> Routes { get; set; }
         public virtual DbSet<Stop> Stops { get; set; }
-        public virtual DbSet<StopTime> StopTimes { get; set; }
         public virtual DbSet<Trip> Trips { get; set; }
         public virtual DbSet<SMSLog> SMSLogs { get; set; }
+        public virtual DbSet<StopTime> StopTimes { get; set; }
+    
+        public virtual ObjectResult<usp_estimatedBusLineSegment_Result> usp_estimatedBusLineSegment(Nullable<System.DateTime> timeUtc, string utcOffset, Nullable<int> routeid)
+        {
+            var timeUtcParameter = timeUtc.HasValue ?
+                new ObjectParameter("timeUtc", timeUtc) :
+                new ObjectParameter("timeUtc", typeof(System.DateTime));
+    
+            var utcOffsetParameter = utcOffset != null ?
+                new ObjectParameter("utcOffset", utcOffset) :
+                new ObjectParameter("utcOffset", typeof(string));
+    
+            var routeidParameter = routeid.HasValue ?
+                new ObjectParameter("routeid", routeid) :
+                new ObjectParameter("routeid", typeof(int));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_estimatedBusLineSegment_Result>("usp_estimatedBusLineSegment", timeUtcParameter, utcOffsetParameter, routeidParameter);
+        }
     }
 }

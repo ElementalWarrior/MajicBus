@@ -4,6 +4,7 @@ using System.Configuration;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using MBBackEnd.Models.TransitViewModels;
 
 namespace MBBackEnd.Controllers
 {
@@ -11,9 +12,9 @@ namespace MBBackEnd.Controllers
     {
         public ActionResult Index()
         {
-            return View();
+            return RedirectToAction("ShowRoutes");
         }
-
+        
         public ActionResult ShowRoutes()
         {
             //get data from the database in the BL folder (BL = Business Logic of the site)
@@ -27,15 +28,16 @@ namespace MBBackEnd.Controllers
             //we want to abstract the information away from the database schema into the view
             //schema therefore we create "View Models" inside the Models folder and convert the 
             //data into those classes
-            List<Models.RouteView> viewRoutes = routes.Select(r => new Models.RouteView
+            
+            //Selects all stops 
+            List<RouteView> viewRoutes = routes.Select(r => new RouteView
                 {
                     Description = r.Description,
                     dtCreated = r.dtCreated,
                     NameLong = r.NameLong,
                     NameShort = r.NameShort,
-                    RouteID = r.RouteID,
-                    TripCount = r.Trips.Count()
-                }).ToList();
+                    RouteID = r.RouteID
+            }).ToList();
 
             //pass this information to the view (Views/Home/ShowRoutes.cshtml)
             return View(viewRoutes);
@@ -43,21 +45,22 @@ namespace MBBackEnd.Controllers
             //or for the api return plain JSON data for the app to render.
             //return Json(viewRoutes, JsonRequestBehavior.AllowGet);
         }
+      
 
-        public ActionResult ShowStops()
+        public ActionResult ShowStops(int routeID)
         {
 
-            List<BL.Stop> stops = BL.Route.GetStopsByRouteID(97);
+            List<BL.Stop> stops = BL.Route.GetStopsByRouteID(routeID);
 
             //we want to abstract the information away from the database schema into the view
             //schema therefore we create "View Models" inside the Models folder and convert the 
             //data into those classes
-            List<Models.StopView> viewStops = stops.Select(r => new Models.StopView
+            List<StopView> viewStops = stops.Select(r => new StopView
             {
                 StopID = r.StopID,
                 lat = r.Lat,
                 lon = r.Lon,
-          
+                Dtimes = r.Dtimes
             }).ToList();
 
             //pass this information to the view (Views/Home/ShowRoutes.cshtml)
@@ -66,50 +69,115 @@ namespace MBBackEnd.Controllers
 
         public ActionResult ShowRoutesJSON()
         {
-            List<BL.Route> routes = BL.Route.GetRoutes();
-            List<Models.RouteView> viewRoutes = routes.Select(r => new Models.RouteView
+            List<BL.Route> routes = BL.Route.GetRoutesJ();
+            List<RouteViewJ> viewRoutes = routes.Select(r => new RouteViewJ
             {
-                Description = r.Description,
-                dtCreated = r.dtCreated,
                 NameLong = r.NameLong,
                 NameShort = r.NameShort,
                 RouteID = r.RouteID,
-                TripCount = r.Trips.Count()
+                //TripCount = r.Trips.Count(),
             }).ToList();
             //Return plain JSON data for the app to render.
             return Json(viewRoutes, JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult ShowStopsJSON()
+        public ActionResult ShowStopsJSON(List<int> routeIDs)
         {
-            List<BL.Stop> stops = BL.Route.GetStopsByRouteID(97);
-            List<Models.StopView> viewStops = stops.Select(r => new Models.StopView
-            {
-                StopID = r.StopID,
-                lat = r.Lat,
-                lon = r.Lon,
+            //Wrapper to hold route id and the stops
+            List<RouteStopViewJ> Routes = new List<RouteStopViewJ>();
 
-            }).ToList();
+            //For each route given
+            for (int i = 0; i < routeIDs.Count; i++) {
+                //Find the stops of the route, make the stopView
+                List<BL.Stop> stops = BL.Route.GetStopsByRouteID(routeIDs.ElementAt(i));
+                List<StopViewJ> viewStops = stops.Select(r => new StopViewJ
+                {
+                    StopID = r.StopID,
+                    lat = (double)r.Lat,
+                    lon = (double)r.Lon,
+                    StopName = r.StopName,
+                    Dtimes = r.Dtimes,
+                }).ToList();
+
+                //Add the stopView and id to the list
+                RouteStopViewJ Route = new RouteStopViewJ
+                {
+                    routeID = routeIDs.ElementAt(i),
+                    routeStops = viewStops,
+                };
+                Routes.Add(Route);
+            }
+            Routes.ToList();
+            
             //Return plain JSON data for the app to render.
-            return Json(viewStops, JsonRequestBehavior.AllowGet);
+            return Json(Routes, JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult About()
+        public ActionResult ShowShapesJSON(List<int> routeIDs)
         {
-            ViewBag.Message = "Your application description page.";
+            //Wrapper to hold route id and the stops
+            List<RouteShapeViewJ> Routes = new List<RouteShapeViewJ>();
 
-            return View();
+            //For each route given
+            for (int i = 0; i < routeIDs.Count; i++)
+            {
+                //Find the shapes of the route and add the route id
+                RouteShapeViewJ Route = new RouteShapeViewJ
+                {
+                    routeID = routeIDs.ElementAt(i),
+                    Shape = BL.Route.GetRouteShapeByRouteID(routeIDs.ElementAt(i)).Select(r => new RouteShapeJ
+                    {
+                        Lat = (double)r.Lat,
+                        Lon = (double)r.Lon
+                    }).ToList()
+                };
+                Routes.Add(Route);
+            }
+            Routes.ToList();
+
+            //Return plain JSON data for the app to render.
+            return Json(Routes, JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult Contact()
+
+        //This Doesn't Work?, Please help
+        public ActionResult ShowBusPositionsJSON(List<int> routeIDs)
         {
-            ViewBag.Message = "Your contact page.";
+            //Wrapper to hold route id and the stops
+            List<RouteBusViewJ> Routes = new List<RouteBusViewJ>();
 
-            return View();
+            //For each route given
+            for (int i = 0; i < routeIDs.Count; i++)
+            {
+                //Add a list of buses to the routeviewJ
+                RouteBusViewJ Route = new RouteBusViewJ
+                {
+                    routeID = routeIDs.ElementAt(i),
+                    Buses = BL.Bus.GetBusPosition(routeIDs.ElementAt(i)).Select(r => new BusJ
+                    {
+                        Lat = r.Latitude,
+                        Lon = r.Longitude
+                    }).ToList()
+            };
+
+                Routes.Add(Route);
+            }
+            Routes.ToList();
+
+            //Return plain JSON data for the app to render.
+            return Json(Routes, JsonRequestBehavior.AllowGet);
         }
-        public ActionResult AdminPage()
-        {
-            return View();
-        }
+
+
+
+        //    return View();
+        //}
+
+        //public ActionResult Contact()
+        //{
+        //    ViewBag.Message = "Your contact page.";
+
+        //    return View();
+        //}
     }
 }

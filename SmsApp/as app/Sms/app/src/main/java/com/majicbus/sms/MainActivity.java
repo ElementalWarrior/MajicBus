@@ -1,4 +1,7 @@
 package com.majicbus.sms;
+
+import android.content.BroadcastReceiver;
+import android.content.IntentFilter;
 import android.telephony.TelephonyManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -8,100 +11,165 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
+import android.util.JsonReader;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonPrimitive;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements OnTaskCompleted {
+    public static int TotalReceived;
+    public static int TotalSent;
+    private SmsListener intentreceiver;
 
-  //  @Override
-int smssent=0;
-    int smsrec=0;
-    TextView textView1;
-    TextView textView2;
+    //  @Override
+    TextView textView4;
+    TextView textView5;
+
+    public void onTaskCompleted(String response, String type) {
+        if(type == "MsgReceived") {
+            Gson parser = new Gson();
+            JsonParser jp = new JsonParser();
+            JsonElement jelement = jp.parse(response);
+            JsonObject base = jelement.getAsJsonObject();
+            try {
+                String phone = base.get("Phone").getAsString();
+
+                JsonArray jarray = null;
+                HashMap<Integer, ArrayList> routes = new HashMap<Integer, ArrayList>();
+                try {
+                    jarray = base.get("Data").getAsJsonArray();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                for (int i = 0; i < jarray.size(); i++) {
+                    JsonObject obj;
+                    try {
+                        obj = (JsonObject) jarray.get(i);
+                        int RouteID = obj.get("RouteID").getAsInt();
+                        JsonArray times = obj.get("Dtimes").getAsJsonArray();
+                        ArrayList sTimes = new ArrayList();
+                        Iterator<JsonElement> iter = times.iterator();
+                        int j = 0;
+                        while (iter.hasNext()) {
+                            String time = iter.next().getAsString();
+                            sTimes.add(time);
+                            j++;
+                        }
+                        routes.put(RouteID, sTimes);
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                Object[] keys = routes.keySet().toArray();
+
+                int currentKey = (int) keys[0];
+                int i = 0;
+                int timeIndexToAppend = 0;
+                String smsResponse = "";
+                String[] routetimes = new String[keys.length];
+                while (smsResponse.length() < 128 && timeIndexToAppend < 5) {
+                    currentKey = (int) keys[i];
+                    if (timeIndexToAppend == 0) {
+                        routetimes[i] = "{" + currentKey + "} ";
+                    }
+                    try {
+                        String t = routes.get(currentKey).get(timeIndexToAppend).toString();
+                        int lastColon = t.lastIndexOf(":");
+                        t = t.substring(0, lastColon);
+                        if ((smsResponse + t + ",").length() > 128) {
+                            break;
+                        } else {
+                            routetimes[i] += t + ",";
+                        }
+                    } catch (IndexOutOfBoundsException ex) {
+                    }
+                    i++;
+
+                    if (i > keys.length - 1) {
+                        i = 0;
+                        timeIndexToAppend++;
+                    }
+                }
+                for (i = 0; i < keys.length; i++) {
+                    smsResponse += routetimes[i].substring(0, routetimes[i].length() - 1) + " ";
+                }
+                SmsListener.sendSMS(phone, smsResponse);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            //String pNum = jobject.get("Phone").toString();
+
+        }
+    }
 
     protected void onCreate(Bundle savedInstanceState) {
 
-        textView1 = (TextView) findViewById(R.id.textView4);
-        textView2 = (TextView) findViewById(R.id.textView5);
-       // textView1.setText(SmsListener.getMsgsent());
-       // textView2.setText(SmsListener.getMsgrec());
+
+        String a = Integer.toString(TotalReceived);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        textView4 = (TextView) findViewById(R.id.textView4);
+        textView5 = (TextView) findViewById(R.id.textView5);
+        textView4.setText("sent");
+        textView5.setText("rec");
+
+
     }
-public void testClick(View v)
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        intentreceiver = new SmsListener();
+        intentreceiver.setActivity(this);
+    }
+    public void GetStopInformation(String body, String address)
     {
-       smssent++;
-       // textView1.setText(smssent);
-        PendingIntent pi = PendingIntent.getActivity(this, 0,
-                new Intent(this, MainActivity.class), 0);
-        SmsManager sms = SmsManager.getDefault();
-        sms.sendTextMessage("17789961163", null, "test msg", null, null);
+        String number = ((TelephonyManager)this.getSystemService(Context.TELEPHONY_SERVICE)).getLine1Number();
+        HTTPConnection conn = new HTTPConnection(this, "MsgReceived", address);
+        conn.makeConnection("http://192.168.0.11/Sms/Receive?from=" + address.trim() + "&to=" + number.trim() + "&body=" + body);
     }
-    /*
-    private void sendSMS(String phoneNumber, String message) {
-        smssent++;
-        textView1.setText(smssent);
-        SmsManager sms = SmsManager.getDefault();
-        sms.sendTextMessage(phoneNumber, null, message, null, null);
+    public void LogMessageSent(String body, String address)
+    {
+        HTTPConnection conn = new HTTPConnection(this, "LogSent");
+        String number = ((TelephonyManager)this.getSystemService(Context.TELEPHONY_SERVICE)).getLine1Number();
+        conn.makeConnection("http://192.168.0.11/Sms/LogMessageSent?from=" + number.trim() + "&to=" + address.trim()+ "&body=" + body);
     }
-    /*
-    public void onReceive(Context context, Intent intent) {
-//check if action is received text
-        if (Telephony.Sms.Intents.SMS_RECEIVED_ACTION.equals(intent.getAction())) {
-            smsrec++;
-            textView1.setText(smsrec);
-            for (SmsMessage smsMessage : Telephony.Sms.Intents.getMessagesFromIntent(intent)) {
-                //save msg and number
-                String messageBody = smsMessage.getMessageBody();
-                String messageAddress = message.getOriginatingAddress();
-
-            }
-            sendSMS(messageBody, "test msg");
-
-        }
-
-        // this will be done by db later
-        /*
-        String url = "tcp:mbdev01.database.windows.net,1433;";
-        String uid = "majicbus";
-        String pw = "AsBrBrChJa5";
-        Connection con = null;
-        String sendBack=null;
-        try {
-        //convert string message to int
-        int i = Integer.parseInt(messageBody.trim());
-            con = DriverManager.getConnection(url, uid, pw);
-            Statement stmt = con.createStatement();
-            String sql = "SELECT dtarrival "+
-                    " FROM stoptimes "+
-                    " WHERE stopid = " + i + ";" ;
-            ResultSet rst = stmt.executeQuery(sql);
-            while (rst.next())
-            {
-            sendBack=rst.getString("stoptimes")
-               //prep to send stuff back
-            }
-            //send text
-            sendSMS("test","test");
-        }
-        catch (SQLException ex){}
-        finally
-        {
-            if (con != null)
-            {
-                try {
-                    con.close();
-                }
-                catch (SQLException ex) {}
-        }
-    }*/
 
 
+    @Override
+    protected void onPause() {
+
+        super.onPause();
     }
+
+
+}

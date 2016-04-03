@@ -193,14 +193,18 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="App_Classes\Coordinate.cs" />
+    <Compile Include="App_Classes\Utility.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\IdentityConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
+    <Compile Include="BL\Buses.cs" />
     <Compile Include="BL\Calendar.cs">
       <DependentUpon>MajicBus.tt</DependentUpon>
     </Compile>
+    <Compile Include="BL\Coordinate.cs" />
     <Compile Include="BL\MajicBus.Context.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -229,22 +233,27 @@
     <Compile Include="BL\Stop.cs">
       <DependentUpon>MajicBus.tt</DependentUpon>
     </Compile>
+    <Compile Include="BL\Stops.cs" />
     <Compile Include="BL\StopTime.cs">
       <DependentUpon>MajicBus.tt</DependentUpon>
     </Compile>
     <Compile Include="BL\Trip.cs">
       <DependentUpon>MajicBus.tt</DependentUpon>
     </Compile>
+    <Compile Include="BL\usp_estimatedBusLineSegment_Result.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\BusController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="BL\Routes.cs" />
+    <Compile Include="Controllers\SmsController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
+    <Compile Include="Models\SMSLogViewModels.cs" />
     <Compile Include="Models\TransitViewModels.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
@@ -328,7 +337,10 @@
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
     <Content Include="Views\Home\ShowRoutes.cshtml" />
     <Content Include="Views\Home\ShowStops.cshtml" />
-    <Content Include="Views\Home\AdminPage.cshtml" />
+    <Content Include="Views\Sms\Index.cshtml" />
+    <Content Include="Views\Sms\SMSByPhone.cshtml" />
+    <Content Include="Views\Home\ShowTimes.cshtml" />
+    <Content Include="Views\Bus\GetBusPosition.cshtml" />
     <None Include="Web.Staging.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

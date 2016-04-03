@@ -16,10 +16,11 @@ namespace MBBackEnd.BL
     {
         public int TripID { get; set; }
         public int StopID { get; set; }
-        public string dtArrival { get; set; }
-        public string dtDeparture { get; set; }
+        public string Arrival { get; set; }
+        public string Departure { get; set; }
         public Nullable<int> SortID { get; set; }
         public System.DateTime dtCreated { get; set; }
+        public Nullable<System.DateTime> dtDeparture { get; set; }
     
         public virtual Stop Stop { get; set; }
         public virtual Trip Trip { get; set; }

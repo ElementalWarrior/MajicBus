@@ -32,16 +32,19 @@
         android:text="@string/GO_TO_MAPS"
         android:id="@+id/MapBtn"
         android:layout_column="12"
-        android:layout_marginBottom="55dp"
+        android:layout_marginBottom="39dp"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_alignRight="@+id/scrollView"
+        android:layout_alignEnd="@+id/scrollView" />
 
 
     <ScrollView
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:scrollbars="none"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:id="@+id/scrollView"
+        android:layout_alignParentBottom="true">
 
         <TableLayout
             android:layout_width="match_parent"
