@@ -449,7 +449,7 @@ namespace MBBackEnd.Controllers
             {
                 return Redirect(returnUrl);
             }
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Index", "Sms");
         }
 
         internal class ChallengeResult : HttpUnauthorizedResult

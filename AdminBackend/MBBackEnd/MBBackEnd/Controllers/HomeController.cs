@@ -12,7 +12,7 @@ namespace MBBackEnd.Controllers
     {
         public ActionResult Index()
         {
-            return View();
+            return RedirectToAction("ShowRoutes");
         }
         
         public ActionResult ShowRoutes()
@@ -36,15 +36,7 @@ namespace MBBackEnd.Controllers
                     dtCreated = r.dtCreated,
                     NameLong = r.NameLong,
                     NameShort = r.NameShort,
-                    RouteID = r.RouteID,
-                    TripCount = r.Trips.Count(),
-                    Stops = r.Trips.First().StopTimes.Select(st => st.Stop).Select(s => new StopView
-                    {
-                        StopID = s.StopID,
-                        lat = s.Lat,
-                        lon = s.Lon,
-
-                    }).ToList()
+                    RouteID = r.RouteID
             }).ToList();
 
             //pass this information to the view (Views/Home/ShowRoutes.cshtml)
@@ -55,10 +47,10 @@ namespace MBBackEnd.Controllers
         }
       
 
-        public ActionResult ShowStops()
+        public ActionResult ShowStops(int routeID)
         {
 
-            List<BL.Stop> stops = BL.Route.GetStopsByRouteID(97);
+            List<BL.Stop> stops = BL.Route.GetStopsByRouteID(routeID);
 
             //we want to abstract the information away from the database schema into the view
             //schema therefore we create "View Models" inside the Models folder and convert the 
@@ -177,18 +169,15 @@ namespace MBBackEnd.Controllers
         }
 
 
-        public ActionResult About()
-        {
-            ViewBag.Message = "Your application description page.";
 
-            return View();
-        }
+        //    return View();
+        //}
 
-        public ActionResult Contact()
-        {
-            ViewBag.Message = "Your contact page.";
+        //public ActionResult Contact()
+        //{
+        //    ViewBag.Message = "Your contact page.";
 
-            return View();
-        }
+        //    return View();
+        //}
     }
 }
