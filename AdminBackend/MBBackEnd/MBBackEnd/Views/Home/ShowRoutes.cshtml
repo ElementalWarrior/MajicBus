@@ -1,5 +1,5 @@
 ﻿@* we need to define the data this view takes, this comes from the "return View(data)" line in the controller *@
-@model List<MBBackEnd.Models.RouteView>
+@model List<MBBackEnd.Models.TransitViewModels.RouteView>
 
 @* we can then access the data through the "Model" object, notice the capitol M vs m in the line above *@
 @* one defines which type to use, and one accesses it *@
@@ -17,7 +17,7 @@
 
     @* this is a razor file, its mixed html with server logic. *@
     @* it is an interpreted file, IE compiled when needed, you can insert server logic with @ or @{} *@
-    @foreach (MBBackEnd.Models.RouteView route in Model)
+    @foreach (MBBackEnd.Models.TransitViewModels.RouteView route in Model)
     {
         <tr>
             <td>
