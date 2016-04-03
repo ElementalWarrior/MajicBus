@@ -1,7 +1,18 @@
-sp_rename 'dbo.StopTimes.dtDeparture' 'Departure'
-go
-sp_rename 'dbo.StopTimes.dtArrival' 'Arrival'
-go
+
+declare @type int
+select top 1 @type = system_type_id from sys.types where name = 'varchar'
+
+if(exists(select * from sys.columns where name = 'dtDeparture' and object_id = object_id('StopTimes') and system_type_id = @type))
+begin
+	sp_rename 'dbo.StopTimes.dtDeparture' 'Departure'
+	go
+end
+
+if(exists(select * from sys.columns where name = 'dtArrival' and object_id = object_id('StopTimes') and system_type_id = @type))
+begin
+	sp_rename 'dbo.StopTimes.dtArrival' 'Arrival'
+	go
+end
 
 if (not exists (select top 1 * from sys.columns where name = 'Departure' and object_id = object_id('StopTimes')))
 begin
