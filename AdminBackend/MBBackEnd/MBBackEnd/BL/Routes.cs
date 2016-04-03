@@ -26,7 +26,8 @@ namespace MBBackEnd.BL
             //        select r).Distinct().ToList();
 
             //
-            return context.Routes.Include("Trips.StopTimes.Stop").ToList();
+            return context.Routes.ToList();
+            //return context.Routes.Include("Trips.StopTimes.Stop").ToList();
         }
 
         //For RouteList for App

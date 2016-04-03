@@ -31,6 +31,7 @@
             };
             
      
+            var bnds = new google.maps.LatLngBounds();
             for(var  i=0; i < window.busStops.length; i++){
                 var Dtimes = ''; 
                 var stop = window.busStops[i];
@@ -46,8 +47,9 @@
                     content: content
                 });
 
+                var pos = {lat: stop.lat, lng: stop.lon};
                 window.markers.push(new google.maps.Marker({
-                    position: {lat: stop.lat, lng: stop.lon},
+                    position: pos,
                     map: map,
                     icon: image,
                     //shape: shape,
@@ -55,6 +57,7 @@
                     infowindow:myinfowindow
             
                 }));
+                bnds.extend(new google.maps.LatLng(pos));
 
                 google.maps.event.addListener(window.markers[window.markers.length-1],'click', function(){
                     this.infowindow.open(map,this);
@@ -62,6 +65,7 @@
      
                 }); 
             }
+            map.fitBounds(bnds);
         }
         google.maps.event.addDomListener(window, 'load', initialize);
 
@@ -97,7 +101,6 @@
 
 
 
-
             for (var i = 0; i < busStops.length; i++) {
                 var busStop = busStops[i];
 
@@ -119,12 +122,14 @@
     </script>
 </head>
 <body>
+    <br />
+    <a href="@Url.Action("ShowRoutes")">&lt; Back To Routes</a>
     <h2 class="text-center">Majic Bus- Kelowna, BC</h2>
-    <div id="googleMap" style="width:1000px;height:500px;"></div>
-    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+    <div id="googleMap" style="width:100%;height:500px;"></div>
+    @*&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
     <div class="form-group">
         <label for="route">Bus Route: </label>
         <input type="route" class="form-control" id="route" placeholder="Enter Bus Route: ">
-    </div>
+    </div>*@
 </body>
 </html>
