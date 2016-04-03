@@ -155,24 +155,36 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         for (int i = 0; i < shapeList.size(); i++) {
             Map<String, Object> shape = (Map) (shapeList).get(i);
             int id = ((Double) shape.get("routeID")).intValue();
-            PolylineOptions pOps = new PolylineOptions();
-
-            List shapesList = (List) shape.get("Shape");
-            for (int j = 0; j < shapesList.size(); j++) {
-                Map<String, Object> shapes = (Map) (shapesList).get(j);
-                double lat = (Double) shapes.get("Lat");
-                double lng = (Double) shapes.get("Lon");
-                pOps.add(new LatLng(lat, lng));
-            }
 
             //Random Colours for each line
             int R = (int) (Math.random() * 256);
             int G = (int) (Math.random() * 256);
             int B = (int) (Math.random() * 256);
 
-            pOps.color(Color.rgb(R, G, B));
-            RouteColors.put(id,Color.rgb(R, G, B));
+            RouteColors.put(id, Color.rgb(R, G, B));
 
+
+            PolylineOptions pOps = new PolylineOptions();
+
+            int lastid = 0;
+            List shapesList = (List) shape.get("Shape");
+            for (int j = 0; j < shapesList.size(); j++) {
+                Map<String, Object> shapes = (Map) (shapesList).get(j);
+                double lat = (Double) shapes.get("Lat");
+                double lng = (Double) shapes.get("Lon");
+
+                int sid = ((Double)shapes.get("sID")).intValue();
+                if(j > 0 && sid != lastid){
+                    pOps.color(Color.rgb(R, G, B));
+                    pOps.width(5);
+                    mMap.addPolyline(pOps);
+                    pOps = new PolylineOptions();
+                }
+                pOps.add(new LatLng(lat,lng));
+                lastid = sid;
+            }
+
+            pOps.color(Color.rgb(R, G, B));
             pOps.width(5);
             mMap.addPolyline(pOps);
         }
@@ -195,6 +207,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     //draw markers
                     MarkerOptions ops = new MarkerOptions();
                     ops.position(new LatLng(lat,lng));
+                    ops.title(String.valueOf(id));
                     ops.icon(BitmapDescriptorFactory.defaultMarker(RouteColors.get(id)));
                     Marker mark = mMap.addMarker(ops);
                     marks.add(mark);
