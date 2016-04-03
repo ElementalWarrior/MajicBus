@@ -78,4 +78,17 @@ namespace MBBackEnd.Models.TransitViewModels
         public double Lat { get; set; }
     }
 
+    public partial class RouteBusViewJ
+    {
+        public int routeID { get; set; }
+        public List<Models.BusJ> Buses { get; set; }
+    }
+
+    public partial class BusJ
+    {
+        public double Lat { get; set; }
+        public double Lon { get; set; }
+        
+    }
+
 }

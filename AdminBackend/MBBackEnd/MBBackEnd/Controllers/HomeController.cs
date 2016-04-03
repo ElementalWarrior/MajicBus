@@ -140,9 +140,35 @@ namespace MBBackEnd.Controllers
         }
 
 
-        //public ActionResult About()
-        //{
-        //    ViewBag.Message = "Your application description page.";
+        //This Doesn't Work, Please help
+        public ActionResult ShowBusPositionsJSON(List<int> routeIDs)
+        {
+            //Wrapper to hold route id and the stops
+            List<Models.RouteBusViewJ> Routes = new List<Models.RouteBusViewJ>();
+
+            //For each route given
+            for (int i = 0; i < routeIDs.Count; i++)
+            {
+                //Add a list of buses to the routeviewJ
+                Models.RouteBusViewJ Route = new Models.RouteBusViewJ
+                {
+                    routeID = routeIDs.ElementAt(i),
+                    Buses = BL.Bus.GetBusPosition(routeIDs.ElementAt(i)).Select(r => new Models.BusJ
+                    {
+                        Lat = r.Latitude,
+                        Lon = r.Longitude
+                    }).ToList()
+            };
+
+                Routes.Add(Route);
+            }
+            Routes.ToList();
+
+            //Return plain JSON data for the app to render.
+            return Json(Routes, JsonRequestBehavior.AllowGet);
+        }
+
+
 
         //    return View();
         //}

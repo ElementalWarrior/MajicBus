@@ -23,7 +23,7 @@ import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements OnTaskCompleted{
     private ArrayList<String> Routes;
-    static String URL = "http://192.168.0.11";
+    static String URL = "http://192.168.1.16";
 
     @Override
     public void onTaskCompleted(String response){
@@ -129,16 +129,6 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleted{
             Log.v("Dirty JSON", JSON);
             HTTPConnection conn = new HTTPConnection(this);
             conn.makeConnection(URL + "/Home/showRoutesJSON");
-
-            /*
-                TableRow row= new TableRow(this);
-                TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT);
-                row.setLayoutParams(lp);
-                TextView text = new TextView(this);
-                text.setText("Error fetching route data.");
-                row.addView(text);
-                ll.addView(row, 1);
-             */
         }
     }
 }

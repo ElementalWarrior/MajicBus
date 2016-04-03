@@ -3,6 +3,7 @@ package majicbus.gpsapp;
 import android.content.Intent;
 
 import android.graphics.Color;
+import android.support.annotation.ColorInt;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -29,7 +30,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private ArrayList<String> routeList;
     private String StopsURL;
     private String ShapesURL;
-    private HashMap<Integer, MarkerOptions> BusHashMap; //possible way to keep track of buses?
+    private String BusesURL;
+    private ArrayList<MarkerOptions> Stops;
+    private ArrayList<PolylineOptions> Lines;
+    private HashMap<Integer, ArrayList<Marker>> BusHashMap; //possible way to keep track of buses?
+    private HashMap<Integer, Integer> RouteColors;
     private GoogleMap mMap;
     private boolean StopsRetrieved;
     private boolean ShapesRetrieved;
@@ -65,13 +70,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }else if(StopsRetrieved&&ShapesRetrieved){
             /* Bus Code!
             try { //Then if the stops data is loaded load the shapes data
-                List shapes = parser.fromJson(response, List.class);
-                Shapes = response;
-                loadShapeData(shapes);
+                List buses = parser.fromJson(response, List.class);
+                loadShapeData(buses);
             } catch (JsonSyntaxException ex) {
                 Log.v("Dirty JSON", response);
                 HTTPConnection conn = new HTTPConnection(this);
-                conn.makeConnection(ShapesURL);
+                conn.makeConnection(BusesURL);
             }
             */
         }
@@ -83,7 +87,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         setContentView(R.layout.activity_maps);
         StopsRetrieved = false;
         ShapesRetrieved = false;
-        BusHashMap = new HashMap<Integer, MarkerOptions>();
+        BusHashMap = new HashMap<Integer, ArrayList<Marker>>();
+        RouteColors = new HashMap<Integer, Integer>();
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -157,42 +162,82 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Map<String, Object> shapes = (Map) (shapesList).get(j);
                 double lat = (Double) shapes.get("Lat");
                 double lng = (Double) shapes.get("Lon");
-                LatLng point = new LatLng(lat, lng);
-                pOps.add(point);
+                pOps.add(new LatLng(lat, lng));
             }
 
             //Random Colours for each line
             int R = (int) (Math.random() * 256);
             int G = (int) (Math.random() * 256);
             int B = (int) (Math.random() * 256);
-            pOps.color(Color.rgb(R, G, B));
 
-            //Color the bus marker to be the same colour as the line
-            //if(!BusHashMap.containsKey(id) || BusHashMap.get(id) == null)
-            //    BusHashMap.put(id, new MarkerOptions());
-            // BusHashMap.get(id).icon(BitmapDescriptorFactory.defaultMarker(Color.rgb(R, G, B)));
+            pOps.color(Color.rgb(R, G, B));
+            RouteColors.put(id,Color.rgb(R, G, B));
 
             pOps.width(5);
             mMap.addPolyline(pOps);
         }
     }
 
+    //TODO: Get this working
+    public void loadBusData(List routeList){
+        for (int i = 0; i < routeList.size(); i++) {
+            Map<String, Object> busList = (Map) (routeList).get(i);
+            int id = ((Double) busList.get("routeID")).intValue();
+            List buses = (List)busList.get("Buses");
+
+            if(!BusHashMap.containsKey(id)){ //There aren't any buses on the map
+                ArrayList<Marker>  marks = new ArrayList<Marker>();
+                for (int j = 0; j < buses.size(); j++) {
+                    Map<String, Object> stopMap = (Map) (buses).get(j);
+                    double lat = (Double) stopMap.get("lat");
+                    double lng = (Double) stopMap.get("lon");
+
+                    //draw markers
+                    MarkerOptions ops = new MarkerOptions();
+                    ops.position(new LatLng(lat,lng));
+                    ops.icon(BitmapDescriptorFactory.defaultMarker(RouteColors.get(id)));
+                    Marker mark = mMap.addMarker(ops);
+                    marks.add(mark);
+                }
+                BusHashMap.put(id,marks); //Keep track of the buses added to the map
+            }
+            else {
+                ArrayList<Marker> marks = BusHashMap.get(id);
+                for (int j = 0; j < marks.size(); j++) {
+                    Map<String, Object> stopMap = (Map) (buses).get(j);
+                    double lat = (Double) stopMap.get("lat");
+                    double lng = (Double) stopMap.get("lon");
+
+                    Marker mark = marks.get(j);
+                    mark.setPosition(new LatLng(lat,lng)); //Update Position
+                }
+            }
+        }
+    }
+
+
     private void makeUrls(){
         StringBuilder StopsBuilder = new StringBuilder();
         StringBuilder ShapesBuilder = new StringBuilder();
+        StringBuilder BusesBuilder = new StringBuilder();
         StringBuilder routeListBuilder = new StringBuilder();
 
         StopsBuilder.append(MainActivity.URL).append("/Home/ShowStopsJSON?");
         ShapesBuilder.append(MainActivity.URL).append("/Home/ShowShapesJSON?");
+        BusesBuilder.append(MainActivity.URL).append("/Home/ShowBusPositionsJSON?");
         for(int i = 0; i < routeList.size(); i++){
             routeListBuilder.append("routeIDs[").append(i).append("]=").append(routeList.get(i));
             if(i < routeList.size() -1)
                 routeListBuilder.append("&");
         }
-        StopsBuilder.append(routeListBuilder.toString());
-        ShapesBuilder.append(routeListBuilder.toString());
+        String routes = routeListBuilder.toString();
+        StopsBuilder.append(routes);
+        ShapesBuilder.append(routes);
+        BusesBuilder.append(routes);
+
         StopsURL = StopsBuilder.toString();
         ShapesURL = ShapesBuilder.toString();
+        BusesURL = BusesBuilder.toString();
     }
 
     public String formatTime(String Time) {
