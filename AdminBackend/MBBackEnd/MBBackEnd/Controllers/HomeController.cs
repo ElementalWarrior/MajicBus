@@ -100,8 +100,8 @@ namespace MBBackEnd.Controllers
                 List<Models.StopViewJ> viewStops = stops.Select(r => new Models.StopViewJ
                 {
                     StopID = r.StopID,
-                    lat = r.Lat,
-                    lon = r.Lon,
+                    lat = (double)r.Lat,
+                    lon = (double)r.Lon,
                     StopName = r.StopName,
                     Dtimes = r.Dtimes,
                 }).ToList();
@@ -119,6 +119,33 @@ namespace MBBackEnd.Controllers
             //Return plain JSON data for the app to render.
             return Json(Routes, JsonRequestBehavior.AllowGet);
         }
+
+        public ActionResult ShowShapesJSON(List<int> routeIDs)
+        {
+            //Wrapper to hold route id and the stops
+            List<Models.RouteShapeViewJ> Routes = new List<Models.RouteShapeViewJ>();
+
+            //For each route given
+            for (int i = 0; i < routeIDs.Count; i++)
+            {
+                //Find the shapes of the route and add the route id
+                Models.RouteShapeViewJ Route = new Models.RouteShapeViewJ
+                {
+                    routeID = routeIDs.ElementAt(i),
+                    Shape = BL.Route.GetRouteShapeByRouteID(routeIDs.ElementAt(i)).Select(r => new Models.RouteShapeJ
+                    {
+                        Lat = (double)r.Lat,
+                        Lon = (double)r.Lon
+                    }).ToList()
+                };
+                Routes.Add(Route);
+            }
+            Routes.ToList();
+
+            //Return plain JSON data for the app to render.
+            return Json(Routes, JsonRequestBehavior.AllowGet);
+        }
+
 
         public ActionResult About()
         {

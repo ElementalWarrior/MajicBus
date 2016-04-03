@@ -6,12 +6,16 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.util.Log;
+
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.net.URL;
 
 public class HTTPConnection {
@@ -63,6 +67,8 @@ public class HTTPConnection {
                 InputStream is = null;
                 try {
                     URL url = new URL(myUrl);
+                    //Proxy prx = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("192.168.1.37", 8888));
+                    //HttpURLConnection conn = (HttpURLConnection) url.openConnection(prx);
                     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                     conn.setReadTimeout(10000 /* milliseconds */);
                     conn.setConnectTimeout(15000 /* milliseconds */);

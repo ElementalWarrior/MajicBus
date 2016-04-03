@@ -7,7 +7,7 @@ namespace MBBackEnd.BL
 {
     public class Bus
     {
-        
+
         public static List<Coordinate> GetBusPosition(int routeID)
         {
             MajicBusEntities context = new MajicBusEntities();

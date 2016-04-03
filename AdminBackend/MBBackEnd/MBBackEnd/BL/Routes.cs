@@ -8,6 +8,15 @@ namespace MBBackEnd.BL
    
     public partial class Route
     {
+        public static List<RouteShape> GetRouteShapeByRouteID(int routeID)
+        {
+            MajicBusEntities context = new MajicBusEntities();
+            List<RouteShape> shapePosition = (from rs in context.RouteShapes
+                                              where rs.RouteID == routeID
+                                              select rs).OrderBy(rs => rs.SortID).ToList();
+            return shapePosition;
+        }
+
         IEnumerable<Stop> Stop { get; set;}
         public static List<Route> GetRoutes()
         {
@@ -57,7 +66,7 @@ namespace MBBackEnd.BL
                                 join t in context.Trips on r.RouteID equals t.RouteID
                                 join st in context.StopTimes on t.TripID equals st.TripID
                                 where r.RouteID == routeID && st.dtDeparture >= normalizedNow
-                                    orderby st.SortID
+                                    orderby st.SortID, st.dtDeparture
                                 select st).ToList(); 
 
             foreach(Stop s in stops)

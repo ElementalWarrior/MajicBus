@@ -42,18 +42,11 @@ namespace MBBackEnd.Models
         public List<String> Dtimes { get; set; } 
     }
 
-    public class RouteShape
+   
+    public class RouteShapeViewJ
     {
-        public int? ShapeID { get; set; }
-        public int? RouteID { get; set; }
-        public decimal? lat { get; set; }
-        public decimal? lon { get; set; }
-    }
-
-    public class RouteWrapper
-    {
-        public List<Models.StopView> ViewStops { get; set; }
-        public RouteShape Shape { get; set; }
+        public int routeID { get; set; }
+        public List<RouteShapeJ> Shape { get; set; }
     }
 
 
@@ -64,18 +57,25 @@ namespace MBBackEnd.Models
         public string NameLong { get; set; }
     }
 
-    public class StopViewJ
-    {
-        public int StopID { get; set; }
-        public String StopName { get; set; }
-        public decimal? lat { get; set; }
-        public decimal? lon { get; set; }
-        public List<String> Dtimes { get; set; }
-    }
-
     public class RouteStopViewJ
     {
         public int routeID { get; set; }
         public List<StopViewJ> routeStops { get; set; }
     }
+
+    public class StopViewJ
+    {
+        public int StopID { get; set; }
+        public String StopName { get; set; }
+        public double lat { get; set; }
+        public double lon { get; set; }
+        public List<String> Dtimes { get; set; }
+    }
+
+    public partial class RouteShapeJ
+    {
+        public double Lon { get; set; }
+        public double Lat { get; set; }
+    }
+
 }
