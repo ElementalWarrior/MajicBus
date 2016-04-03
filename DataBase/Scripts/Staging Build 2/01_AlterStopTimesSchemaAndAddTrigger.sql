@@ -1,3 +1,8 @@
+sp_rename 'dbo.StopTimes.dtDeparture' 'Departure'
+go
+sp_rename 'dbo.StopTimes.dtArrival' 'Arrival'
+go
+
 if (not exists (select top 1 * from sys.columns where name = 'Departure' and object_id = object_id('StopTimes')))
 begin
 	print 'Adding dtDeparture(Datetime) to StopTimes'
@@ -18,3 +23,5 @@ as
 begin
 	update stoptimes set dtDeparture = convert(datetime, 0) + dbo.ufn_convertGTFSTime('00:00', i.Departure, convert(datetime, 0)) from stoptimes st join inserted i on i.Tripid = st.Tripid and i.stopid = st.stopid
 end
+
+update StopTimes set dtDeparture = convert(datetime, 0) + dbo.ufn_convertGTFSTime('00:00', i.Departure, convert(datetime, 0))

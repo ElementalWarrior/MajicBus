@@ -1,11 +1,14 @@
 package com.majicbus.sms;
+import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.provider.Telephony;
 import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
+import android.util.Log;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -17,69 +20,47 @@ import java.sql.Statement;
  * Created by Charlotte on 2016-03-14.
  */
 public class SmsListener extends BroadcastReceiver {
-    int msgrec=0;
-    int msgsent=0;
-    private void sendSMS(String phoneNumber, String message) {
+    private static Activity _activity;
+    public static void sendSMS(String phoneNumber, String message) {
         //method that will actually send the message back
-        msgsent++;
+
         SmsManager sms = SmsManager.getDefault();
         sms.sendTextMessage(phoneNumber, null, message, null, null);
+        MainActivity.TotalSent++;
+    }
+    public void setActivity(Activity active)
+    {
+        _activity = active;
     }
 @Override
     public void onReceive(Context context, Intent intent) {
 //check if action is received text
-        if (Telephony.Sms.Intents.SMS_RECEIVED_ACTION.equals(intent.getAction())) {
-            for (SmsMessage smsMessage : Telephony.Sms.Intents.getMessagesFromIntent(intent)) {
-                //save msg and address
-                msgrec++;
-                String messageBody = smsMessage.getMessageBody();
-                String messageAddress = smsMessage.getOriginatingAddress();
+    Bundle extras = intent.getExtras();
+    if (extras == null)
+        return;
+    if (Telephony.Sms.Intents.SMS_RECEIVED_ACTION.equals(intent.getAction())) {
+        for (SmsMessage smsMessage : Telephony.Sms.Intents.getMessagesFromIntent(intent)) {
+            //save msg and address
 
-                String url = "tcp:mbdev01.database.windows.net,1433;";
-                String uid = "majicbus";
-                String pw = "AsBrBrChJa5";
-                Connection con = null;
-                String sendBack=null;
-                try {
-                    //convert string message to int
-                    int i = Integer.parseInt(messageBody.trim());
-                    con = DriverManager.getConnection(url, uid, pw);
-                    Statement stmt = con.createStatement();
-                    String sql = "SELECT dtarrival "+
-                            " FROM stoptimes "+
-                            " WHERE stopid ='" + i +"'" ;
-                    ResultSet rst = stmt.executeQuery(sql);
-                    while (rst.next())
-                    {
-                        sendBack=rst.getString("dtarrival");
-                        //prep to send stuff back
-                    }
+            String messageBody = smsMessage.getMessageBody();
+            String messageAddress = smsMessage.getOriginatingAddress();
 
-                }
-                catch (SQLException ex){}
-                finally
+            class ToastRunnable implements Runnable {
+                Activity _active;
+                String _body;
+                String _address;
+                public ToastRunnable(Activity active, String msgBody, String msgAddress)
                 {
-                    if (con != null)
-                    {
-                        try {
-                            con.close();
-                        }
-                        catch (SQLException ex) {}
-                    }
-if (sendBack==null){
-    sendSMS(messageAddress,"Couldn't find bus route.");
-}
-                    else{
-                sendSMS(messageAddress,sendBack);}
+                    _active = active;
+                    _body = msgBody;
+                    _address = msgAddress;
+                }
+                public void run(){
+                    ((MainActivity)_active).GetStopInformation(_body, _address);
+                }
             }
+            _activity.runOnUiThread(new ToastRunnable(_activity, messageBody, messageAddress));
         }
-    }}
-    public int getMsgrec(){
-        //getter for messages sent
-        return this.msgrec;
     }
-    public int getMsgsent(){
-        //getter for messages received
-        return this.msgsent;
-    }
+}
 }
