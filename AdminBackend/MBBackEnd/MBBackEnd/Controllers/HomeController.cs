@@ -127,6 +127,7 @@ namespace MBBackEnd.Controllers
                     routeID = routeIDs.ElementAt(i),
                     Shape = BL.Route.GetRouteShapeByRouteID(routeIDs.ElementAt(i)).Select(r => new RouteShapeJ
                     {
+                        sID = r.RouteShapeID,
                         Lat = (double)r.Lat,
                         Lon = (double)r.Lon
                     }).ToList()
