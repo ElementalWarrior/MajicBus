@@ -55,19 +55,39 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleted {
 
     public void onTaskCompleted(String response, String type) {
         if(type == "MsgReceived") {
-            Gson parser = new Gson();
-            JsonParser jp = new JsonParser();
-            JsonElement jelement = jp.parse(response);
-            JsonObject base = jelement.getAsJsonObject();
+            JsonParser jp;
+            JsonElement jelement;
+            JsonObject base;
+            String phone;
+            try
+            {
+                jp = new JsonParser();
+                jelement = jp.parse(response);
+                base = jelement.getAsJsonObject();
+
+                phone = base.get("Phone").getAsString();
+            }
+            catch(Exception ex)
+            {
+                return;
+            }
             try {
-                String phone = base.get("Phone").getAsString();
 
                 JsonArray jarray = null;
                 HashMap<Integer, ArrayList> routes = new HashMap<Integer, ArrayList>();
-                try {
-                    jarray = base.get("Data").getAsJsonArray();
-                } catch (Exception e) {
-                    e.printStackTrace();
+                jarray = base.get("Data").getAsJsonArray();
+                if (jarray == null || jarray.size() == 0)
+                {
+
+                    String body = "There was no data associated with that stop number.";
+                    SmsListener.sendSMS(phone, body);
+                    try {
+                        body = URLEncoder.encode(body, "UTF-8");
+                    } catch (UnsupportedEncodingException ex) {
+                        ex.printStackTrace();
+                    }
+                    LogMessageSent(body, phone);
+                    return;
                 }
                 for (int i = 0; i < jarray.size(); i++) {
                     JsonObject obj;
@@ -125,10 +145,16 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleted {
                 }
                 SmsListener.sendSMS(phone, smsResponse);
             } catch (Exception e) {
+                String body = "There was a problem contacting the server. Please try again.";
+                SmsListener.sendSMS(phone, body);
+                try {
+                    body = URLEncoder.encode(body, "UTF-8");
+                } catch (UnsupportedEncodingException ex) {
+                    ex.printStackTrace();
+                }
+                LogMessageSent(body, phone);
                 e.printStackTrace();
             }
-            //String pNum = jobject.get("Phone").toString();
-
         }
     }
 
@@ -154,7 +180,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleted {
         bg.setMaxWidth(p.x);
         bg.setMinimumWidth(p.x);
         bg.setMinimumHeight((int) (height * imageScale));
-        bg.setMaxHeight((int)(height * imageScale));
+        bg.setMaxHeight((int) (height * imageScale));
 
 
     }

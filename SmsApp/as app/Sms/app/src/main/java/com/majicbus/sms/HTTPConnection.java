@@ -68,7 +68,8 @@ public class HTTPConnection extends AsyncTask<String, Void, String> {
                 InputStream input = conn.getInputStream();
                 return readIt(input, conn.getContentLength());
             } catch (Exception ex){
-                Log.v("httpBroke", "" + ex.getMessage());
+                ex.printStackTrace();
+                Log.v("httpBroke",  " " + ex.getMessage());
             }
             finally {
                 if (is != null)

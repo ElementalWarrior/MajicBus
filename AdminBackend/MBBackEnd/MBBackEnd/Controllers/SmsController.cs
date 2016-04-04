@@ -18,7 +18,7 @@ namespace MBBackEnd.Controllers
         }
         public ActionResult LogMessageSent(String from, String to, String body)
         {
-            BL.SMSLog.UpdateSmsLog(from, to, body);
+            BL.SMSLog.UpdateSmsLog(from, to, body.Substring(0, 159));
             return Json("", JsonRequestBehavior.AllowGet);
         }
         [Authorize]
