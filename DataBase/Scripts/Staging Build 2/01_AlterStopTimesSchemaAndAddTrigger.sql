@@ -31,15 +31,15 @@ end
 
 go
 
-create trigger trg_StopTimesAltered
-on StopTimes
-after insert, update
-as
-begin
-	update stoptimes set dtDeparture = convert(datetime, 0) + dbo.ufn_convertGTFSTime('00:00', i.Departure, convert(datetime, 0)) from stoptimes st join inserted i on i.Tripid = st.Tripid and i.stopid = st.stopid
-end
+--create trigger trg_StopTimesAltered
+--on StopTimes
+--after insert, update
+--as
+--begin
+--	update stoptimes set dtDeparture = convert(datetime, 0) + dbo.ufn_convertGTFSTime('00:00', i.Departure, convert(datetime, 0)) from stoptimes st join inserted i on i.Tripid = st.Tripid and i.stopid = st.stopid
+--end
 
-update StopTimes set dtDeparture = convert(datetime, 0) + dbo.ufn_convertGTFSTime('00:00', i.Departure, convert(datetime, 0))
+update StopTimes set dtDeparture = convert(datetime, 0) + dbo.ufn_convertGTFSTime('00:00', Departure, convert(datetime, 0))
 
 --commit tran
 --rollback tran

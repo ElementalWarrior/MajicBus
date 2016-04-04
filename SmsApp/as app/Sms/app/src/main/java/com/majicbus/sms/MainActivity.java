@@ -43,6 +43,8 @@ import java.util.List;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements OnTaskCompleted {
+    public static final String URL = "http://majicbus.azurewebsites.net";
+//    public static final String URL = "http://192.168.0.11";
     public static int TotalReceived;
     public static int TotalSent;
     private SmsListener intentreceiver;
@@ -155,13 +157,13 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleted {
     {
         String number = ((TelephonyManager)this.getSystemService(Context.TELEPHONY_SERVICE)).getLine1Number();
         HTTPConnection conn = new HTTPConnection(this, "MsgReceived", address);
-        conn.makeConnection("http://192.168.0.11/Sms/Receive?from=" + address.trim() + "&to=" + number.trim() + "&body=" + body);
+        conn.makeConnection(URL + "/Sms/Receive?from=" + address.trim() + "&to=" + number.trim() + "&body=" + body);
     }
     public void LogMessageSent(String body, String address)
     {
         HTTPConnection conn = new HTTPConnection(this, "LogSent");
         String number = ((TelephonyManager)this.getSystemService(Context.TELEPHONY_SERVICE)).getLine1Number();
-        conn.makeConnection("http://192.168.0.11/Sms/LogMessageSent?from=" + number.trim() + "&to=" + address.trim()+ "&body=" + body);
+        conn.makeConnection(URL + "/Sms/LogMessageSent?from=" + number.trim() + "&to=" + address.trim()+ "&body=" + body);
     }
 
 
