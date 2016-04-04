@@ -2,6 +2,9 @@ package com.majicbus.sms;
 
 import android.content.BroadcastReceiver;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Point;
 import android.telephony.TelephonyManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -14,6 +17,7 @@ import android.telephony.SmsMessage;
 import android.util.JsonReader;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,29 +47,47 @@ import java.util.List;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements OnTaskCompleted {
+//    public static final String URL = "http://majicbus.azurewebsites.net";
+    public static final String URL = "http://192.168.0.11";
     public static int TotalReceived;
     public static int TotalSent;
     private SmsListener intentreceiver;
 
-    //  @Override
-    TextView textView4;
-    TextView textView5;
-
     public void onTaskCompleted(String response, String type) {
         if(type == "MsgReceived") {
-            Gson parser = new Gson();
-            JsonParser jp = new JsonParser();
-            JsonElement jelement = jp.parse(response);
-            JsonObject base = jelement.getAsJsonObject();
+            JsonParser jp;
+            JsonElement jelement;
+            JsonObject base;
+            String phone;
+            try
+            {
+                jp = new JsonParser();
+                jelement = jp.parse(response);
+                base = jelement.getAsJsonObject();
+
+                phone = base.get("Phone").getAsString();
+            }
+            catch(Exception ex)
+            {
+                return;
+            }
             try {
-                String phone = base.get("Phone").getAsString();
 
                 JsonArray jarray = null;
                 HashMap<Integer, ArrayList> routes = new HashMap<Integer, ArrayList>();
-                try {
-                    jarray = base.get("Data").getAsJsonArray();
-                } catch (Exception e) {
-                    e.printStackTrace();
+                jarray = base.get("Data").getAsJsonArray();
+                if (jarray == null || jarray.size() == 0)
+                {
+
+                    String body = "There was no data associated with that stop number.";
+                    SmsListener.sendSMS(phone, body);
+                    try {
+                        body = URLEncoder.encode(body, "UTF-8");
+                    } catch (UnsupportedEncodingException ex) {
+                        ex.printStackTrace();
+                    }
+                    LogMessageSent(body, phone);
+                    return;
                 }
                 for (int i = 0; i < jarray.size(); i++) {
                     JsonObject obj;
@@ -122,11 +144,23 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleted {
                     smsResponse += routetimes[i].substring(0, routetimes[i].length() - 1) + " ";
                 }
                 SmsListener.sendSMS(phone, smsResponse);
+                try {
+                    smsResponse = URLEncoder.encode(smsResponse, "UTF-8");
+                } catch (UnsupportedEncodingException ex) {
+                    ex.printStackTrace();
+                }
+                LogMessageSent(smsResponse, phone);
             } catch (Exception e) {
+                String body = "There was a problem contacting the server. Please try again.";
+                SmsListener.sendSMS(phone, body);
+                try {
+                    body = URLEncoder.encode(body, "UTF-8");
+                } catch (UnsupportedEncodingException ex) {
+                    ex.printStackTrace();
+                }
+                LogMessageSent(body, phone);
                 e.printStackTrace();
             }
-            //String pNum = jobject.get("Phone").toString();
-
         }
     }
 
@@ -136,10 +170,23 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleted {
         String a = Integer.toString(TotalReceived);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        textView4 = (TextView) findViewById(R.id.textView4);
-        textView5 = (TextView) findViewById(R.id.textView5);
-        textView4.setText("sent");
-        textView5.setText("rec");
+
+        ImageView bg = ((ImageView) findViewById(R.id.backgroundImage));
+        bg.setImageResource(R.drawable.busapp);
+        Point p = new Point();
+        getWindowManager().getDefaultDisplay().getSize(p);
+
+        BitmapFactory.Options dimensions = new BitmapFactory.Options();
+        dimensions.inJustDecodeBounds = true;
+        Bitmap mBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.busapp, dimensions);
+        int height = dimensions.outHeight;
+        int width =  dimensions.outWidth;
+
+        double imageScale = p.x / width;
+        bg.setMaxWidth(p.x);
+        bg.setMinimumWidth(p.x);
+        bg.setMinimumHeight((int) (height * imageScale));
+        bg.setMaxHeight((int) (height * imageScale));
 
 
     }
@@ -155,13 +202,13 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleted {
     {
         String number = ((TelephonyManager)this.getSystemService(Context.TELEPHONY_SERVICE)).getLine1Number();
         HTTPConnection conn = new HTTPConnection(this, "MsgReceived", address);
-        conn.makeConnection("http://192.168.0.11/Sms/Receive?from=" + address.trim() + "&to=" + number.trim() + "&body=" + body);
+        conn.makeConnection(URL + "/Sms/Receive?from=" + address.trim() + "&to=" + number.trim() + "&body=" + body);
     }
     public void LogMessageSent(String body, String address)
     {
         HTTPConnection conn = new HTTPConnection(this, "LogSent");
         String number = ((TelephonyManager)this.getSystemService(Context.TELEPHONY_SERVICE)).getLine1Number();
-        conn.makeConnection("http://192.168.0.11/Sms/LogMessageSent?from=" + number.trim() + "&to=" + address.trim()+ "&body=" + body);
+        conn.makeConnection(URL + "/Sms/LogMessageSent?from=" + number.trim() + "&to=" + address.trim()+ "&body=" + body);
     }
 
 
