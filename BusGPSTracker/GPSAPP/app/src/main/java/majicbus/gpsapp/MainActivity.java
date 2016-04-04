@@ -13,6 +13,8 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TableLayout;
 import android.widget.TableRow;
+import android.widget.Toast;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
@@ -88,7 +90,6 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleted{
     public void loadData(String JSON){
         TableLayout ll = (TableLayout) findViewById(R.id.RouteTable);
         Gson parser = new Gson();
-
         try {
              List routeList = parser.fromJson(JSON, List.class);
 
@@ -125,10 +126,8 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleted{
                 row.addView(routeBox);
                 ll.addView(row, i + 1);
             }
-        }catch(JsonSyntaxException e){
-            Log.v("Dirty JSON", JSON);
-            HTTPConnection conn = new HTTPConnection(this);
-            conn.makeConnection(URL + "/Home/showRoutesJSON");
+        }catch(Exception e){
+            Toast.makeText(this,"Unable to fetch Route List",Toast.LENGTH_LONG);
         }
     }
 }

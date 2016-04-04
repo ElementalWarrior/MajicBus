@@ -1,22 +1,15 @@
 package majicbus.gpsapp;
 
-import android.app.Activity;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.util.Log;
-
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
-import java.net.InetSocketAddress;
-import java.net.Proxy;
 import java.net.URL;
 
 public class HTTPConnection extends AsyncTask<String, Void, String> {
@@ -43,8 +36,6 @@ public class HTTPConnection extends AsyncTask<String, Void, String> {
             InputStream is = null;
             try {
                 URL url = new URL(urls[0]);
-                //Proxy prx = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("192.168.1.37", 8888));
-                //HttpURLConnection conn = (HttpURLConnection) url.openConnection(prx);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setReadTimeout(10000 /* milliseconds */);
                 conn.setConnectTimeout(15000 /* milliseconds */);
@@ -77,12 +68,9 @@ public class HTTPConnection extends AsyncTask<String, Void, String> {
     //Converts the Input stream to a string
     public String readIt(InputStream stream, int len) throws IOException {
         StringBuilder sb = new StringBuilder();
-
         BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
-
         String line;
-        while((line = reader.readLine()) != null)
-        {
+        while((line = reader.readLine()) != null) {
             sb.append(line);
         }
         return sb.toString();
