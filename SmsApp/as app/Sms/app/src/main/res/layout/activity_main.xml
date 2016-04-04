@@ -9,50 +9,14 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.majicbus.sms.MainActivity"
     android:id="@+id/r"
-    android:background="@drawable/busapp"
-    >
+    android:background="#1d549b"
+    android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
 
-    <TextView
+    <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Texts Sent: "
-        android:id="@+id/textView"
-        android:layout_marginTop="64dp"
-        android:layout_below="@+id/textView3"
-        android:layout_alignParentStart="true" />
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Texts Received: "
-        android:layout_marginTop="75dp"
-        android:id="@+id/textView2"
-        android:layout_below="@+id/textView"
-        android:layout_alignParentStart="true" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="MajicBus"
-        android:id="@+id/textView3"
+        android:id="@+id/backgroundImage"
         android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:id="@+id/textView4"
-        android:layout_alignBottom="@+id/textView"
-        android:layout_toEndOf="@+id/textView"
-        android:autoText="false" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:id="@+id/textView5"
-        android:layout_alignBottom="@+id/textView2"
-        android:layout_toEndOf="@+id/textView2" />
+        android:layout_centerHorizontal="true" />
 
 </RelativeLayout>

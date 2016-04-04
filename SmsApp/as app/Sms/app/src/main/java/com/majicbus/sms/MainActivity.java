@@ -2,6 +2,9 @@ package com.majicbus.sms;
 
 import android.content.BroadcastReceiver;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Point;
 import android.telephony.TelephonyManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -14,6 +17,7 @@ import android.telephony.SmsMessage;
 import android.util.JsonReader;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -48,10 +52,6 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleted {
     public static int TotalReceived;
     public static int TotalSent;
     private SmsListener intentreceiver;
-
-    //  @Override
-    TextView textView4;
-    TextView textView5;
 
     public void onTaskCompleted(String response, String type) {
         if(type == "MsgReceived") {
@@ -138,10 +138,23 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleted {
         String a = Integer.toString(TotalReceived);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        textView4 = (TextView) findViewById(R.id.textView4);
-        textView5 = (TextView) findViewById(R.id.textView5);
-        textView4.setText("sent");
-        textView5.setText("rec");
+
+        ImageView bg = ((ImageView) findViewById(R.id.backgroundImage));
+        bg.setImageResource(R.drawable.busapp);
+        Point p = new Point();
+        getWindowManager().getDefaultDisplay().getSize(p);
+
+        BitmapFactory.Options dimensions = new BitmapFactory.Options();
+        dimensions.inJustDecodeBounds = true;
+        Bitmap mBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.busapp, dimensions);
+        int height = dimensions.outHeight;
+        int width =  dimensions.outWidth;
+
+        double imageScale = p.x / width;
+        bg.setMaxWidth(p.x);
+        bg.setMinimumWidth(p.x);
+        bg.setMinimumHeight((int) (height * imageScale));
+        bg.setMaxHeight((int)(height * imageScale));
 
 
     }
