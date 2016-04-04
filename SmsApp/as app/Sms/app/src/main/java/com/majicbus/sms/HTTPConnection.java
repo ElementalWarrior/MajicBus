@@ -58,8 +58,8 @@ public class HTTPConnection extends AsyncTask<String, Void, String> {
                 //Proxy prx = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("192.168.1.37", 8888));
                 //HttpURLConnection conn = (HttpURLConnection) url.openConnection(prx);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setReadTimeout(10000 /* milliseconds */);
-                conn.setConnectTimeout(15000 /* milliseconds */);
+                conn.setReadTimeout(30000 /* milliseconds */);
+                conn.setConnectTimeout(30000 /* milliseconds */);
                 conn.setRequestMethod("GET");
                 conn.setRequestProperty("charset", "UTF-8");
                 conn.setDoInput(true);

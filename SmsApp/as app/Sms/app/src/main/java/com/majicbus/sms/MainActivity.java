@@ -47,8 +47,8 @@ import java.util.List;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements OnTaskCompleted {
-    public static final String URL = "http://majicbus.azurewebsites.net";
-//    public static final String URL = "http://192.168.0.11";
+//    public static final String URL = "http://majicbus.azurewebsites.net";
+    public static final String URL = "http://192.168.0.11";
     public static int TotalReceived;
     public static int TotalSent;
     private SmsListener intentreceiver;
@@ -144,6 +144,12 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleted {
                     smsResponse += routetimes[i].substring(0, routetimes[i].length() - 1) + " ";
                 }
                 SmsListener.sendSMS(phone, smsResponse);
+                try {
+                    smsResponse = URLEncoder.encode(smsResponse, "UTF-8");
+                } catch (UnsupportedEncodingException ex) {
+                    ex.printStackTrace();
+                }
+                LogMessageSent(smsResponse, phone);
             } catch (Exception e) {
                 String body = "There was a problem contacting the server. Please try again.";
                 SmsListener.sendSMS(phone, body);
