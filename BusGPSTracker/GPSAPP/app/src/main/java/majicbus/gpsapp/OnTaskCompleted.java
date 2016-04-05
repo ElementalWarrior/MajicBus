@@ -6,5 +6,5 @@ package majicbus.gpsapp;
   call back to that activity.
  */
 public interface OnTaskCompleted {
-   public void onTaskCompleted(String response);
+   public void onTaskCompleted(DataHandler handler);
 }
