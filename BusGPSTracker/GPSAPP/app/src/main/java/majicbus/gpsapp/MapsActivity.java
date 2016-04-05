@@ -2,10 +2,8 @@ package majicbus.gpsapp;
 
 import android.content.Context;
 import android.content.Intent;
-
 import android.graphics.Color;
 import android.graphics.Point;
-import android.location.GpsStatus;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -31,6 +29,9 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+import com.google.maps.android.SphericalUtil;
+
+
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -96,7 +97,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             try { //Then if the stops data is loaded and the shape data is loaded, load bus data
                 List buses = parser.fromJson(response, List.class);
                 loadBusData(buses);
-                Log.v("Bus Pos:", "Updated");
             } catch (JsonSyntaxException ex) {
                 Log.v("Dirty JSON", response);
                 HTTPConnection conn = new HTTPConnection(this);
@@ -118,38 +118,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         BusHashMap = new HashMap<Integer, ArrayList<Marker>>();
         RouteColors = new HashMap<Integer, Integer[]>();
 
-        //Location Listener code
-        locationListener = new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-                LatLng point = new LatLng(location.getLatitude(),location.getLongitude());
-                if(myPos.isVisible())
-                    animateMarker(myPos,point,false);
-                else {
-                    myPos.setPosition(point);
-                    myPos.setVisible(true);
-                }
-            }
-            @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) {}
-            @Override
-            public void onProviderEnabled(String provider) {
-                //create marker
-                MarkerOptions ops = new MarkerOptions();
-                ops.position(new LatLng(0,0));
-                ops.visible(false);
-                ops.title("Your Position").snippet("");
-                ops.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
-                myPos = mMap.addMarker(ops);
-            }
-            @Override
-            public void onProviderDisabled(String provider) {if(myPos != null)myPos.remove();}
-        };
-
-        //User Location code
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        try {locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);}
-        catch(SecurityException e){Log.v("GPSOpen:", "Failed to get GPS Access");}
+        initLocationListener();
 
         //Create timer to refresh bus locations
         final Context con = this;
@@ -248,7 +217,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 MarkerOptions mOps = new MarkerOptions();
 
                 mOps.title("Stop: " + ((Double) stopMap.get("StopID")).intValue());
-
                 StringBuilder build = new StringBuilder();
                 build.append("Route: ").append(id).append("\n");
                 build.append(stopMap.get("StopName"));
@@ -331,43 +299,63 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             int id = ((Double) busList.get("routeID")).intValue();
             List buses = (List)busList.get("Buses");
 
-            if(!BusHashMap.containsKey(id)){ //There aren't any buses on the map
-                ArrayList<Marker>  marks = new ArrayList<Marker>();
-                for (int j = 0; j < buses.size(); j++) {
-                    Map<String, Object> busMap = (Map) (buses).get(j);
-                    double lat = (Double) busMap.get("Lat");
-                    double lng = (Double) busMap.get("Lon");
-
-                    //draw markers
-                    MarkerOptions ops = new MarkerOptions();
-                    ops.position(new LatLng(lat, lng));
-                    ops.title(String.valueOf(id));
-                    ops.snippet("0%");
-                    Integer RGB[] = RouteColors.get(id);
-                    float HSL[] = new float[3];
-                    ColorUtils.RGBToHSL(RGB[0],RGB[1],RGB[2],HSL);
-
-                    ops.icon(BitmapDescriptorFactory.defaultMarker(HSL[0]));
-                    Marker mark = mMap.addMarker(ops);
-                    marks.add(mark);
-                }
-                BusHashMap.put(id,marks); //Keep track of the buses added to the map
-            }
-            else {
+            if(!BusHashMap.containsKey(id)) //There aren't any buses on the map
+                makeBuses(id,buses);
+            else { //Update the buses
                 ArrayList<Marker> marks = BusHashMap.get(id);
-                for (int j = 0; j < marks.size(); j++) {
-                    try {
-                        Map<String, Object> stopMap = (Map) (buses).get(j);
-                        double lat = (Double) stopMap.get("Lat");
-                        double lng = (Double) stopMap.get("Lon");
-                        Marker mark = marks.get(j);
-                        animateMarker(mark,new LatLng(lat,lng),false);
-                    }catch(IndexOutOfBoundsException e){
-                        Log.v("Out of bounds", "" + e.getMessage());
-                        BusHashMap.remove(id); //Need to remove the buses and redraw as if it was just started.
-                    }
+                //If there are the same number of buses fetched
+                if(buses.size() == marks.size())
+                    updateBuses(id,buses);
+                else{//Remove all the buses and remake
+                    for(int j = 0; j < marks.size(); j++)
+                        marks.get(j).remove();
+                    makeBuses(id,buses);
+                }
+
+            }
+        }
+    }
+
+    private void makeBuses(int id, List buses){
+        ArrayList<Marker>  marks = new ArrayList<Marker>();
+        for (int j = 0; j < buses.size(); j++) {
+            Map<String, Object> busMap = (Map) (buses).get(j);
+            double lat = (Double) busMap.get("Lat");
+            double lng = (Double) busMap.get("Lon");
+
+            //draw markers
+            MarkerOptions ops = new MarkerOptions();
+            ops.position(new LatLng(lat, lng));
+            ops.title(String.valueOf(id));
+            ops.snippet("0%");
+            Integer RGB[] = RouteColors.get(id);
+            float HSL[] = new float[3];
+            ColorUtils.RGBToHSL(RGB[0],RGB[1],RGB[2],HSL);
+
+            ops.icon(BitmapDescriptorFactory.defaultMarker(HSL[0]));
+            Marker mark = mMap.addMarker(ops);
+            marks.add(mark);
+        }
+        BusHashMap.put(id, marks); //Keep track of the buses added to the map
+    }
+
+    private void updateBuses(int id, List buses){
+        ArrayList<Marker>  marks = BusHashMap.get(id);
+        for (int i = 0; i < buses.size(); i++) {
+            Map<String, Object> busMap = (Map) (buses).get(i);
+            LatLng newBusPos = new LatLng((Double) busMap.get("Lat"),(Double) busMap.get("Lon"));
+            double min = Double.MAX_VALUE;
+            Marker closestBus = null;
+
+            for(int j = 0; j < marks.size(); j++){
+                Marker mark = marks.get(j);
+                double tempMin = SphericalUtil.computeDistanceBetween(newBusPos,mark.getPosition());
+                if(tempMin < min) {
+                    closestBus = mark;
+                    min = tempMin;
                 }
             }
+            animateMarker(closestBus, newBusPos, false);
         }
     }
 
@@ -456,6 +444,41 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
             }
         });
+    }
+
+    private void initLocationListener(){
+        //Location Listener code
+        locationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                LatLng point = new LatLng(location.getLatitude(),location.getLongitude());
+                if(myPos.isVisible())
+                    animateMarker(myPos,point,false);
+                else {
+                    myPos.setPosition(point);
+                    myPos.setVisible(true);
+                }
+            }
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {}
+            @Override
+            public void onProviderEnabled(String provider) {
+                //create marker
+                MarkerOptions ops = new MarkerOptions();
+                ops.position(new LatLng(0,0));
+                ops.visible(false);
+                ops.title("Your Position").snippet("");
+                ops.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+                myPos = mMap.addMarker(ops);
+            }
+            @Override
+            public void onProviderDisabled(String provider) {if(myPos != null)myPos.remove();}
+        };
+
+        //User Location code
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        try {locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);}
+        catch(SecurityException e){Log.v("GPSOpen:", "Failed to get GPS Access");}
     }
 
     /**

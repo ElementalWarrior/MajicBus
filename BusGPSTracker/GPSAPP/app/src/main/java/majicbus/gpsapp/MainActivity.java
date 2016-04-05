@@ -25,7 +25,7 @@ import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements OnTaskCompleted{
     private ArrayList<String> Routes;
-    static String URL = "http://192.168.1.16";
+    static String URL = "http://192.168.1.79";
 
     @Override
     public void onTaskCompleted(String response){
