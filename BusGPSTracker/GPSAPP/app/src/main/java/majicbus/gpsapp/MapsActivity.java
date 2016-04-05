@@ -45,6 +45,8 @@ import java.util.TimerTask;
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, OnTaskCompleted {
     private ArrayList<String> routeList;
     private BusHandler busHandler;
+    private ShapeHandler shapeHandler;
+    private StopHandler stopHandler;
     private HashMap<Integer, Integer[]> RouteColors;
     private GoogleMap mMap;
     private Timer timer;
@@ -149,14 +151,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if(!routeList.isEmpty()) {
             //Get Stops
             url = Utility.makeUrl("/Home/ShowStopsJSON?", routeList);
-            StopHandler stophandler = new StopHandler(url, this,mMap);
-            HTTPConnection conn = new HTTPConnection(stophandler);
+            stopHandler = new StopHandler(url, this,mMap);
+            HTTPConnection conn = new HTTPConnection(stopHandler);
             conn.makeConnection();
 
             //Get Route Shapes
             url = Utility.makeUrl("/Home/ShowShapesJSON?", routeList);
-            ShapeHandler shapehandler = new ShapeHandler(url, this,RouteColors, mMap);
-            conn = new HTTPConnection(shapehandler);
+            shapeHandler = new ShapeHandler(url, this,RouteColors, mMap);
+            conn = new HTTPConnection(shapeHandler);
             conn.makeConnection();
 
             //Get Bus Positions
