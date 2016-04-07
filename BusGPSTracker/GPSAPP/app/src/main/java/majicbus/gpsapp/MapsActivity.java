@@ -1,5 +1,6 @@
 package majicbus.gpsapp;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -7,8 +8,10 @@ import android.graphics.Point;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Handler;
 import android.os.SystemClock;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.graphics.ColorUtils;
@@ -72,8 +75,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Intent routeData = getIntent();
         routeList = routeData.getStringArrayListExtra("routeData");
         RouteColors = Utility.randomColorGen(routeList);
-        initLocationListener();
 
+
+        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] granted) {
+        if (requestCode == 0) {
+            initLocationListener();
+        }
         timer = new Timer();
         task = new TimerTask() {
             @Override
@@ -82,11 +94,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 conn.makeConnection();
             }
         };
-
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
+        //Get Bus Positions
+        timer.scheduleAtFixedRate(task, 0, updateFrequency);
     }
+
 
     @Override
     public void onResume(){
@@ -117,10 +128,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             timer.cancel();
             timer.purge();
         }
-        try{locationManager.removeUpdates(locationListener);}
-        catch(SecurityException e){
-            Log.v("GPSClose:", "Failed to get GPS Access");
-            Toast.makeText(this, "Unable to access location", Toast.LENGTH_LONG).show();
+        if(locationManager != null) {
+            try {
+                locationManager.removeUpdates(locationListener);
+            } catch (SecurityException e) {
+                Log.v("GPSClose:", "Failed to get GPS Access");
+                Toast.makeText(this, "Unable to access location", Toast.LENGTH_LONG).show();
+            }
         }
     }
 
@@ -161,8 +175,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             conn = new HTTPConnection(shapeHandler);
             conn.makeConnection();
 
-            //Get Bus Positions
-            timer.scheduleAtFixedRate(task,0,updateFrequency);
+        }
+
+        if (Build.VERSION.SDK_INT < 23) {
+            initLocationListener();
+
+            timer = new Timer();
+            task = new TimerTask() {
+                @Override
+                public void run() {
+                    HTTPConnection conn = new HTTPConnection(busHandler);
+                    conn.makeConnection();
+                }
+            };
+        } else {
+            int reqFine = 0;
+            ActivityCompat.requestPermissions(this, new String[]{
+                    Manifest.permission.ACCESS_FINE_LOCATION
+            }, reqFine);
         }
     }
 
@@ -189,6 +219,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 ops.visible(false);
                 ops.title("Your Position").snippet("");
                 ops.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+                if(myPos != null)
+                {
+                    myPos.remove();
+                }
                 myPos = mMap.addMarker(ops);
             }
             @Override
@@ -197,7 +231,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         //User Location code
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        try {locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);}
+
+        try {
+
+        MarkerOptions ops = new MarkerOptions();
+        Location loc = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        ops.position(new LatLng(loc.getLatitude(), loc.getLongitude()));
+        ops.title("Your Position").snippet("");
+        ops.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+        myPos = mMap.addMarker(ops);
+
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);}
         catch(SecurityException e){
             Log.v("GPSOpen:", "Failed to get GPS Access");
             Toast.makeText(this, "Unable to access location", Toast.LENGTH_LONG).show();

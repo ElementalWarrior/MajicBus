@@ -48,7 +48,7 @@ import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements OnTaskCompleted {
 //    public static final String URL = "http://majicbus.azurewebsites.net";
-    public static final String URL = "http://192.168.0.11";
+    public static final String URL = "http://majicbus.azurewebsites.net";
     public static int TotalReceived;
     public static int TotalSent;
     private SmsListener intentreceiver;

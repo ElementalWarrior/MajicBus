@@ -25,7 +25,7 @@ import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements OnTaskCompleted{
     private RouteHandler handler;
-    static String URL = "http://192.168.1.16";
+    static String URL = "http://majicbus.azurewebsites.net";
 
     @Override
     public void onTaskCompleted(DataHandler handler){handler.loadData();}
