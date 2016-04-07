@@ -18,9 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/**
- * TODO: Document the class
- */
 public class RouteHandler extends DataHandler {
     private ArrayList<String> Routes;
     private TableLayout routeTable;

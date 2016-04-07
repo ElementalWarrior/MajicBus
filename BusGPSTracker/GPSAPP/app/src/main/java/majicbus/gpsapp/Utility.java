@@ -12,9 +12,6 @@ import com.google.android.gms.maps.model.Marker;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-/**
- * TODO: Document the class
- */
 public abstract class Utility {
 
     /**

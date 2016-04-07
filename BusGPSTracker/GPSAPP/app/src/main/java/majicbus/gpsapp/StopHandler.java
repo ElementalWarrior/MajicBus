@@ -12,9 +12,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.util.List;
 import java.util.Map;
 
-/**
- * TODO: Document the class
- */
+
 public class StopHandler extends DataHandler {
     private GoogleMap mMap;
     private LayoutInflater inflater;

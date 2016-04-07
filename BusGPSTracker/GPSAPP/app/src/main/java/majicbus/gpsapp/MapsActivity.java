@@ -185,7 +185,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         if (Build.VERSION.SDK_INT < 23) {
             initLocationListener();
-
             InitTimer();
         } else {
             int reqFine = 0;
@@ -218,8 +217,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 ops.visible(false);
                 ops.title("Your Position").snippet("");
                 ops.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
-                if(myPos != null)
-                {
+                if(myPos != null) {
                     myPos.remove();
                 }
                 myPos = mMap.addMarker(ops);
