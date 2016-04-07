@@ -25,15 +25,13 @@ public abstract class Utility {
             String min = Time.substring(3,5);
             if(hour > 12){
                 hour -= 12;
-                if(hour > 12)
-                    hour -=11;
-                if(hour == 12)
-                    build.append(hour).append(":").append(min).append(" AM");
-                else
-                    build.append(hour).append(":").append(min).append(" PM");
+                build.append(hour).append(":").append(min).append(" PM");
             }
-            else
+            else {
+                if(hour == 0)
+                    hour = 12;
                 build.append(hour).append(":").append(min).append(" AM");
+            }
 
             return build.toString();
         }
