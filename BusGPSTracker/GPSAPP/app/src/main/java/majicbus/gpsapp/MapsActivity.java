@@ -188,6 +188,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     conn.makeConnection();
                 }
             };
+            //Get Bus Positions
+            timer.scheduleAtFixedRate(task, 0, updateFrequency);
         } else {
             int reqFine = 0;
             ActivityCompat.requestPermissions(this, new String[]{
