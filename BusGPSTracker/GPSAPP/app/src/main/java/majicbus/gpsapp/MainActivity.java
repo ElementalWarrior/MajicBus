@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-
 public class MainActivity extends AppCompatActivity implements OnTaskCompleted{
     private RouteHandler handler;
     static String URL = "http://majicbus.azurewebsites.net";
@@ -38,9 +37,8 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleted{
         setSupportActionBar(toolbar);
 
         createMapButton();
-        //Make HTTP Request, will callback to the loadData function
-        String url = URL +"/Home/showRoutesJSON";
 
+        String url = URL +"/Home/showRoutesJSON";
         handler = new RouteHandler(url,this,findViewById(R.id.RouteTable));
         HTTPConnection conn = new HTTPConnection(handler);
         conn.makeConnection();
@@ -56,9 +54,8 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleted{
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_settings)
             return true;
-        }
         return super.onOptionsItemSelected(item);
     }
 

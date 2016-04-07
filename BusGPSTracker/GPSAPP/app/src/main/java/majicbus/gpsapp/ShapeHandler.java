@@ -9,9 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * TODO: Document the class
- */
 public class ShapeHandler extends DataHandler {
     private GoogleMap mMap;
     private HashMap<Integer, Integer[]> RouteColors;

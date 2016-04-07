@@ -12,9 +12,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-/**
- * TODO: Document the class
- */
 public class HTTPConnection extends AsyncTask<String, Void, String> {
     protected Context appContext;
     protected DataHandler handler;

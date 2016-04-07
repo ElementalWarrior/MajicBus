@@ -1,4 +1,4 @@
-﻿@model List<MBBackEnd.Models.TransitViewModels.StopView>
+﻿@model MBBackEnd.Models.TransitViewModels.BusPositionPage
 
 <!DOCTYPE html>
 <html>
@@ -6,7 +6,9 @@
     <script src="http://maps.googleapis.com/maps/api/js">
     </script>
     <script>
-        window.busStops = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model));
+        window.busStops = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.Stops));
+        var routeShapes = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.RouteShapes));
+        var buses = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.BusPositions));
         window.markers = [];
 
         //initialize map
@@ -65,6 +67,17 @@
      
                 }); 
             }
+            for(var i = 0; i < routeShapes.length; i++)
+            {
+                routeShapes[i].lng = routeShapes[i].lon;
+            }
+            for(var i = 0; i < buses.length; i++)
+            {
+                buses[i].lat = buses[i].Latitude;
+                buses[i].lng = buses[i].Longitude;
+                new google.maps.Marker({ map: map, position: buses[i] });
+            }
+            var polyline = new google.maps.Polyline({ map: map, strokeColor: "#ff0000", strokeWeight: 2, strokeOpacity: 1, path: routeShapes });
             map.fitBounds(bnds);
         }
         google.maps.event.addDomListener(window, 'load', initialize);
