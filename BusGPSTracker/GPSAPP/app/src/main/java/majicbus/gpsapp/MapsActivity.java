@@ -86,6 +86,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (requestCode == 0) {
             initLocationListener();
         }
+        InitTimer();
+    }
+    private void InitTimer()
+    {
         timer = new Timer();
         task = new TimerTask() {
             @Override
@@ -98,11 +102,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         timer.scheduleAtFixedRate(task, 0, updateFrequency);
     }
 
-
     @Override
     public void onResume(){
         super.onResume();
 
+        if(mMap != null) {
+            InitTimer();
+        }
     }
 
     /**
@@ -180,14 +186,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (Build.VERSION.SDK_INT < 23) {
             initLocationListener();
 
-            timer = new Timer();
-            task = new TimerTask() {
-                @Override
-                public void run() {
-                    HTTPConnection conn = new HTTPConnection(busHandler);
-                    conn.makeConnection();
-                }
-            };
+            InitTimer();
             //Get Bus Positions
             timer.scheduleAtFixedRate(task, 0, updateFrequency);
         } else {
