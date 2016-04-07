@@ -13,6 +13,8 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TableLayout;
 import android.widget.TableRow;
+import android.widget.Toast;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
@@ -22,28 +24,26 @@ import java.util.Map;
 
 
 public class MainActivity extends AppCompatActivity implements OnTaskCompleted{
-    private ArrayList<String> Routes;
-    static String URL = "http://192.168.1.16";
+    private RouteHandler handler;
+    static String URL = "http://majicbus.azurewebsites.net";
 
     @Override
-    public void onTaskCompleted(String response){
-        loadData(response);
-    }
+    public void onTaskCompleted(DataHandler handler){handler.loadData();}
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Routes = new ArrayList<String>();
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         createMapButton();
-
         //Make HTTP Request, will callback to the loadData function
-        HTTPConnection conn = new HTTPConnection(this);
-        conn.makeConnection(URL +"/Home/showRoutesJSON");
+        String url = URL +"/Home/showRoutesJSON";
+
+        handler = new RouteHandler(url,this,findViewById(R.id.RouteTable));
+        HTTPConnection conn = new HTTPConnection(handler);
+        conn.makeConnection();
     }
 
     @Override
@@ -55,16 +55,10 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleted{
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -74,61 +68,9 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleted{
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, MapsActivity.class);
-                intent.putStringArrayListExtra("routeData", Routes);
+                intent.putStringArrayListExtra("routeData", handler.getRoutes());
                 startActivity(intent);
             }
         });
-    }
-
-    /*
-      Puts data into the table to show route information
-      Creates event listeners to keep track of which are selected
-      Then selected routes are put into an ArrayList to transfer to the map
-    */
-    public void loadData(String JSON){
-        TableLayout ll = (TableLayout) findViewById(R.id.RouteTable);
-        Gson parser = new Gson();
-
-        try {
-             List routeList = parser.fromJson(JSON, List.class);
-
-            for (int i = 0; i < routeList.size(); i++) {
-                StringBuilder build = new StringBuilder();
-
-                TableRow row= new TableRow(this);
-                TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT);
-                row.setLayoutParams(lp);
-                CheckBox routeBox = new CheckBox(this);
-
-                Map<String, Object> routeMap = (Map)(routeList).get(i);
-                build.append("Route ");
-                build.append((String)routeMap.get("NameShort")).append(": ");
-                build.append((String) routeMap.get("NameLong"));
-                String result = build.toString();
-
-                routeBox.setText(result);
-                routeBox.setId(((Double)routeMap.get("RouteID")).intValue());
-
-                //Create listener
-                CompoundButton Btn = (CompoundButton)routeBox;
-                Btn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                    @Override
-                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                        String id = String.valueOf(buttonView.getId());
-                        if (isChecked)
-                            Routes.add(id);
-                        else
-                            Routes.remove(id);
-                    }
-                });
-
-                row.addView(routeBox);
-                ll.addView(row, i + 1);
-            }
-        }catch(JsonSyntaxException e){
-            Log.v("Dirty JSON", JSON);
-            HTTPConnection conn = new HTTPConnection(this);
-            conn.makeConnection(URL + "/Home/showRoutesJSON");
-        }
     }
 }

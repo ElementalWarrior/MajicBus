@@ -12,13 +12,13 @@ namespace MBBackEnd.Controllers
         // GET: Sms
         public ActionResult Receive(String from, String to, String body)
         {
-            BL.SMSLog.UpdateSmsLog(from, to, body);
+            BL.SMSLog.UpdateSmsLog(from, to, body.Substring(0, Math.Min(159, body.Length)));
             int stopID = Int32.Parse(body);
             return Json(new { Phone = from, Data = BL.Route.GetStopByStopID(stopID) }, JsonRequestBehavior.AllowGet);
         }
         public ActionResult LogMessageSent(String from, String to, String body)
         {
-            BL.SMSLog.UpdateSmsLog(from, to, body);
+            BL.SMSLog.UpdateSmsLog(from, to, body.Substring(0, Math.Min(159, body.Length)));
             return Json("", JsonRequestBehavior.AllowGet);
         }
         [Authorize]
@@ -42,14 +42,14 @@ namespace MBBackEnd.Controllers
             }).ToList();
 
             DateTime beginningOfDayUTC = DateTime.UtcNow;
-            beginningOfDayUTC.AddHours(-7); //kelowna = PST, PST w/o DST = -7
+            beginningOfDayUTC = beginningOfDayUTC.AddHours(-7); //kelowna = PST, PST w/o DST = -7
             beginningOfDayUTC = beginningOfDayUTC.AddHours(beginningOfDayUTC.Hour * -1); //change to midnight
             beginningOfDayUTC = beginningOfDayUTC.AddMinutes(beginningOfDayUTC.Minute * -1); //change to midnight
             beginningOfDayUTC = beginningOfDayUTC.AddSeconds(beginningOfDayUTC.Second * -1); //change to midnight
-            beginningOfDayUTC.AddHours(7); //convert back to utc
+            beginningOfDayUTC = beginningOfDayUTC.AddHours(7); //convert back to utc
 
             //get all sms's today
-            pg.Daily = allSmsMessages.Where(s => s.dtReceived >= beginningOfDayUTC && s.dtReceived <= beginningOfDayUTC.AddHours(24)).ToList();
+            pg.Daily = allSmsMessages.Where(s => s.dtReceived >= beginningOfDayUTC && s.dtReceived <= new DateTime(beginningOfDayUTC.Ticks).AddHours(24)).ToList();
 
             DateTime beginningOfWeekUtc = DateTime.UtcNow.AddHours(-7);
             beginningOfWeekUtc = beginningOfWeekUtc.AddDays(-1 * (int)beginningOfWeekUtc.DayOfWeek); // change to sunday
@@ -59,7 +59,7 @@ namespace MBBackEnd.Controllers
             beginningOfWeekUtc = beginningOfWeekUtc.AddHours(7);
 
             //get all sms's week
-            pg.Weekly = allSmsMessages.Where(s => s.dtReceived >= beginningOfWeekUtc && s.dtReceived <= beginningOfWeekUtc.AddDays(6)).ToList();
+            pg.Weekly = allSmsMessages.Where(s => s.dtReceived >= beginningOfWeekUtc && s.dtReceived <= new DateTime(beginningOfWeekUtc.Ticks).AddDays(6)).ToList();
 
             DateTime beginningOfMonthUtc = DateTime.UtcNow.AddHours(-7);
             beginningOfMonthUtc = beginningOfMonthUtc.AddDays(-1 * beginningOfMonthUtc.Day); //set to first day of month
@@ -70,7 +70,7 @@ namespace MBBackEnd.Controllers
 
             int numDaysInMonth = beginningOfMonthUtc.AddMonths(1).AddDays(-1).Day;
             //get all sms's monthly
-            pg.Monthly = allSmsMessages.Where(s => s.dtReceived >= beginningOfMonthUtc && s.dtReceived <= beginningOfMonthUtc.AddDays(numDaysInMonth + 1)).ToList();
+            pg.Monthly = allSmsMessages.Where(s => s.dtReceived >= beginningOfMonthUtc && s.dtReceived <= new DateTime(beginningOfMonthUtc.Ticks).AddDays(numDaysInMonth + 1)).ToList();
 
             //get message counts
             List<BL.SMSLog.MessageCounts> messageCounts = pg.Daily.GroupBy(msg => msg.MessageBody).Select(agg => new BL.SMSLog.MessageCounts { MessageBody = agg.Key, Count = agg.Count() }).OrderByDescending(agg => agg.Count).ToList();

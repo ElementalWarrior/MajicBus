@@ -1,17 +1,31 @@
 package majicbus.gpsapp;
 
+import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
-
 import android.graphics.Color;
-import android.support.annotation.ColorInt;
+import android.graphics.Point;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.Build;
+import android.os.Handler;
+import android.os.SystemClock;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v4.graphics.ColorUtils;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Interpolator;
+import android.view.animation.LinearInterpolator;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
@@ -20,252 +34,217 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+import com.google.maps.android.SphericalUtil;
+
+
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, OnTaskCompleted {
     private ArrayList<String> routeList;
-    private String StopsURL;
-    private String ShapesURL;
-    private String BusesURL;
-    private ArrayList<MarkerOptions> Stops;
-    private ArrayList<PolylineOptions> Lines;
-    private HashMap<Integer, ArrayList<Marker>> BusHashMap; //possible way to keep track of buses?
-    private HashMap<Integer, Integer> RouteColors;
+    private BusHandler busHandler;
+    private ShapeHandler shapeHandler;
+    private StopHandler stopHandler;
+    private HashMap<Integer, Integer[]> RouteColors;
     private GoogleMap mMap;
-    private boolean StopsRetrieved;
-    private boolean ShapesRetrieved;
+    private Timer timer;
+    private TimerTask task;
+    private Marker myPos;
+    protected LocationManager locationManager;
+    protected LocationListener locationListener;
+    public static int updateFrequency = 2000;
 
     @Override
-    public void onTaskCompleted(String response){
-        Gson parser = new Gson();
-        if(!StopsRetrieved) { //First get the stops data and load to map
-            try {
-                List stops = parser.fromJson(response, List.class);
-                StopsRetrieved = true;
-                loadStopData(stops);
+    public void onTaskCompleted(DataHandler handler){handler.loadData();}
 
-                HTTPConnection conn = new HTTPConnection(this); //Load Shapes
-                conn.makeConnection(ShapesURL);
-            } catch (JsonSyntaxException ex) {
-                Log.v("Dirty JSON", response); //Redo
-                HTTPConnection conn = new HTTPConnection(this);
-                conn.makeConnection(StopsURL);
-            }
-
-        }else if(!ShapesRetrieved){
-            try { //Then if the stops data is loaded load the shapes data
-                List shapes = parser.fromJson(response, List.class);
-                ShapesRetrieved = true;
-                loadShapeData(shapes);
-            } catch (JsonSyntaxException ex) {
-                Log.v("Dirty JSON", response); //Redo
-                HTTPConnection conn = new HTTPConnection(this);
-                conn.makeConnection(ShapesURL);
-            }
-
-        }else if(StopsRetrieved&&ShapesRetrieved){
-            /* Bus Code!
-            try { //Then if the stops data is loaded load the shapes data
-                List buses = parser.fromJson(response, List.class);
-                loadShapeData(buses);
-            } catch (JsonSyntaxException ex) {
-                Log.v("Dirty JSON", response);
-                HTTPConnection conn = new HTTPConnection(this);
-                conn.makeConnection(BusesURL);
-            }
-            */
-        }
-    }
-
+    /**
+     * Setup all the variables
+     * @param savedInstanceState - doesn't really do much as far as I know
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-        StopsRetrieved = false;
-        ShapesRetrieved = false;
-        BusHashMap = new HashMap<Integer, ArrayList<Marker>>();
-        RouteColors = new HashMap<Integer, Integer>();
+
+        //Get data passed from the previous activity
+        Intent routeData = getIntent();
+        routeList = routeData.getStringArrayListExtra("routeData");
+        RouteColors = Utility.randomColorGen(routeList);
+
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
     }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] granted) {
+        if (requestCode == 0) {
+            initLocationListener();
+        }
+        timer = new Timer();
+        task = new TimerTask() {
+            @Override
+            public void run() {
+                HTTPConnection conn = new HTTPConnection(busHandler);
+                conn.makeConnection();
+            }
+        };
+        //Get Bus Positions
+        timer.scheduleAtFixedRate(task, 0, updateFrequency);
+    }
 
+
+    @Override
+    public void onResume(){
+        super.onResume();
+
+    }
+
+    /**
+     * OnPause stop everything on the timer
+     */
+    @Override
+    public void onPause(){
+        super.onPause();
+        destroy();
+    }
+
+    /**
+     * OnStop stop everything on the timer
+     */
+    @Override
+    public void onStop(){
+        super.onStop();
+        destroy();
+    }
+
+    private void destroy(){
+        if(timer != null) {
+            timer.cancel();
+            timer.purge();
+        }
+        if(locationManager != null) {
+            try {
+                locationManager.removeUpdates(locationListener);
+            } catch (SecurityException e) {
+                Log.v("GPSClose:", "Failed to get GPS Access");
+                Toast.makeText(this, "Unable to access location", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+    /**
+     * Sets up the map, moves the camera,
+     * Gets a route list, and makes the first HTTP request
+     * @param googleMap
+     */
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(49.887952, -119.496011)));
         mMap.moveCamera(CameraUpdateFactory.zoomTo(10));
 
-        //Get data passed from the previous page
-        Intent routeData = getIntent();
-        routeList = routeData.getStringArrayListExtra("routeData");
+        //Bus Data Handler
+        String url = Utility.makeUrl("/Home/ShowBusPositionsJSON?", routeList);
+        busHandler = new BusHandler(url,this,RouteColors,mMap);
 
-        //If there was a route selected, do the stuff.
+        //Create my position marker
+        MarkerOptions ops = new MarkerOptions();
+        ops.position(new LatLng(0, 0));
+        ops.visible(false);
+        ops.title("Your Position").snippet("");
+        ops.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+        myPos = mMap.addMarker(ops);
+
+        //If there was a route selected, do the fetch the stops.
         if(!routeList.isEmpty()) {
-            makeUrls();
-            HTTPConnection conn = new HTTPConnection(this);
-            conn.makeConnection(StopsURL);
+            //Get Stops
+            url = Utility.makeUrl("/Home/ShowStopsJSON?", routeList);
+            stopHandler = new StopHandler(url, this,mMap);
+            HTTPConnection conn = new HTTPConnection(stopHandler);
+            conn.makeConnection();
+
+            //Get Route Shapes
+            url = Utility.makeUrl("/Home/ShowShapesJSON?", routeList);
+            shapeHandler = new ShapeHandler(url, this,RouteColors, mMap);
+            conn = new HTTPConnection(shapeHandler);
+            conn.makeConnection();
+
         }
 
-    }
+        if (Build.VERSION.SDK_INT < 23) {
+            initLocationListener();
 
-    public void loadStopData(List routes){
-
-        for(int i = 0; i < routes.size();i++) {
-            Map<String, Object> route = (Map) (routes).get(i);
-
-            int id = ((Double)route.get("routeID")).intValue();
-            List stopsList = (List)route.get("routeStops");
-            for (int j = 0; j < stopsList.size(); j++) {
-                Map<String, Object> stopMap = (Map) (stopsList).get(j);
-                double lat = (Double) stopMap.get("lat");
-                double lng = (Double) stopMap.get("lon");
-
-                LatLng point = new LatLng(lat, lng);
-                MarkerOptions mOps = new MarkerOptions();
-
-                mOps.title("Stop: " + ((Double) stopMap.get("StopID")).intValue());
-
-                StringBuilder build = new StringBuilder();
-                build.append("Route: ").append(id).append("\n");
-                build.append(stopMap.get("StopName"));
-                build.append("\nNext 5 Times:\n");
-                List TimeList = (List) stopMap.get("Dtimes");
-                for (int k = 0; k < TimeList.size(); k++)
-                    build.append(formatTime((String) TimeList.get(k))).append("\n");
-
-                mOps.position(point);
-                mOps.snippet(build.toString());
-                mOps.icon(BitmapDescriptorFactory.fromResource(R.mipmap.stop_icon));
-
-                mMap.addMarker(mOps);
-                mMap.setInfoWindowAdapter(new MarkerInfoWindowAdapter());
-
-            }
-        }
-    }
-
-    public void loadShapeData(List shapeList) {
-        for (int i = 0; i < shapeList.size(); i++) {
-            Map<String, Object> shape = (Map) (shapeList).get(i);
-            int id = ((Double) shape.get("routeID")).intValue();
-            PolylineOptions pOps = new PolylineOptions();
-
-            List shapesList = (List) shape.get("Shape");
-            for (int j = 0; j < shapesList.size(); j++) {
-                Map<String, Object> shapes = (Map) (shapesList).get(j);
-                double lat = (Double) shapes.get("Lat");
-                double lng = (Double) shapes.get("Lon");
-                pOps.add(new LatLng(lat, lng));
-            }
-
-            //Random Colours for each line
-            int R = (int) (Math.random() * 256);
-            int G = (int) (Math.random() * 256);
-            int B = (int) (Math.random() * 256);
-
-            pOps.color(Color.rgb(R, G, B));
-            RouteColors.put(id,Color.rgb(R, G, B));
-
-            pOps.width(5);
-            mMap.addPolyline(pOps);
-        }
-    }
-
-    //TODO: Get this working
-    public void loadBusData(List routeList){
-        for (int i = 0; i < routeList.size(); i++) {
-            Map<String, Object> busList = (Map) (routeList).get(i);
-            int id = ((Double) busList.get("routeID")).intValue();
-            List buses = (List)busList.get("Buses");
-
-            if(!BusHashMap.containsKey(id)){ //There aren't any buses on the map
-                ArrayList<Marker>  marks = new ArrayList<Marker>();
-                for (int j = 0; j < buses.size(); j++) {
-                    Map<String, Object> stopMap = (Map) (buses).get(j);
-                    double lat = (Double) stopMap.get("lat");
-                    double lng = (Double) stopMap.get("lon");
-
-                    //draw markers
-                    MarkerOptions ops = new MarkerOptions();
-                    ops.position(new LatLng(lat,lng));
-                    ops.icon(BitmapDescriptorFactory.defaultMarker(RouteColors.get(id)));
-                    Marker mark = mMap.addMarker(ops);
-                    marks.add(mark);
+            timer = new Timer();
+            task = new TimerTask() {
+                @Override
+                public void run() {
+                    HTTPConnection conn = new HTTPConnection(busHandler);
+                    conn.makeConnection();
                 }
-                BusHashMap.put(id,marks); //Keep track of the buses added to the map
-            }
-            else {
-                ArrayList<Marker> marks = BusHashMap.get(id);
-                for (int j = 0; j < marks.size(); j++) {
-                    Map<String, Object> stopMap = (Map) (buses).get(j);
-                    double lat = (Double) stopMap.get("lat");
-                    double lng = (Double) stopMap.get("lon");
+            };
+        } else {
+            int reqFine = 0;
+            ActivityCompat.requestPermissions(this, new String[]{
+                    Manifest.permission.ACCESS_FINE_LOCATION
+            }, reqFine);
+        }
+    }
 
-                    Marker mark = marks.get(j);
-                    mark.setPosition(new LatLng(lat,lng)); //Update Position
+    private void initLocationListener(){
+        //Location Listener code
+        locationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                LatLng point = new LatLng(location.getLatitude(),location.getLongitude());
+                if(myPos.isVisible())
+                    Utility.animateMarker(mMap, myPos, point, false, updateFrequency);
+                else {
+                    myPos.setPosition(point);
+                    myPos.setVisible(true);
                 }
             }
-        }
-    }
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {}
+            @Override
+            public void onProviderEnabled(String provider) {
+                //create marker
+                MarkerOptions ops = new MarkerOptions();
+                ops.position(new LatLng(0,0));
+                ops.visible(false);
+                ops.title("Your Position").snippet("");
+                ops.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+                if(myPos != null)
+                {
+                    myPos.remove();
+                }
+                myPos = mMap.addMarker(ops);
+            }
+            @Override
+            public void onProviderDisabled(String provider) {if(myPos != null)myPos.remove();}
+        };
 
+        //User Location code
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
-    private void makeUrls(){
-        StringBuilder StopsBuilder = new StringBuilder();
-        StringBuilder ShapesBuilder = new StringBuilder();
-        StringBuilder BusesBuilder = new StringBuilder();
-        StringBuilder routeListBuilder = new StringBuilder();
+        try {
 
-        StopsBuilder.append(MainActivity.URL).append("/Home/ShowStopsJSON?");
-        ShapesBuilder.append(MainActivity.URL).append("/Home/ShowShapesJSON?");
-        BusesBuilder.append(MainActivity.URL).append("/Home/ShowBusPositionsJSON?");
-        for(int i = 0; i < routeList.size(); i++){
-            routeListBuilder.append("routeIDs[").append(i).append("]=").append(routeList.get(i));
-            if(i < routeList.size() -1)
-                routeListBuilder.append("&");
-        }
-        String routes = routeListBuilder.toString();
-        StopsBuilder.append(routes);
-        ShapesBuilder.append(routes);
-        BusesBuilder.append(routes);
+        MarkerOptions ops = new MarkerOptions();
+        Location loc = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        ops.position(new LatLng(loc.getLatitude(), loc.getLongitude()));
+        ops.title("Your Position").snippet("");
+        ops.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+        myPos = mMap.addMarker(ops);
 
-        StopsURL = StopsBuilder.toString();
-        ShapesURL = ShapesBuilder.toString();
-        BusesURL = BusesBuilder.toString();
-    }
-
-    public String formatTime(String Time) {
-        StringBuilder build = new StringBuilder();
-        int hour = Integer.valueOf(Time.substring(0,2));
-        String min = Time.substring(3,5);
-        if(hour > 12){
-            hour -= 12;
-            build.append(hour).append(":").append(min).append(" PM");
-        }
-        else
-            build.append(hour).append(":").append(min).append(" AM");
-
-        return build.toString();
-    }
-
-    public class MarkerInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
-        public MarkerInfoWindowAdapter() {}
-        @Override
-        public View getInfoWindow(Marker marker){return null;}
-        @Override
-        public View getInfoContents(Marker marker) {
-            View v  = getLayoutInflater().inflate(R.layout.infowindow_layout, null);
-            //ImageView markerIcon = (ImageView) v.findViewById(R.mipmap.stop_icon);
-            TextView markerLabel = (TextView)v.findViewById(R.id.marker_label);
-            //  markerIcon.setImageResource(manageMarkerIcon(myMarker.getmIcon()));
-            markerLabel.setText(marker.getTitle() + "\n" +  marker.getSnippet());
-            return v;
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);}
+        catch(SecurityException e){
+            Log.v("GPSOpen:", "Failed to get GPS Access");
+            Toast.makeText(this, "Unable to access location", Toast.LENGTH_LONG).show();
         }
     }
 }
