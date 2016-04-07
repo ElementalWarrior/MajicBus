@@ -9,6 +9,7 @@ namespace MBBackEnd.Models.TransitViewModels
     {
         public List<StopView> RouteShapes { get; set; }
         public List<Classes.Coordinate> BusPositions { get; set; }
+        public List<StopView> Stops { get; set; }
     }
     public class RouteView
     {
