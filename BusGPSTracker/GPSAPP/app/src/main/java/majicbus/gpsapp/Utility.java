@@ -27,12 +27,13 @@ public abstract class Utility {
                 hour -= 12;
                 build.append(hour).append(":").append(min).append(" PM");
             }
+            else if(hour == 12)
+                build.append(hour).append(":").append(min).append(" PM");
             else {
                 if(hour == 0)
                     hour = 12;
                 build.append(hour).append(":").append(min).append(" AM");
             }
-
             return build.toString();
         }
 
