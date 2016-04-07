@@ -113,7 +113,7 @@ namespace MBBackEnd.BL
                                      {
                                          RouteID = aggregate.Select(a => a.t.RouteID.Value).FirstOrDefault(),
                                          StopID = stopID,
-                                         Dtimes = aggregate.Select(a => a.st.dtDeparture.Value.ToString("hh:mm")).Take(5).ToList()
+                                         Dtimes = aggregate.Select(a => a.st.Departure).Take(5).ToList()
                                          
                                      }).ToList();
             
