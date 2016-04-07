@@ -73,7 +73,7 @@ namespace MBBackEnd.BL
 
             foreach(Stop s in stops)
             {
-                s.Dtimes = times.Where(st => st.StopID == s.StopID).Select(st => st.dtDeparture.Value.ToString("hh:mm")).Distinct().Take(5).ToList();
+                s.Dtimes = times.Where(st => st.StopID == s.StopID).Select(st => st.dtDeparture.Value.ToString("HH:mm")).Distinct().Take(5).ToList();
             }
             
             //TODO: select the next 5 times or so from the database based on routeID (for each stop!!)
