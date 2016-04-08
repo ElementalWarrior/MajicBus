@@ -4,7 +4,9 @@ import android.content.Context;
 import com.google.gson.Gson;
 
 /**
- * TODO: Document the class
+ * Data handler class is an abstract class that is used to
+ * abstract away the processing of different sets of data that the HTTP requests
+ * can fetch. The load data method is the primary function of the Data Handler class
  */
 public abstract class DataHandler {
     protected Gson parser;
@@ -12,6 +14,9 @@ public abstract class DataHandler {
     protected String JSON;
     protected Context context;
 
+    /**
+     * Constructor initializes the context of the Datahandler and the url  to connect to
+     */
     public DataHandler(String newUrl, Context newContext){
         url = newUrl;
         parser = new Gson();

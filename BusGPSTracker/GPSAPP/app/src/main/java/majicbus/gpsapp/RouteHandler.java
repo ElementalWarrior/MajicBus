@@ -18,6 +18,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * The RouteHandler class is an extension of the DataHandler Class
+ * It is used to get the route list and display it on the screen
+ */
 public class RouteHandler extends DataHandler {
     private ArrayList<String> Routes;
     private TableLayout routeTable;
@@ -30,6 +34,11 @@ public class RouteHandler extends DataHandler {
 
     public ArrayList<String> getRoutes(){return Routes;}
 
+    /**
+     * loadData parses the JSON, fetches the table to put the data in
+     * Create the strings to display on the screen, and create the
+     * event listener for the checking and unchecking the routes.
+     */
     @Override
     public void loadData() {
         Gson parser = new Gson();
@@ -68,7 +77,7 @@ public class RouteHandler extends DataHandler {
                 row.addView(routeBox);
                 routeTable.addView(row, i + 1);
             }
-        }catch(Exception e){
+        }catch(Exception e){ //If it fails for any reason display a notification
             Toast.makeText(context, "Unable to fetch Route List", Toast.LENGTH_LONG).show();
         }
     }

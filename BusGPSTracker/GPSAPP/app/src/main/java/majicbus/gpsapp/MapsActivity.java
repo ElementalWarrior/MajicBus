@@ -45,6 +45,12 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+/**
+ * This is the map screen. It fetches the route shapes and stops from the routes selected on the
+ * previous screen. The route list passed over from the previous screen via an array-list.
+ * A location listener is also setup for the user's position. And the timer to retrieve bus
+ * positions is setup.
+ */
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, OnTaskCompleted {
     private ArrayList<String> routeList;
     private BusHandler busHandler;

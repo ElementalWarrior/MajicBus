@@ -22,6 +22,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * This is the first screen that a user sees. It creates the buttons and
+ * Fetches the route information.
+ */
 public class MainActivity extends AppCompatActivity implements OnTaskCompleted{
     private RouteHandler handler;
     static String URL = "http://majicbus.azurewebsites.net";

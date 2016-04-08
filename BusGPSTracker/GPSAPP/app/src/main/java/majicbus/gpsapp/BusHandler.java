@@ -16,7 +16,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * TODO: Document the class
+ * The BusHandler class is an extension of the DataHandler Class
+ * It is used to get the bus position data and display it on the screen
  */
 public class BusHandler extends DataHandler {
     private GoogleMap mMap;
@@ -31,7 +32,8 @@ public class BusHandler extends DataHandler {
     }
 
     /**
-     * Loads and updates bus position data
+     * Parses the JSON
+     * Updates or makes the bus markers
      */
     @Override
     public void loadData() {
@@ -46,8 +48,7 @@ public class BusHandler extends DataHandler {
                 makeBuses(id,buses);
             else { //Update the buses
                 ArrayList<Marker> marks = BusHashMap.get(id);
-                //If there are the same number of buses fetched
-                if(buses.size() == marks.size())
+                if(buses.size() == marks.size())//If there are the same number of buses fetched
                     updateBuses(id,buses);
                 else{//Remove all the buses and remake
                     for(int j = 0; j < marks.size(); j++)
@@ -100,6 +101,8 @@ public class BusHandler extends DataHandler {
             double min = Double.MAX_VALUE;
             Marker closestBus = null;
 
+            //For each bus in the list find the closest bus then update the marker
+            //This results in O(n^2) complexity for n buses, could be reduced but don't have the time.
             for(int j = 0; j < marks.size(); j++){
                 Marker mark = marks.get(j);
                 double tempMin = SphericalUtil.computeDistanceBetween(newBusPos, mark.getPosition());

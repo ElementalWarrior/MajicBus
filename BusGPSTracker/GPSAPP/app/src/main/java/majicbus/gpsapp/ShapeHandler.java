@@ -9,6 +9,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * The ShapeHandler class is an extension of the DataHandler Class
+ * It is used to get the route shape data and display it on the map
+ */
 public class ShapeHandler extends DataHandler {
     private GoogleMap mMap;
     private HashMap<Integer, Integer[]> RouteColors;
@@ -21,9 +25,10 @@ public class ShapeHandler extends DataHandler {
     }
 
     /**
+     * Parses the JSON
      * Loads route shapes on the map
      * Splits up routes that have multiple shapes
-     * Randomly generates a colour and stores it for each route
+     * Selects the route colour from the input HashMap
      */
     @Override
     public void loadData() {
@@ -43,6 +48,7 @@ public class ShapeHandler extends DataHandler {
                 double lat = (Double) shapes.get("Lat");
                 double lng = (Double) shapes.get("Lon");
 
+                //sid is for detecting separate shapes.
                 int sid = ((Double)shapes.get("sID")).intValue();
                 if(j > 0 && sid != lastId){
                     pOps.color(Color.rgb(RGB[0], RGB[1], RGB[2]));

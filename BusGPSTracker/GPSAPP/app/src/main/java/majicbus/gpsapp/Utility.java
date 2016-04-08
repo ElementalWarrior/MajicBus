@@ -12,6 +12,11 @@ import com.google.android.gms.maps.model.Marker;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+/**
+ * This is an abstract class that holds utility functions
+ * Just a combined area that holds static methods that can be utilized
+ * in different places in the app.
+ */
 public abstract class Utility {
 
     /**

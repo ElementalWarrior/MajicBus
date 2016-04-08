@@ -12,6 +12,11 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+/**
+ * The HTTPConnection class handles the HTTP connection and the conversion
+ * of the input stream data that is returned from the connection.
+ * A DataHandler object is used to perform the HTTP requests.
+ */
 public class HTTPConnection extends AsyncTask<String, Void, String> {
     protected Context appContext;
     protected DataHandler handler;

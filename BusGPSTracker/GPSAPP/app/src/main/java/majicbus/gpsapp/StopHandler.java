@@ -12,7 +12,10 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.util.List;
 import java.util.Map;
 
-
+/**
+ * The StopHandler class is an extension of the DataHandler Class
+ * It is used to get the stop data and display it on the map
+ */
 public class StopHandler extends DataHandler {
     private GoogleMap mMap;
     private LayoutInflater inflater;
@@ -23,6 +26,11 @@ public class StopHandler extends DataHandler {
         inflater = (LayoutInflater) context.getSystemService( Context.LAYOUT_INFLATER_SERVICE );
     }
 
+    /**
+     * Parses the JSON
+     * Creates the strings to be displayed on the marker
+     * Displays on the map
+     */
     @Override
     public void loadData() {
         List routes = parser.fromJson(JSON, List.class);
@@ -63,6 +71,11 @@ public class StopHandler extends DataHandler {
         }
     }
 
+    /**
+     * Private class for the InfoWindowAdapter,
+     * This is required because the Snippet by default does not support
+     * multiple lines and \n characters.
+     */
     private class MarkerInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
         public MarkerInfoWindowAdapter() {}
         @Override
