@@ -230,15 +230,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
         try {
-
-        MarkerOptions ops = new MarkerOptions();
-        Location loc = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        ops.position(new LatLng(loc.getLatitude(), loc.getLongitude()));
-        ops.title("Your Position").snippet("");
-        ops.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
-        myPos = mMap.addMarker(ops);
-
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);}
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+            MarkerOptions ops = new MarkerOptions();
+            Location loc = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            if(loc != null) {
+                ops.position(new LatLng(loc.getLatitude(), loc.getLongitude()));
+                ops.title("Your Position").snippet("");
+                ops.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+                myPos = mMap.addMarker(ops);
+            }
+        }
         catch(SecurityException e){
             Log.v("GPSOpen:", "Failed to get GPS Access");
             Toast.makeText(this, "Unable to access location", Toast.LENGTH_LONG).show();
